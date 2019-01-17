@@ -3,33 +3,24 @@ library(dplyr)
 library(ggplot2)
 library(purrr)
 
-create_movie_model <- function(x_val,partial_x_train,y_val,partial_y_train,test_data,test_labels) {
-
-# input shape is the vocabulary count used for the movie reviews (10,000 words)
-vocab_size <- 10000
+create_fruit_model <- function(train_data,train_labels,test_data,test_labels) {
 
 model <- keras_model_sequential()
-model %>% 
-  layer_embedding(input_dim = vocab_size, output_dim = 16) %>%
-  layer_global_average_pooling_1d() %>%
-  layer_dense(units = 16, activation = "relu") %>%
-  layer_dense(units = 1, activation = "sigmoid")
-
-model %>% summary()
-
+model %>%
+  layer_flatten(input_shape = c(28, 28)) %>%
+  layer_dense(units = 128, activation = 'relu') %>%
+  layer_dense(units = 10, activation = 'softmax')
+  
 model %>% compile(
-  optimizer = 'adam',
-  loss = 'binary_crossentropy',
-  metrics = list('accuracy')
+  optimizer = 'adam', 
+  loss = 'sparse_categorical_crossentropy',
+  metrics = c('accuracy')
 )
 
 history <- model %>% fit(
-  partial_x_train,
-  partial_y_train,
-  epochs = 40,
-  batch_size = 512,
-  validation_data = list(x_val, y_val),
-  verbose=1
+  train_data,
+  train_labels, 
+  epochs = 5
 )
   
 results <- model %>% evaluate(test_data, test_labels)

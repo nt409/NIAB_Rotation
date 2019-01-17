@@ -1,6 +1,6 @@
 fruit_image_data <- function(image_path){
 
-  img <- image_load(img_path, target_size = c(224,224))
+  img <- image_load(img_path, target_size = c(224,224)) #c(224,224)
   a <- image_to_array(img)
   
   # ensure we have a 4d tensor with single element in the batch dimension,
