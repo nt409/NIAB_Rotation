@@ -7,7 +7,7 @@ create_fruit_model <- function(train_data,train_labels,test_data,test_labels) {
 
 model <- keras_model_sequential()
 model %>%
-  layer_flatten(input_shape = c(28, 28)) %>%
+  layer_flatten(input_shape = c(100, 300)) %>% # was 28,28
   layer_dense(units = 128, activation = 'relu') %>%
   layer_dense(units = 10, activation = 'softmax')
   

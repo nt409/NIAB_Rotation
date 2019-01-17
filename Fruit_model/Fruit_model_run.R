@@ -11,4 +11,5 @@ predict <- features(fruit_data_1)
 return(predict)
 }
 
-# e.g Run_fruit_model('C:/Users/Administrator/Documents/Rotation/10_100.jpg')
+# e.g 
+Run_fruit_model('C:/Users/Administrator/Documents/Rotation/10_100.jpg',224,224)

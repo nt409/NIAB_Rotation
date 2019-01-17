@@ -2,6 +2,7 @@ source('~/GitHub/NIAB_Rotation/multiplot.R')
 
 rgb_plots <- function(image_path,x,y){
 
+  img_path <- image_path
   img <- image_load(img_path, target_size = c(x,y)) # c(224,224) # smaller size is faster?
   a <- image_to_array(img)
   
