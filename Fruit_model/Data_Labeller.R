@@ -84,7 +84,7 @@ class_names <- c('Apple_Braeburn',
 
 
 labeller <- function(n){
-  pathname <- paste("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Fruit_data/fruits-360/Training",class_names[n],sep = '/')
+  pathname <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360/Training",class_names[n],sep = '/')
   files <- list.files(path = pathname, pattern=".jpg",all.files=T, full.names=F, no.. = T) 
   array <- cbind(files,b=n)
   return(array)
