@@ -19,7 +19,7 @@ class_names = c('T-shirt/top',
                 'Ankle boot')
 
 dim(train_images)
-train_labels[1:20]
+#train_labels[1:20]
 dim(test_images)
 dim(test_labels)
 
