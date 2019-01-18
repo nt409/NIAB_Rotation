@@ -1,21 +1,7 @@
 library(abind)
 library(OpenImageR)
 
-class_names <- c('Apple_Braeburn',
-                 'Apple_Golden_1',
-                 'Apple_Golden_2',
-                 'Apple_Golden_3',
-                 'Apple_Granny_Smith',
-                 'Apple_Red_1',
-                 'Apple_Red_2',
-                 'Apple_Red_3',
-                 'Apple_Red_Delicious',
-                 'Apple_Red_Yellow',
-                 'Apricot',
-                 'Avocado',
-                 'Avocado_ripe',
-                 'Banana',
-                 'Banana_Red',
+class_names <- c('Banana_Red',
                  'Cactus_fruit',
                  'Cantaloupe_1',
                  'Cantaloupe_2',
@@ -83,6 +69,22 @@ class_names <- c('Apple_Braeburn',
                  'Tomato_Maroon',
                  'Walnut')
 
+
+#'Apple_Braeburn',
+#'Apple_Golden_1',
+#'Apple_Golden_2',
+#'Apple_Golden_3',
+#'Apple_Granny_Smith',
+#'Apple_Red_1',
+#'Apple_Red_2',
+#'Apple_Red_3',
+#'Apple_Red_Delicious',
+#'Apple_Red_Yellow',
+#'Apricot',
+#'Avocado',
+#'Avocado_ripe',
+#'Banana',
+
 Data_labelled <- function(folder){
 
 labeller <- function(n){
@@ -112,7 +114,7 @@ Data_in_final_form <- function(Fruit_train_data,folder,maxi){
   
   label <- as.data.frame(N)
   colnames(label)<-'label'
-  for(i in 2:maxi){ # maxi
+  for(i in 2:maxi){
     image_number <- i
     N <- as.numeric(Fruit_train_data[image_number,2])
     path <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360",folder,class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
