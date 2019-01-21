@@ -1,88 +1,6 @@
 library(abind)
 library(OpenImageR)
 
-class_names <- c('Apple_Braeburn',
-                  'Apple_Golden_1',
-                  'Apple_Golden_2',
-                  'Apple_Golden_3',
-                  'Apple_Granny_Smith',
-                  'Apple_Red_1',
-                  'Apple_Red_2',
-                  'Apple_Red_3',
-                  'Apple_Red_Delicious',
-                  'Apple_Red_Yellow',
-                  'Apricot',
-                  'Avocado',
-                  'Avocado_ripe',
-                  'Banana',
-                  'Banana_Red',
-                 'Cactus_fruit',
-                 'Cantaloupe_1',
-                 'Cantaloupe_2',
-                 'Carambula',
-                 'Cherry_1',
-                 'Cherry_2',
-                 'Cherry_Rainier',
-                 'Cherry_Wax_Black',
-                 'Cherry_Wax_Red',
-                 'Cherry_Wax_Yellow',
-                 'Clementine',
-                 'Cocos',
-                 'Dates',
-                 'Granadilla',
-                 'Grape_Pink',
-                 'Grape_White',
-                 'Grape_White_2',
-                 'Grapefruit_Pink',
-                 'Grapefruit_White',
-                 'Guava',
-                 'Huckleberry',
-                 'Kaki',
-                 'Kiwi',
-                 'Kumquats',
-                 'Lemon',
-                 'Lemon_Meyer',
-                 'Limes',
-                 'Lychee',
-                 'Mandarine',
-                 'Mango',
-                 'Maracuja',
-                 'Melon_Piel_de_Sapo',
-                 'Mulberry',
-                 'Nectarine',
-                 'Orange',
-                 'Papaya',
-                 'Passion_Fruit',
-                 'Peach',
-                 'Peach_Flat',
-                 'Pear',
-                 'Pear_Abate',
-                 'Pear_Monster',
-                 'Pear_Williams',
-                 'Pepino',
-                 'Physalis',
-                 'Physalis_with_Husk',
-                 'Pineapple',
-                 'Pineapple_Mini',
-                 'Pitahaya_Red',
-                 'Plum',
-                 'Pomegranate',
-                 'Quince',
-                 'Rambutan',
-                 'Raspberry',
-                 'Salak',
-                 'Strawberry',
-                 'Strawberry_Wedge',
-                 'Tamarillo',
-                 'Tangelo',
-                 'Tomato_1',
-                 'Tomato_2',
-                 'Tomato_3',
-                 'Tomato_4',
-                 'Tomato_Cherry_Red',
-                 'Tomato_Maroon',
-                 'Walnut')
-
 folder_names <- function(path_name,folder_name){
 path_name_with_folder <- paste(path_name,folder_name,sep = "/")
 folders <- list.dirs(path = path_name_with_folder, full.names = TRUE, recursive = TRUE)
@@ -95,20 +13,8 @@ return(class_names_from_folder)
 pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
 train_fold <- "Training"
 test_fold <- "Test"
-folder_names(pathname,train_fold)
 folder_names(pathname,test_fold)
-
-#train_path <- paste(pathname,"Training",sep = "/")
-#test_path  <- paste(pathname,"Test",sep = "/")
-#folders_training <- list.dirs(path = train_path, full.names = TRUE, recursive = TRUE)
-#folders_test     <- list.dirs(path = test_path, full.names = TRUE, recursive = TRUE)
-#class_names_from_folder_train <- gsub(train_path,"",folders_training)
-#class_names_from_folder_test  <- gsub(test_path,"",folders_test)
-#class_names_from_folder_train <- class_names_from_folder_train[2:(length(class_names_from_folder_train))] # ignores containing folder
-#class_names_from_folder_test <- class_names_from_folder_test[2:(length(class_names_from_folder_test))] # ignores containing folder
-#class_names_from_folder_train <- gsub("/","",class_names_from_folder_train)
-#class_names_from_folder_test  <- gsub("/","",class_names_from_folder_test)
-
+class_names <- folder_names(pathname,train_fold)
 
 Data_labelled <- function(folder){
 

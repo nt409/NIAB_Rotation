@@ -28,12 +28,16 @@ Test_labels <- Test_data_and_labels$label_vector[,1]
 
 ####
 
+Train_data_reshaped <- array_reshape(Train_data,c(max_train,100,100,3),order=c("F"))
+Test_data_reshaped <- array_reshape(Test_data,c(max_test,100,100,3),order=c("F"))
+
+
 #Train_labels2 <- Train_labels - 1
-model_my_own <-create_fruit_model(Train_data,Train_labels,Test_data,Test_labels)
+model_my_own <-create_fruit_model(Train_data_reshaped,Train_labels,Test_data_reshaped,Test_labels)
 model_my_own %>% summary()
 model_my_own %>% save_model_hdf5("fruit_model.h5")
 
-results <- model_my_own %>% predict(Test_data)
+results <- model_my_own %>% predict(Test_data_reshaped)
 
 
 ####
