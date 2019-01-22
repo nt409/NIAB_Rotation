@@ -3,12 +3,14 @@ library(dplyr)
 library(ggplot2)
 library(purrr)
 
-create_fruit_model <- function(train_data,train_labels,test_data,test_labels) {
+# contains function 'create_fruit_model'
+
+create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
 
 model <- keras_model_sequential()
 output_n <- 81 # number of classes
 model %>%
-  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(100, 100, 3)) %>%
+  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(100, 100, channels)) %>%
   layer_activation("relu") %>%
   layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same") %>%
   layer_activation_leaky_relu(0.5) %>%

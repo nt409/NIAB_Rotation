@@ -1,6 +1,10 @@
 library(abind)
 library(OpenImageR)
 
+#contains functions 'folder_names', 'labeller', 'Data_labelled', 'Data_in_final_form'
+
+##################################################
+
 folder_names <- function(path_name,folder_name){
 path_name_with_folder <- paste(path_name,folder_name,sep = "/")
 folders <- list.dirs(path = path_name_with_folder, full.names = TRUE, recursive = TRUE)
@@ -10,35 +14,41 @@ class_names_from_folder <- gsub("/","",class_names_from_folder)
 return(class_names_from_folder)
 }
 
-pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
-train_fold <- "Training"
-test_fold <- "Test"
-folder_names(pathname,test_fold)
-class_names <- folder_names(pathname,train_fold)
+##################################################
 
-Data_labelled <- function(folder){
-
-labeller <- function(n){
-  pathname <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360",folder,class_names[n],sep = '/')
-  files <- list.files(path = pathname, pattern=".jpg",all.files=T, full.names=F, no.. = T) 
+labeller <- function(folder,n){
+  path_name_new <- paste(pathname,folder,class_names[n],sep = '/')
+  files <- list.files(path = path_name_new, pattern=".jpg",all.files=T, full.names=F, no.. = T) 
   array <- cbind(files,b=n)
   return(array)
 }
 
-Fruit_train_data <- labeller(1)
-for( i in 2:(length(class_names))){
-  new_data <- labeller(i)
-  Fruit_train_data <- rbind(Fruit_train_data,new_data)
-}
+##################################################
 
-return(Fruit_train_data)
-}
+# Data_labelled <- function(folder){
+# 
+# Fruit_train_data <- labeller(folder,1)
+# for( i in 2:(length(class_names))){
+#   new_data <- labeller(folder,i)
+#   Fruit_train_data <- rbind(Fruit_train_data,new_data)
+# }
+# 
+# return(Fruit_train_data)
+# }
 
+##################################################
 
-Data_in_final_form <- function(Fruit_train_data,folder,maxi){
+Data_in_final_form <- function(folder,maxi){ #Fruit_train_data,
+  
+  Fruit_train_data <- labeller(folder,1)
+  for( i in 2:(length(class_names))){
+    new_data <- labeller(folder,i)
+    Fruit_train_data <- rbind(Fruit_train_data,new_data)
+  }
+  
   image_number <- 1
   N <- as.numeric(Fruit_train_data[image_number,2]) # label
-  path <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360",folder,class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
+  path <- paste(pathname,folder,class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
   
   im <- readImage(path)
   data <- as.data.frame(im)
@@ -48,7 +58,7 @@ Data_in_final_form <- function(Fruit_train_data,folder,maxi){
   for(i in 2:maxi){
     image_number <- i
     N <- as.numeric(Fruit_train_data[image_number,2])
-    path <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360",folder,class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
+    path <- paste(pathname,folder,class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
     new_data <- as.data.frame(im)
@@ -58,6 +68,8 @@ Data_in_final_form <- function(Fruit_train_data,folder,maxi){
   }
   return(list('Image_array'=data,'label_vector'=label))
 }
+
+##################################################
 
 # im <- image_load(path, target_size = c(x_size,y_size)) # attempt to get size control - have as extra argument
 # a <- image_to_array(im) # attempt to get size control - have as extra argument

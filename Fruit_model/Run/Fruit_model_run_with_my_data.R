@@ -1,63 +1,75 @@
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data_Labeller.R')
-source('~/GitHub/NIAB_Rotation/Fruit_model/Fruit_model.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Labeller.R') #contains functions 'folder_names', 'labeller', 'Data_in_final_form'
+source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')   # contains function 'create_fruit_model'
 
 library(keras)
 library(dplyr)
 library(ggplot2)
 
-max_train<-975 #10000 goes up to label 21
-max_test<-300 #3400 goes up to label 21
+############################################
 
-Fruit_data_training <- Data_labelled('Training')
-Train_data_and_labels <- Data_in_final_form(Fruit_data_training,'Training',max_train)
+max_train<-975 #10000 goes up to label 21
+max_test <-300 #3400 goes up to label 21
+
+pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
+training_folder <- "Training"
+test_folder <- "Test"
+
+###
+# folder_names(pathname,test_folder) # not necessary though
+class_names <- folder_names(pathname,training_folder)
+
+############################################
+
+Train_data_and_labels <- Data_in_final_form(training_folder,max_train)
 
 Train_data <-Train_data_and_labels$Image_array
 Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
 Train_labels <- Train_data_and_labels$label_vector[,1]
 
-# im_number <- 3
-# Train_data[,,im_number]
-# Train_labels[im_number]
+####
 
-Fruit_data_test <- Data_labelled('Test')
-Test_data_and_labels <- Data_in_final_form(Fruit_data_test,'Test',max_test)
+Test_data_and_labels <- Data_in_final_form(test_folder,max_test)
 
 Test_data <-Test_data_and_labels$Image_array
 Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
 Test_labels <- Test_data_and_labels$label_vector[,1]
 
-####
+############################################
 
 Train_data_reshaped <- array_reshape(Train_data,c(max_train,100,100,3),order=c("F"))
 Test_data_reshaped <- array_reshape(Test_data,c(max_test,100,100,3),order=c("F"))
 
-
-#Train_labels2 <- Train_labels - 1
-model_my_own <-create_fruit_model(Train_data_reshaped,Train_labels,Test_data_reshaped,Test_labels)
+############################################
+channels <- 3
+channel_no <- 1:3
+model_name <- "fruit_model.h5"
+model_my_own <-create_fruit_model(Train_data_reshaped[,,,channel_no],Train_labels,Test_data_reshaped[,,,channel_no],Test_labels,channels)
 model_my_own %>% summary()
-model_my_own %>% save_model_hdf5("fruit_model.h5")
+model_my_own %>% save_model_hdf5(model_name)
 
-results <- model_my_own %>% predict(Test_data_reshaped)
+results <- model_my_own %>% predict(Test_data_reshaped[,,,channel_no])
 
 
-####
+
+############################################
+# old version
 
 Train_data_reshaped <- array_reshape(Train_data,c(max_train,100,100,3),order=c("F"))
 Test_data_reshaped <- array_reshape(Test_data,c(max_test,100,100,3),order=c("F"))
+
+model_name_conv <- "fruit_model_conv.h5"
 
 model_my_own_conv <-create_fruit_model_conv(Train_data_reshaped,Train_labels,Test_data_reshaped,Test_labels)
 model_my_own_conv %>% summary()
-model_my_own_conv %>% save_model_hdf5("fruit_model_conv.h5")
+model_my_own_conv %>% save_model_hdf5(model_name_conv)
 
 results <- model_my_own_conv %>% predict(Test_data_reshaped[1,,,], Test_labels[1])
 
-
-
-
-####
-
+############################################
 
 plot_fruit(500)
+
+##
 
 plot_fruit <- function(k){
 n <- as.data.frame(Train_data[k,,]) # new attempt
