@@ -7,37 +7,41 @@ library(ggplot2)
 
 ############################################
 
-max_train<-975 #10000 goes up to label 21
-max_test <-300 #3400 goes up to label 21
-
 pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
 training_folder <- "Training"
 test_folder <- "Test"
 
-###
-# folder_names(pathname,test_folder) # not necessary though
 class_names <- folder_names(pathname,training_folder)
+fruit_list <- c("Walnut","Banana")
+
+# attempt to collect label numbers after specify name of fruit
+class_names_frame <- cbind(class_names,seq(length(class_names)))
+class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
+colnames(class_names_frame) <- c('Fruit','label')
+vector <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2])
+#vector <- 51:52
 
 ############################################
 
-Train_data_and_labels <- Data_in_final_form(training_folder,max_train)
+Train_data_and_labels <- Data_in_final_form(training_folder,class_names,vector)
 
 Train_data <-Train_data_and_labels$Image_array
 Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
 Train_labels <- Train_data_and_labels$label_vector[,1]
-
+Train_total  <- Train_data_and_labels$total_no
 ####
 
-Test_data_and_labels <- Data_in_final_form(test_folder,max_test)
+Test_data_and_labels <- Data_in_final_form(test_folder,class_names,vector)
 
 Test_data <-Test_data_and_labels$Image_array
 Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
 Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
 
 ############################################
 
-Train_data_reshaped <- array_reshape(Train_data,c(max_train,100,100,3),order=c("F"))
-Test_data_reshaped <- array_reshape(Test_data,c(max_test,100,100,3),order=c("F"))
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,100,100,3),order=c("F"))
+Test_data_reshaped <- array_reshape(Test_data,c(Test_total,100,100,3),order=c("F"))
 
 ############################################
 channels <- 3

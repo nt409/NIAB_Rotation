@@ -8,7 +8,7 @@ library(purrr)
 create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
 
 model <- keras_model_sequential()
-output_n <- 81 # number of classes
+output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
 model %>%
   layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(100, 100, channels)) %>%
   layer_activation("relu") %>%
