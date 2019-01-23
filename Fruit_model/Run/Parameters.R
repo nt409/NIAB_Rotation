@@ -3,7 +3,10 @@ pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
 training_folder <- "Training"
 test_folder <- "Test"
 #####
-#internet_folder <- 
+internet_path <- "C:/Users/Administrator/Documents/Rotation/Photos_to_test_model"
+internet_folder_banana <- "Banana"
+internet_folder_wal <- "Walnut"
+internet_file_type <- ".jpg"
 #####
 class_names <- folder_names(pathname,training_folder)
 fruit_list <- c("Walnut","Banana")
@@ -12,8 +15,9 @@ fruit_list <- c("Walnut","Banana")
 class_names_frame <- cbind(class_names,seq(length(class_names)))
 class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
 colnames(class_names_frame) <- c('Fruit','label')
-labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2])
+#labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2])
 #labels_to_be_tested <- 1:(length(class_names))
+labels_to_be_tested <- 1:10
 
 ############################################
 channels <- 3
@@ -23,5 +27,5 @@ output_n <- 1 + length(class_names)
 
 filetype <- ".jpg"
 
-xshape <- 30
-yshape <- 30
+xshape <- 20
+yshape <- 20

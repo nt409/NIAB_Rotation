@@ -1,4 +1,4 @@
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Labeller.R') #contains functions 'folder_names', 'labeller', 'Data_in_final_form' # slow to run
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Labeller.R') #contains functions 'folder_names', 'labeller', 'Data_in_final_form', 'image_tester' # slow to run
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Labeller
 source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R') # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
 
@@ -37,17 +37,16 @@ return(prediction_and_prob)
 preds(results)
 
 ############################################
-im <- readImage("C:/Users/Administrator/Documents/Rotation/Photos_to_test_model/wal_test.jpg")
-min_dimension <- which.min(c(dim(im)[1],dim(im)[2]))
-im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
-eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
-im <- resizeImage(eq_sp, width = xshape, height = yshape, method = 'bilinear')
-new_data <- as.data.frame(im)
-data <- abind(new_data,new_data,along=3)
-data <-  aperm(data,c(3,1,2)) # reorders elements
-data <- array_reshape(data,c(2,xshape,yshape,3),order=c("F"))
-res2 <- model_my_own %>% predict(data[1,,,channel_no,drop=F])
+data <- image_tester(internet_path,internet_folder_banana)
+res2 <- model_my_own %>% predict(data)
 preds(res2)
+
+####
+
+data <- image_tester(internet_path,internet_folder_wal)
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+
 
 
 

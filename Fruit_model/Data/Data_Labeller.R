@@ -39,6 +39,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   
 ##########
   j <- list_of_labels_to_be_tested[1]
+  print('Set number 1') # gives idea of progress.
   Fruit_filtered_data<-filter(Fruit_frame,Label==j)
   number_of_files_filtered <- length(Fruit_filtered_data[,2])
   total_files <- number_of_files_filtered
@@ -59,12 +60,8 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
     path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
-    #im2<-im
     im <- resizeImage(im, width = xshape, height = yshape, method = 'bilinear')
     new_data <- as.data.frame(im)
-    #new_data2 <- as.data.frame(im2)
-    #print(dim(new_data))
-    #print(dim(new_data2))
     
     data <- abind(data,new_data,along=3)
     label <- rbind(label,j)
@@ -73,6 +70,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
 ############
   
   for(j in list_of_labels_to_be_tested[-1]){
+  print(paste('Set number',j)) # gives idea of progress.
   Fruit_filtered_data<-filter(Fruit_frame,Label==j)
   number_of_files_filtered <- length(Fruit_filtered_data[,2])
   total_files <- number_of_files_filtered + total_files
@@ -93,6 +91,50 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   return(list('Image_array'=data,'label_vector'=label,'total_no'=total_files))
 }
 
+
+############################################
+
+image_tester <- function(pathname_of_images,folder){
+  
+  internet_fold_path <- paste(pathname_of_images,folder,sep = '/')
+  internet_image_names <- list.files(path = internet_fold_path, pattern=internet_file_type, all.files=T, full.names=F, no.. = T)
+  
+  path_name_new <- paste(pathname_of_images,folder,internet_image_names[1],sep = '/')
+  im <- readImage(path_name_new)
+  
+  min_dimension <- which.min(c(dim(im)[1],dim(im)[2]))
+  im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
+  eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
+  im <- resizeImage(eq_sp, width = xshape, height = yshape, method = 'bilinear')
+  
+  data <- as.data.frame(im)
+  
+  if(length(internet_image_names)==1){
+    data <- abind(data,data,along=3) # gets into a 4 dimensional array
+    data <- aperm(data,c(3,1,2)) # reorders elements
+    data <- array_reshape(data,c(2,xshape,yshape,3),order=c("F"))
+    data <- data[1,,,,drop=F]
+  }
+  else{
+    for(k in 2:(length(internet_image_names))){
+      path_name_new <- paste(pathname_of_images,folder,internet_image_names[k],sep = '/')
+      im <- readImage(path_name_new)
+      
+      min_dimension <- which.min(c(dim(im)[1],dim(im)[2]))
+      im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
+      eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
+      im <- resizeImage(eq_sp, width = xshape, height = yshape, method = 'bilinear')
+      
+      new_data <- as.data.frame(im)
+      
+      data <- abind(data,new_data,along=3) # gets into a 4 dimensional array
+    }
+    data <- aperm(data,c(3,1,2)) # reorders elements
+    data <- array_reshape(data,c(length(internet_image_names),xshape,yshape,3),order=c("F"))
+  }
+  
+  return(data)
+}
 
 ############################################
 
