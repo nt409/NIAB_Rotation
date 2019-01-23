@@ -11,7 +11,7 @@ model <- keras_model_sequential()
 # output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
 # needs to include label values? eg 14, 81 -> is max
 model %>%
-  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(100, 100, channels)) %>%
+  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(xshape, yshape, channels)) %>%
   layer_activation("relu") %>%
   layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same") %>%
   layer_activation_leaky_relu(0.5) %>%
@@ -63,5 +63,5 @@ return(model)
 image_predictor <- function(n,results_of_model){
   pred <- which.max(results_of_model[n, ])-1
   prob <- results_of_model[n,pred+1]
-  return(list('Pred' = pred,'Prob' = prob))
+  return(list('Label' = pred,'Probability' = prob))
 }

@@ -6,8 +6,8 @@ library(OpenImageR)
 
 ##################################################
 
-folder_names <- function(path_name,folder_name){
-path_name_with_folder <- paste(path_name,folder_name,sep = "/")
+folder_names <- function(pathname_of_images,folder_name){
+path_name_with_folder <- paste(pathname_of_images,folder_name,sep = "/")
 folders <- list.dirs(path = path_name_with_folder, full.names = TRUE, recursive = TRUE)
 class_names_from_folder <- gsub(path_name_with_folder,"",folders)
 class_names_from_folder <- class_names_from_folder[2:(length(class_names_from_folder))] # ignores containing folder
@@ -17,20 +17,20 @@ return(class_names_from_folder)
 
 ##################################################
 
-labeller <- function(folder,class_names_used,n){
-  path_name_new <- paste(pathname,folder,class_names_used[n],sep = '/')
-  files <- list.files(path = path_name_new, pattern=".jpg",all.files=T, full.names=F, no.. = T) 
+labeller <- function(pathname_of_images,folder,class_names_used,n,file_type){
+  path_name_new <- paste(pathname_of_images,folder,class_names_used[n],sep = '/')
+  files <- list.files(path = path_name_new, pattern=file_type,all.files=T, full.names=F, no.. = T) 
   array <- cbind(files,b=n)
   return(array)
 }
 
 ##################################################
 
-Data_in_final_form <- function(folder,class_names_used,list_of_labels_to_be_tested){
+Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_of_labels_to_be_tested,file_type){
   
-  Fruit_train_data <- labeller(folder,class_names_used,1)
+  Fruit_train_data <- labeller(pathname_of_images,folder,class_names_used,1,file_type)
   for( i in 2:(length(class_names))){
-    new_data <- labeller(folder,class_names_used,i)
+    new_data <- labeller(pathname_of_images,folder,class_names_used,i,file_type)
     Fruit_train_data <- rbind(Fruit_train_data,new_data)
   }
   Fruit_frame <- as.data.frame(Fruit_train_data)
@@ -44,20 +44,27 @@ Data_in_final_form <- function(folder,class_names_used,list_of_labels_to_be_test
   total_files <- number_of_files_filtered
   
   image_number <- 1
-  path <- paste(pathname,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/') # was Fruit_train_data
+  path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/') # was Fruit_train_data
   
   im <- readImage(path)
+  im <- resizeImage(im, width = xshape, height = yshape, method = 'bilinear')
   data <- as.data.frame(im)
+  #imageShow(im)
   
   label <- as.data.frame(j)
   colnames(label)<-'label'
   
   for(i in 2:number_of_files_filtered){
     image_number <- i
-    path <- paste(pathname,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
+    #im2<-im
+    im <- resizeImage(im, width = xshape, height = yshape, method = 'bilinear')
     new_data <- as.data.frame(im)
+    #new_data2 <- as.data.frame(im2)
+    #print(dim(new_data))
+    #print(dim(new_data2))
     
     data <- abind(data,new_data,along=3)
     label <- rbind(label,j)
@@ -72,9 +79,10 @@ Data_in_final_form <- function(folder,class_names_used,list_of_labels_to_be_test
   
   for(i in 1:number_of_files_filtered){
     image_number <- i
-    path <- paste(pathname,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
+    im <- resizeImage(im, width = xshape, height = yshape, method = 'bilinear')
     new_data <- as.data.frame(im)
     
     data <- abind(data,new_data,along=3)
@@ -88,7 +96,7 @@ Data_in_final_form <- function(folder,class_names_used,list_of_labels_to_be_test
 
 ############################################
 
-Train_data_and_labels <- Data_in_final_form(training_folder,class_names,labels_to_be_tested)
+Train_data_and_labels <- Data_in_final_form(pathname,training_folder,class_names,labels_to_be_tested,filetype)
 
 Train_data <-Train_data_and_labels$Image_array
 Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
@@ -96,7 +104,7 @@ Train_labels <- Train_data_and_labels$label_vector[,1]
 Train_total  <- Train_data_and_labels$total_no
 ####
 
-Test_data_and_labels <- Data_in_final_form(test_folder,class_names,labels_to_be_tested)
+Test_data_and_labels <- Data_in_final_form(pathname,test_folder,class_names,labels_to_be_tested,filetype)
 
 Test_data <-Test_data_and_labels$Image_array
 Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
@@ -105,8 +113,8 @@ Test_total  <- Test_data_and_labels$total_no
 
 ############################################
 
-Train_data_reshaped <- array_reshape(Train_data,c(Train_total,100,100,3),order=c("F"))
-Test_data_reshaped <- array_reshape(Test_data,c(Test_total,100,100,3),order=c("F"))
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,xshape,yshape,3),order=c("F"))
+Test_data_reshaped <- array_reshape(Test_data,c(Test_total,xshape,yshape,3),order=c("F"))
 
 
 
