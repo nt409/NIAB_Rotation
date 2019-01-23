@@ -1,3 +1,4 @@
+source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')
 library(abind)
 library(OpenImageR)
 
@@ -25,7 +26,7 @@ labeller <- function(folder,class_names_used,n){
 
 ##################################################
 
-Data_in_final_form <- function(folder,class_names_used,vector){
+Data_in_final_form <- function(folder,class_names_used,list_of_labels_to_be_tested){
   
   Fruit_train_data <- labeller(folder,class_names_used,1)
   for( i in 2:(length(class_names))){
@@ -37,7 +38,7 @@ Data_in_final_form <- function(folder,class_names_used,vector){
   
   
 ##########
-  j <- vector[1]
+  j <- list_of_labels_to_be_tested[1]
   Fruit_filtered_data<-filter(Fruit_frame,Label==j)
   number_of_files_filtered <- length(Fruit_filtered_data[,2])
   total_files <- number_of_files_filtered
@@ -64,7 +65,7 @@ Data_in_final_form <- function(folder,class_names_used,vector){
 
 ############
   
-  for(j in vector[-1]){
+  for(j in list_of_labels_to_be_tested[-1]){
   Fruit_filtered_data<-filter(Fruit_frame,Label==j)
   number_of_files_filtered <- length(Fruit_filtered_data[,2])
   total_files <- number_of_files_filtered + total_files
@@ -85,28 +86,28 @@ Data_in_final_form <- function(folder,class_names_used,vector){
 }
 
 
+############################################
 
-##################################################
+Train_data_and_labels <- Data_in_final_form(training_folder,class_names,labels_to_be_tested)
 
-# im <- image_load(path, target_size = c(x_size,y_size)) # attempt to get size control - have as extra argument
-# a <- image_to_array(im) # attempt to get size control - have as extra argument
-# data <- as.data.frame(a)
+Train_data <-Train_data_and_labels$Image_array
+Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
+Train_labels <- Train_data_and_labels$label_vector[,1]
+Train_total  <- Train_data_and_labels$total_no
+####
+
+Test_data_and_labels <- Data_in_final_form(test_folder,class_names,labels_to_be_tested)
+
+Test_data <-Test_data_and_labels$Image_array
+Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
+Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
+
+############################################
+
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,100,100,3),order=c("F"))
+Test_data_reshaped <- array_reshape(Test_data,c(Test_total,100,100,3),order=c("F"))
 
 
-# im <- image_load(path, target_size = c(x_size,y_size)) # attempt to get size control
-# a <- image_to_array(im) # attempt to get size control
-# data <- as.data.frame(a)
 
 
-
-
-# to check a random image from the data set
-# image_number <- 40000
-# N <- as.numeric(Fruit_train_data[image_number,2])
-# N
-# class_names[N]
-
-# path <- paste("C:/Users/Administrator/Documents/Rotation/fruits-360/Training",class_names[N],as.character(Fruit_train_data[image_number,1]),sep = '/')
-# im <- readImage(path)
-# dim(im) # im is the array
-# imageShow(im)

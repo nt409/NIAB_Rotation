@@ -3,12 +3,13 @@ library(dplyr)
 library(ggplot2)
 library(purrr)
 
-# contains function 'create_fruit_model'
+# contains function 'create_fruit_model', 'image_predictor'
 
 create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
 
 model <- keras_model_sequential()
-output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
+# output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
+# needs to include label values? eg 14, 81 -> is max
 model %>%
   layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(100, 100, channels)) %>%
   layer_activation("relu") %>%
@@ -57,4 +58,10 @@ print(results)
 plot(history)
 
 return(model)
+}
+
+image_predictor <- function(n,results_of_model){
+  pred <- which.max(results_of_model[n, ])-1
+  prob <- results_of_model[n,pred+1]
+  return(list('Pred' = pred,'Prob' = prob))
 }
