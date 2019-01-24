@@ -11,9 +11,9 @@ model <- keras_model_sequential()
 # output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
 # needs to include label values? eg 14, 81 -> is max
 model %>%
-  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same",input_shape = c(xshape, yshape, channels)) %>%
+  layer_conv_2d(filter=My_filter_number, kernel_size= My_kernel_size,padding="same",input_shape = c(xshape, yshape, channels)) %>%
   layer_activation("relu") %>%
-  layer_conv_2d(filter=32, kernel_size= c(3,3),padding="same") %>%
+  layer_conv_2d(filter=My_filter_number, kernel_size= My_kernel_size,padding="same") %>%
   layer_activation_leaky_relu(0.5) %>%
   
   # Use max pooling
@@ -46,8 +46,8 @@ model %>% compile(
 history <- model %>% fit(
   train_data, #batch_size = 128? #validation_split = 0.1,
   train_labels,
-  batch_size = 32,
-  epochs = 5
+  batch_size = My_batch_size,
+  epochs = My_epoch_number
 )
 
 
@@ -60,22 +60,3 @@ plot(history)
 return(model)
 }
 
-
-image_predictor <- function(n,results_of_model){
-  pred <- which.max(results_of_model[n, ])-1
-  prob <- results_of_model[n,pred+1]
-  return(list('Label' = pred,'Probability' = prob))
-}
-
-# 
-# image_predictor <- function(n,results_of_model,number_of_preds){
-#   len <- length(results_of_model[n, ])
-#   pred <- rep(1,number_of_preds)
-#   prob <- rep(1,number_of_preds)
-#   for(k in 1:number_of_preds){
-#   prob[k] <- sort(results_of_model[n, ], partial=len-k)[len-k]
-#   pred[k] <- filter(results_of_model[n, ],prob[k]) - 1
-#   }
-#   else{prob <- results_of_model[n,pred+1]}
-#   return(list('Label' = pred,'Probability' = prob))
-# }
