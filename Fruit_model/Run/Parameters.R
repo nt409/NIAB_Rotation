@@ -18,8 +18,8 @@ labels_to_be_tested <- 20:40
 #labels_to_be_tested <- 1:(length(class_names))
 ############################################
 # model parameters
-channels <- 1 # how many channels
-channel_no <- 3 # which of these channels?
+channels <- 1   # how many channels? - 1, 2 or 3
+channel_no <- 3 # which of these channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
 My_filter_number<- 32
 My_kernel_size  <- c(3,3)
 My_batch_size <- 32
