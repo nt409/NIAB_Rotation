@@ -1,5 +1,5 @@
 ---
-title: "Fruit_model"
+title: "Fruit Model"
 output: html_document
 ---
 
@@ -7,26 +7,26 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Running Model
+## Running The Model
 
-To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. The parameters can be adjusted in the file 'Parameters' in folder 'Run'. The other scripts and functions involved are found in 'Analysis/Functions', 'Data/Data_Producer' and 'Model/Fruit_model'. The source files are uncommented on the GitHub version.
+To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. The parameters can be adjusted in the file 'Parameters' in folder 'Run'. The other scripts and functions involved are found in 'Analysis/Functions', 'Data/Data_Producer' and 'Model/Fruit_model'. The R code is uncommented on the GitHub version - for some reason didn't run properly via RMarkdown.
 
-```{r echo=FALSE}
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
-source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions
-source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
-source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
+```{r}
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
 ```
 
-```{r next}
+```{r}
 # library(keras)
 # library(dplyr)
 # library(ggplot2)
 # library(tidyr)
 ```
 
-```{r next2}
+```{r}
 # data comes in from Data_Labeller
 
 ############################################
