@@ -39,7 +39,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   
 ##########
   j <- list_of_labels_to_be_tested[1]
-  print('Set number 1') # gives idea of progress.
+  print(paste('Set number',j)) # gives idea of progress.
   Fruit_filtered_data<-filter(Fruit_frame,Label==j)
   number_of_files_filtered <- length(Fruit_filtered_data[,2])
   total_files <- number_of_files_filtered
@@ -106,7 +106,7 @@ image_tester <- function(pathname_of_images,folder){
   im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
   eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
   im <- resizeImage(eq_sp, width = xshape, height = yshape, method = 'bilinear')
-  
+  imageShow(im)
   data <- as.data.frame(im)
   
   if(length(internet_image_names)==1){

@@ -18,7 +18,7 @@ model %>%
   
   # Use max pooling
   layer_max_pooling_2d(pool_size = c(2,2)) %>%
-  layer_dropout(0.25) %>%
+  layer_dropout(0.25) %>% # dropout- regularises
   
   # Flatten max filtered output into feature vector 
   # and feed into dense layer
@@ -60,8 +60,22 @@ plot(history)
 return(model)
 }
 
+
 image_predictor <- function(n,results_of_model){
   pred <- which.max(results_of_model[n, ])-1
   prob <- results_of_model[n,pred+1]
   return(list('Label' = pred,'Probability' = prob))
 }
+
+# 
+# image_predictor <- function(n,results_of_model,number_of_preds){
+#   len <- length(results_of_model[n, ])
+#   pred <- rep(1,number_of_preds)
+#   prob <- rep(1,number_of_preds)
+#   for(k in 1:number_of_preds){
+#   prob[k] <- sort(results_of_model[n, ], partial=len-k)[len-k]
+#   pred[k] <- filter(results_of_model[n, ],prob[k]) - 1
+#   }
+#   else{prob <- results_of_model[n,pred+1]}
+#   return(list('Label' = pred,'Probability' = prob))
+# }
