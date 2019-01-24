@@ -32,18 +32,3 @@ data <- image_tester(internet_path,"Walnut")
 res2 <- model_my_own %>% predict(data)
 preds(res2)
 multipreds(res2,number_probs)
-
-
-# manually test accuracy
-right <- 0
-wrong <- 0
-for(k in 20:40){
-data <- image_tester(pathname,paste("Test",class_names[k],sep="/"))
-res2 <- model_my_own %>% predict(data)
-print(k)
-print(preds(res2)[,3])
-vec<-preds(res2)[,3]-rep(k,length(preds(res2)[,3]))
-right<-right+sum(vec==0)
-wrong<-wrong+(length(preds(res2)[,3]) - sum(vec==0))
-print(paste("Number right =",right,", Number wrong =",wrong,", Accuracy =",right/(wrong+right),sep=''))
-}
