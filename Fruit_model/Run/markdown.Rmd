@@ -1,6 +1,12 @@
 ---
 title: "Fruit Model"
 output: html_document
+params:
+  channels: 1   # how many channels? - 1, 2 or 3
+  channel_no: 1 # which of these channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
+  xshape: 40 # image size, can't influence from here though?
+  yshape: 40 # image size, can't influence from here though?
+  labels_to_be_tested: c(12,46) # can't actually influence from here?
 ---
 
 ```{r setup, include=FALSE}
@@ -9,46 +15,204 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Running The Model
 
-To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. The parameters can be adjusted in the file 'Parameters' in folder 'Run'. The other scripts and functions involved are found in 'Analysis/Functions', 'Data/Data_Producer' and 'Model/Fruit_model'. The R code is uncommented on the GitHub version - for some reason didn't run properly via RMarkdown.
+To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. The parameters can be adjusted in the file 'Parameters' in folder 'Run'. The other scripts and functions involved are found in 'Analysis/Functions', 'Data/Data_Functions', 'Data/Data_Producer' and 'Model/Fruit_model'.
+
+## Initialise
+
+'Data_Functions.R' contains functions 'folder_names', 'labeller', 'Data_in_final_form'.
+
+'Parameters.R' needs Data_Functions.
+
+'Functions.R' contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'.
+
+'Data_Producer.R' slow to run.
+
+'Fruit_model.R' needs parameters, contains function 'create_fruit_model', 'image_predictor'.
+
+```{r results='hide'}
+#setwd('~/GitHub/NIAB_Rotation/Fruit_model')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
+#source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')
+#Sys.setenv(R_CONFIG_ACTIVE = "default")
+config <- config::get()
+source('~/GitHub/NIAB_Rotation/Fruit_model/config.yml')   
+source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  
+```
+
+Data_Functions will use:
+
+```{r eval=FALSE}
+library(abind)
+library(OpenImageR)
+library(dplyr)
+```
+
+Parameters will use:
+
+```{r eval=FALSE}
+library(params)
+```
+
+Data_Producer will use:
+
+```{r eval=FALSE}
+library(reticulate)
+```
+
+Fruit_model will use:
+
+``` {r eval=FALSE}
+library(keras)
+library(dplyr)
+library(ggplot2)
+library(purrr)
+```
+
+And Fruit_model_run_with_my_data will use
+
+```{r eval=FALSE}
+library(keras)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+## Model G
+
+### Fit Model R
+
+Our data comes in from script 'Data_Producer'. Now we fit the model.
 
 ```{r}
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
+model_name <- "fruit_model_new.h5" # "fruit_model.h5"
+model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_my_own %>% summary()
+model_my_own %>% save_model_hdf5(model_name)
+```
+
+### Load Saved Model
+
+We load saved models by using the code below.
+
+```{r}
+new_model <- load_model_hdf5(model_name)
+new_model %>% summary()
+```
+
+### Test Model R
+
+```{r}
+results <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+```
+
+### Obtain Predictions R
+
+```{r}
+data <- image_tester(internet_path,"Walnut")
 ```
 
 ```{r}
-# library(keras)
-# library(dplyr)
-# library(ggplot2)
-# library(tidyr)
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+mpreds1<-multipreds(res2,number_probs)
 ```
 
-```{r}
-# data comes in from Data_Labeller
+## Model G
 
-############################################
-# fit model
-# model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-# model_my_own <-create_fruit_model(Train_data_reshaped[,,,channel_no,drop = F],Train_labels,Test_data_reshaped[,,,channel_no,drop = F],Test_labels,channels) # drop = F stops R collapsing array to 3 dimensions not 4
-# model_my_own %>% summary()
-# model_my_own %>% save_model_hdf5(model_name)
-# 
-# 
-# # below model has all fruits
-# #new_model <- load_model_hdf5("fruit_model.h5")
-# #new_model %>% summary()
-# 
-# results <- model_my_own %>% evaluate(Test_data_reshaped[165:3622,,,channel_no,drop=F], Test_labels[165:3622])
-# results
-# 
-# results <- model_my_own %>% predict_classes(Test_data_reshaped[1:164,,,channel_no,drop = F]) # drop = F stops R collapsing array to 3 dimensions not 4
-# ############################################
-# data <- image_tester(internet_path,"Walnut")
-# res2 <- model_my_own %>% predict(data)
-# preds(res2)
-# multipreds(res2,number_probs)
+### Fit Model G
+config$channel = 2
+```{r results='hide', echo=FALSE}
+model_name <- "fruit_model_new.h5" # "fruit_model.h5"
+model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_my_own %>% summary()
+model_my_own %>% save_model_hdf5(model_name)
+```
 
+### Test Model G
+
+```{r results='hide', echo=FALSE}
+results2 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+```
+
+### Obtain Predictions G
+
+```{r results='hide', echo=FALSE}
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+mpreds2<-multipreds(res2,number_probs)
+```
+
+## Model B
+
+### Fit Model B
+config$channel = 3
+```{r results='hide', echo=FALSE}
+model_name <- "fruit_model_new.h5" # "fruit_model.h5"
+model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_my_own %>% summary()
+model_my_own %>% save_model_hdf5(model_name)
+```
+
+### Test Model B
+
+```{r results='hide', echo=FALSE}
+results3 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+```
+
+### Obtain Predictions B
+
+```{r results='hide', echo=FALSE}
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+mpreds3<-multipreds(res2,number_probs)
+```
+
+### Fit Model RGB
+config$channels = 3
+config$channel  = 1:3
+```{r results='hide', echo=FALSE}
+model_name <- "fruit_model_new.h5" # "fruit_model.h5"
+model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_my_own %>% summary()
+model_my_own %>% save_model_hdf5(model_name)
+```
+
+### Test Model RGB
+
+```{r results='hide', echo=FALSE}
+results2 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+```
+
+### Obtain Predictions RGB
+
+```{r results='hide', echo=FALSE}
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+mpreds2<-multipreds(res2,number_probs)
+```
+
+## Summary
+
+```{r echo=FALSE}
+frame<-as.data.frame(results)
+frame<-rbind(frame,as.data.frame(results2),as.data.frame(results3))
+colnames(frame)<-c("Loss","Accuracy")
+frame$Model<-c("R only","G only","B only")
+frame<-frame[c("Model","Loss","Accuracy")]
+```
+
+```{r echo=FALSE}
+knitr::kable(frame, caption = "Summary")
+```
+
+```{r echo=FALSE}
+knitr::kable(mpreds1, caption = "Table Of Predictions")
+```
+```{r echo=FALSE}
+knitr::kable(mpreds2, caption = "Table Of Predictions")
+```
+```{r echo=FALSE}
+knitr::kable(mpreds3, caption = "Table Of Predictions")
 ```

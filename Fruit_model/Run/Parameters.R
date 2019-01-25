@@ -1,3 +1,10 @@
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
+
+library(params)
+
 ############################################
 pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
 training_folder <- "Training"
@@ -14,7 +21,7 @@ class_names_frame <- cbind(class_names,seq(length(class_names)))
 class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
 colnames(class_names_frame) <- c('Fruit','label')
 # labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2]) # gives the ones specified in fruit list
-labels_to_be_tested <- 20:40
+labels_to_be_tested <- 20:21
 #labels_to_be_tested <- 1:(length(class_names))
 ############################################
 # model parameters
@@ -35,3 +42,5 @@ yshape <- 40 # image size
 number_probs<-4 # this many probabilities quoted by multipred
 ############################################
 resize_method <- 'bilinear' # or 'nearest' 
+
+

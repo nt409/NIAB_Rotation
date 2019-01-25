@@ -1,7 +1,7 @@
 image_tester <- function(pathname_of_images,folder){
   
   internet_fold_path <- paste(pathname_of_images,folder,sep = '/')
-  internet_image_names <- list.files(path = internet_fold_path, pattern=internet_file_type, all.files=T, full.names=F, no.. = T)
+  internet_image_names <- list.files(path = internet_fold_path, pattern=params$internet_file_type, all.files=T, full.names=F, no.. = T)
   
   path_name_new <- paste(pathname_of_images,folder,internet_image_names[1],sep = '/')
   im <- readImage(path_name_new)
@@ -9,14 +9,14 @@ image_tester <- function(pathname_of_images,folder){
   min_dimension <- which.min(c(dim(im)[1],dim(im)[2]))
   im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
   eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
-  im <- resizeImage(eq_sp, width = xshape, height = yshape, method = resize_method)
+  im <- resizeImage(eq_sp, width = params$xshape, height = params$yshape, method = params$resize_method)
   imageShow(im)
   data <- as.data.frame(im)
   
   if(length(internet_image_names)==1){
     data <- abind(data,data,along=3) # gets into a 4 dimensional array
     data <- aperm(data,c(3,1,2)) # reorders elements
-    data <- array_reshape(data,c(2,xshape,yshape,3),order=c("F"))
+    data <- array_reshape(data,c(2,params$xshape,params$yshape,3),order=c("F"))
     data <- data[1,,,,drop=F]
   }
   else{
@@ -27,16 +27,16 @@ image_tester <- function(pathname_of_images,folder){
       min_dimension <- which.min(c(dim(im)[1],dim(im)[2]))
       im_size<-dim(im)[min_dimension] -1 # shouldn't need -1, but didn't like it otherwise
       eq_sp <- cropImage(im, new_width = im_size, new_height = im_size, type = 'equal_spaced')
-      im <- resizeImage(eq_sp, width = xshape, height = yshape, method = resize_method)
+      im <- resizeImage(eq_sp, width = params$xshape, height = params$yshape, method = params$resize_method)
       
       new_data <- as.data.frame(im)
       
       data <- abind(data,new_data,along=3) # gets into a 4 dimensional array
     }
     data <- aperm(data,c(3,1,2)) # reorders elements
-    data <- array_reshape(data,c(length(internet_image_names),xshape,yshape,3),order=c("F"))
+    data <- array_reshape(data,c(length(internet_image_names),params$xshape,params$yshape,3),order=c("F"))
   }
-    data <- data[,,,channel_no,drop=F]
+    data <- data[,,,params$channel_no,drop=F]
   return(data)
 }
 
@@ -50,7 +50,7 @@ multipreds <- function(result,number_of_probs){
   frame3<-mutate(frame2,Rank = rank(desc(Probability))) %>%
     arrange(Rank)
   frame4<-filter(frame3,Rank <= number_of_probs)
-  frame4$Prediction <- class_names[frame4$Label]
+  frame4$Prediction <- params$class_names[frame4$Label]
   frame4$Image_number <- paste('Image',1)
   frame4 <- frame4[c("Image_number","Prediction","Probability","Label","Rank")]
   final_frame<-frame4
@@ -62,7 +62,7 @@ multipreds <- function(result,number_of_probs){
       frame3<-mutate(frame2,Rank = rank(desc(Probability))) %>%
         arrange(Rank)
       frame4<-filter(frame3,Rank <= number_of_probs)
-      frame4$Prediction <- class_names[frame4$Label]
+      frame4$Prediction <- params$class_names[frame4$Label]
       frame4$Image_number <- paste('Image',k)
       frame4 <- frame4[c("Image_number","Prediction","Probability","Label","Rank")]
       final_frame <- rbind(final_frame,frame4)
@@ -84,7 +84,7 @@ preds <- function(result){#,number_of_preds
       prediction_and_prob<-rbind(prediction_and_prob,new_prediction)
     }
   }
-  prediction_and_prob$Prediction <- class_names[prediction_and_prob$Label]
+  prediction_and_prob$Prediction <- params$class_names[prediction_and_prob$Label]
   prediction_and_prob <- prediction_and_prob[c("Prediction","Probability","Label")]
   return(prediction_and_prob)
 }
