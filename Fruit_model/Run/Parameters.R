@@ -3,7 +3,7 @@ source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains fun
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
 
-library(params)
+#library(params)
 
 ############################################
 pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"

@@ -1,41 +1,26 @@
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions - put after folder_names?
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
+source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 
 library(abind)
 library(OpenImageR)
 library(dplyr)
 
-#contains functions 'folder_names', 'labeller', 'Data_labelled', 'Data_in_final_form'
+#contains functions 'labeller', 'Data_in_final_form'
 
 ##################################################
 
-folder_names <- function(pathname_of_images,folder_name){
-path_name_with_folder <- paste(pathname_of_images,folder_name,sep = "/")
-folders <- list.dirs(path = path_name_with_folder, full.names = TRUE, recursive = TRUE)
-class_names_from_folder <- gsub(path_name_with_folder,"",folders)
-class_names_from_folder <- class_names_from_folder[2:(length(class_names_from_folder))] # ignores containing folder
-class_names_from_folder <- gsub("/","",class_names_from_folder)
-return(class_names_from_folder)
-}
-
-##################################################
-
-labeller <- function(pathname_of_images,folder,class_names_used,n,file_type){
-  path_name_new <- paste(pathname_of_images,folder,class_names_used[n],sep = '/')
+labeller <- function(pathname_of_images,folder,class_names_input,n,file_type){
+  path_name_new <- paste(pathname_of_images,folder,class_names_input[n],sep = '/')
   files <- list.files(path = path_name_new, pattern=file_type, all.files=T, full.names=F, no.. = T) 
   array <- cbind(files,b=n)
   return(array)
 }
-
 ##################################################
 
-Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_of_labels_to_be_tested,file_type){
+Data_in_final_form <- function(pathname_of_images,folder,class_names_input,list_of_labels_to_be_tested,file_type){
   
-  Fruit_train_data <- labeller(pathname_of_images,folder,class_names_used,1,file_type)
-  for( i in 2:(length(params$class_names))){
-    new_data <- labeller(pathname_of_images,folder,class_names_used,i,file_type)
+  Fruit_train_data <- labeller(pathname_of_images,folder,class_names_input,list_of_labels_to_be_tested[1],file_type)
+  for( i in list_of_labels_to_be_tested[-1]){ # changed from 2:length(params$class_names)
+    new_data <- labeller(pathname_of_images,folder,class_names_input,i,file_type)
     Fruit_train_data <- rbind(Fruit_train_data,new_data)
   }
   Fruit_frame <- as.data.frame(Fruit_train_data)
@@ -50,7 +35,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   total_files <- number_of_files_filtered
   
   image_number <- 1
-  path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/') # was Fruit_train_data
+  path <- paste(pathname_of_images,folder,class_names_input[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/') # was Fruit_train_data
   
   im <- readImage(path)
   im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
@@ -62,7 +47,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   
   for(i in 2:number_of_files_filtered){
     image_number <- i
-    path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    path <- paste(pathname_of_images,folder,class_names_input[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
     im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
@@ -82,7 +67,7 @@ Data_in_final_form <- function(pathname_of_images,folder,class_names_used,list_o
   
   for(i in 1:number_of_files_filtered){
     image_number <- i
-    path <- paste(pathname_of_images,folder,class_names_used[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    path <- paste(pathname_of_images,folder,class_names_input[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
     
     im <- readImage(path)
     im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)

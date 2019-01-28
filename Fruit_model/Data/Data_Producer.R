@@ -1,7 +1,5 @@
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
-source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs parameters   # contains function 'create_fruit_model', 'image_predictor'
+source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 
 library(reticulate)
 
@@ -24,3 +22,8 @@ Test_total  <- Test_data_and_labels$total_no
 
 Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
 Test_data_reshaped <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
+
+saveRDS(Train_data_reshaped,file="fruit_train_data.Rda")
+saveRDS(Train_labels,file="fruit_train_labels.Rda")
+saveRDS(Test_data_reshaped,file="fruit_test_data.Rda")
+saveRDS(Test_labels,file="fruit_test_labels.Rda")

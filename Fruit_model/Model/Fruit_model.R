@@ -1,14 +1,11 @@
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions 'folder_names', 'labeller', 'Data_in_final_form'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')     # needs Data_Functions
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run
+source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 
 library(keras)
 library(dplyr)
 library(ggplot2)
 library(purrr)
 
-# contains function 'create_fruit_model', 'image_predictor'
+# contains function 'create_fruit_model'
 
 create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
 
