@@ -15,15 +15,15 @@ To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. T
 
 'Data_Functions.R' contains functions 'labeller', 'Data_in_final_form'.
 
-'params.R'..
+'params.R'. contains the parameters we will need. These are then put into a list and called using params$parameter_name.
 
 'Functions.R' contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'.
 
-'Data_Producer.R' slow to run.
+'Data_Producer.R' is slow to run.
 
 'Fruit_model.R' needs parameters, contains function 'create_fruit_model'.
 
-```{r results='hide'}
+```{r echo=FALSE}
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
@@ -32,7 +32,7 @@ source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')
 
 ```{r, echo=FALSE}
 evaluate_scripts <- FALSE
-evaluate_scripts2<- TRUE
+evaluate_scripts2<- FALSE
 ```
 
 ```{r, eval=evaluate_scripts}
@@ -90,10 +90,11 @@ Test_labels_saved <- readRDS("fruit_test_labels.Rda")
 The model is set up to identify single fruits - it has not been trained on images with multiple fruits and the probabilities it gives sum to 1 for prediciting individual fruits.
 
 
+## Comparison between colour choices
 
-## Model R
+### Model, Channel R
 
-### Fit Model R
+#### Fit Model, Channel R
 
 Our data comes in from script 'Data_Producer'. Now we fit the model.
 
@@ -108,7 +109,7 @@ model_my_own %>% summary()
 model_my_own %>% save_model_hdf5("fruit_model_r.h5")
 ```
 
-### Load Saved Model
+#### Load Saved Model
 
 We load saved models by using the code below.
 
@@ -117,13 +118,13 @@ model_r <- load_model_hdf5("fruit_model_r.h5")
 model_r %>% summary()
 ```
 
-### Test Model R
+#### Test Model, Channel R
 
 ```{r}
 results_r <- model_r %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
-### Obtain Predictions R
+#### Obtain Predictions For Model, Channel R
 
 ```{r}
 data <- image_tester(internet_path,"Banana")
@@ -137,9 +138,9 @@ mpreds_r<-multipreds(res_r,number_probs)
 
 
 
-## Model G
+### Model, Channel G
 
-### Fit Model G
+#### Fit Model, Channel G
 
 ```{r}
 params$channel_no = 2
@@ -157,13 +158,13 @@ model_g %>% summary()
 ```
 
 
-### Test Model G
+#### Test Model, Channel G
 
 ```{r results='hide', echo=FALSE}
 results_g <- model_g %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
-### Obtain Predictions G
+#### Obtain Predictions For Model, Channel G
 
 ```{r results='hide', echo=FALSE}
 res_g <- model_g %>% predict(data)
@@ -173,9 +174,9 @@ mpreds_g<-multipreds(res_g,number_probs)
 
 
 
-## Model B
+### Model, Channel B
 
-### Fit Model B
+#### Fit Model, Channel B
 
 ```{r}
 params$channel = 3
@@ -193,13 +194,13 @@ model_b %>% summary()
 ```
 
 
-### Test Model B
+#### Test Model, Channel B
 
 ```{r results='hide', echo=FALSE}
 results_b <- model_b %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
-### Obtain Predictions B
+#### Obtain Predictions For Model, Channel B
 
 ```{r results='hide', echo=FALSE}
 res_b <- model_b %>% predict(data)
@@ -207,12 +208,14 @@ preds(res_b)
 mpreds_b<-multipreds(res_b,number_probs)
 ```
 
-### Fit Model RGB
+### Model, Channels RGB
 
 ```{r}
 params$channels = 3
 params$channel_no  = 1:3
 ```
+
+#### Fit Model, Channels RGB
 
 ```{r results='hide', echo=FALSE, eval=evaluate_scripts}
 model_rgb <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
@@ -225,16 +228,15 @@ model_rgb <- load_model_hdf5("fruit_model_rgb.h5")
 model_rgb %>% summary()
 ```
 
-
-### Test Model RGB
+#### Test Model, Channels RGB
 
 ```{r results='hide', echo=FALSE}
 results_rgb <- model_rgb %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
-### Obtain Predictions RGB
+#### Obtain Predictions For Model, Channels RGB
 
-```{r}
+```{r results='hide', echo=FALSE}
 data <- image_tester(internet_path,"Banana")
 ```
 
@@ -276,17 +278,44 @@ knitr::kable(mpreds_rgb, caption = "Table Of Predictions RGB")
 
 ### 100 x 100
 
-```{r}
+```{r results='hide'}
 params$xshape <- 100
 params$yshape <- 100
 params$train_data_name  <- "fruit_train_data100.Rda"
 params$train_label_name <- "fruit_train_labels100.Rda"
 params$test_data_name   <- "fruit_test_data100.Rda"
 params$test_label_name  <- "fruit_test_labels100.Rda"
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+
+
+###
+
+Train_data_and_labels <- Data_in_final_form(params$pathname,params$training_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Train_data <-Train_data_and_labels$Image_array
+Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
+Train_labels <- Train_data_and_labels$label_vector[,1]
+Train_total  <- Train_data_and_labels$total_no
+####
+
+Test_data_and_labels <- Data_in_final_form(params$pathname,params$test_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Test_data <-Test_data_and_labels$Image_array
+Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
+Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
+
+############################################
+
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
+Test_data_reshaped  <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
+
+saveRDS(Train_data_reshaped,file=params$train_data_name)
+saveRDS(Train_labels,file=params$train_label_name)
+saveRDS(Test_data_reshaped,file=params$test_data_name)
+saveRDS(Test_labels,file=params$test_label_name)
 ```
 
-```{r, echo=FALSE}
+```{r}
 Train_data_saved <- readRDS("fruit_train_data100.Rda")
 Train_labels_saved <- readRDS("fruit_train_labels100.Rda")
 Test_data_saved <- readRDS("fruit_test_data100.Rda")
@@ -306,23 +335,50 @@ model_rgb100 %>% summary()
 ```
 
 
-```{r results='hide', echo=FALSE}
+```{r results='hide'}
 results_rgb100 <- model_rgb100 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
 ### 50 x 50
 
-```{r}
+```{r echo=FALSE, results='hide'}
 params$xshape <- 50
 params$yshape <- 50
 params$train_data_name  <- "fruit_train_data50.Rda"
 params$train_label_name <- "fruit_train_labels50.Rda"
 params$test_data_name   <- "fruit_test_data50.Rda"
 params$test_label_name  <- "fruit_test_labels50.Rda"
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+
+
+###
+
+Train_data_and_labels <- Data_in_final_form(params$pathname,params$training_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Train_data <-Train_data_and_labels$Image_array
+Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
+Train_labels <- Train_data_and_labels$label_vector[,1]
+Train_total  <- Train_data_and_labels$total_no
+####
+
+Test_data_and_labels <- Data_in_final_form(params$pathname,params$test_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Test_data <-Test_data_and_labels$Image_array
+Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
+Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
+
+############################################
+
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
+Test_data_reshaped  <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
+
+saveRDS(Train_data_reshaped,file=params$train_data_name)
+saveRDS(Train_labels,file=params$train_label_name)
+saveRDS(Test_data_reshaped,file=params$test_data_name)
+saveRDS(Test_labels,file=params$test_label_name)
 ```
 
-```{r, echo=FALSE}
+```{r}
 Train_data_saved   <- readRDS("fruit_train_data50.Rda")
 Train_labels_saved <- readRDS("fruit_train_labels50.Rda")
 Test_data_saved    <- readRDS("fruit_test_data50.Rda")
@@ -347,14 +403,41 @@ results_rgb50 <- model_rgb50 %>% evaluate(Test_data_saved[,,,params$channel_no,d
 
 ### 28 x 28
 
-```{r}
+```{r echo=FALSE, results='hide'}
 params$xshape <- 28
 params$yshape <- 28
 params$train_data_name  <- "fruit_train_data28.Rda"
 params$train_label_name <- "fruit_train_labels28.Rda"
 params$test_data_name   <- "fruit_test_data28.Rda"
 params$test_label_name  <- "fruit_test_labels28.Rda"
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+
+
+###
+
+Train_data_and_labels <- Data_in_final_form(params$pathname,params$training_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Train_data <-Train_data_and_labels$Image_array
+Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
+Train_labels <- Train_data_and_labels$label_vector[,1]
+Train_total  <- Train_data_and_labels$total_no
+####
+
+Test_data_and_labels <- Data_in_final_form(params$pathname,params$test_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Test_data <-Test_data_and_labels$Image_array
+Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
+Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
+
+############################################
+
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
+Test_data_reshaped  <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
+
+saveRDS(Train_data_reshaped,file=params$train_data_name)
+saveRDS(Train_labels,file=params$train_label_name)
+saveRDS(Test_data_reshaped,file=params$test_data_name)
+saveRDS(Test_labels,file=params$test_label_name)
 ```
 
 ```{r, echo=FALSE}
@@ -383,14 +466,41 @@ results_rgb28 <- model_rgb28 %>% evaluate(Test_data_saved[,,,params$channel_no,d
 
 ### 12 x 12
 
-```{r}
+```{r echo=FALSE, results='hide'}
 params$xshape <- 12
 params$yshape <- 12
 params$train_data_name  <- "fruit_train_data12.Rda"
 params$train_label_name <- "fruit_train_labels12.Rda"
 params$test_data_name   <- "fruit_test_data12.Rda"
 params$test_label_name  <- "fruit_test_labels12.Rda"
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+
+
+###
+
+Train_data_and_labels <- Data_in_final_form(params$pathname,params$training_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Train_data <-Train_data_and_labels$Image_array
+Train_data <- aperm(Train_data,c(3,1,2)) # reorders elements
+Train_labels <- Train_data_and_labels$label_vector[,1]
+Train_total  <- Train_data_and_labels$total_no
+####
+
+Test_data_and_labels <- Data_in_final_form(params$pathname,params$test_folder,params$class_names,params$labels_to_be_tested,params$filetype)
+
+Test_data <-Test_data_and_labels$Image_array
+Test_data <- aperm(Test_data,c(3,1,2)) # reorders elements
+Test_labels <- Test_data_and_labels$label_vector[,1]
+Test_total  <- Test_data_and_labels$total_no
+
+############################################
+
+Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
+Test_data_reshaped  <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
+
+saveRDS(Train_data_reshaped,file=params$train_data_name)
+saveRDS(Train_labels,file=params$train_label_name)
+saveRDS(Test_data_reshaped,file=params$test_data_name)
+saveRDS(Test_labels,file=params$test_label_name)
 ```
 
 ```{r, echo=FALSE}
@@ -423,8 +533,9 @@ results_rgb12 <- model_rgb12 %>% evaluate(Test_data_saved[,,,params$channel_no,d
 frame<-as.data.frame(results_rgb100)
 frame<-rbind(frame,as.data.frame(results_rgb50),as.data.frame(results_rgb28),as.data.frame(results_rgb12))
 colnames(frame)<-c("Loss","Accuracy")
-frame$Model<-c("100","50","28","12")
-frame<-frame[c("Image Size","Loss","Accuracy")]
+frame$Image_Size<-c("100","50","28","12")
+frame<-frame[c("Image_Size","Loss","Accuracy")]
+colnames(frame)<-c("Image_Size" ,"Loss","Accuracy")
 ```
 
 ```{r echo=FALSE}

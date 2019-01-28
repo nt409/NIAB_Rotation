@@ -23,7 +23,7 @@ class_names <- folder_names(pathname,training_folder)
 
 ##################################################
 # get label numbers after specify categories we want
-fruit_list <- c("Apple_Braeburn","Banana","Orange","Grape_White","Kiwi")
+fruit_list <- c("Apple_Braeburn","Banana") #,"Orange","Grape_White","Kiwi")
 class_names_frame <- cbind(class_names,seq(length(class_names)))
 class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
 colnames(class_names_frame) <- c('Fruit','label')
