@@ -10,12 +10,11 @@ library(purrr)
 create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
 
 model <- keras_model_sequential()
-# output_n <- 1 + length(unique(train_labels)) # number of classes, plus one because we don't cast to 0?
-# needs to include label values? eg 14, 81 -> is max
+
 model %>%
-  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size,padding="same",input_shape = c(params$xshape, params$yshape, params$channels)) %>%
+  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size,padding="same",input_shape = c(params$xshape, params$yshape, channels)) %>%
   layer_activation("relu") %>%
-  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size,padding="same") %>%
+  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size, padding="same") %>%
   layer_activation_leaky_relu(0.5) %>%
   
   # Use max pooling

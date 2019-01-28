@@ -15,7 +15,7 @@ To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. T
 
 'Data_Functions.R' contains functions 'labeller', 'Data_in_final_form'.
 
-'params.R' needs Data_Functions.
+'params.R'..
 
 'Functions.R' contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'.
 
@@ -27,8 +27,8 @@ To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. T
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
 ```
 
 Data_Functions will use:
@@ -39,16 +39,10 @@ library(OpenImageR)
 library(dplyr)
 ```
 
-Parameters will use:
+params will use:
 
 ```{r eval=FALSE}
-library(params)
-```
-
-Data_Producer will use:
-
-```{r eval=FALSE}
-library(reticulate)
+library(dplyr)
 ```
 
 Fruit_model will use:
@@ -58,6 +52,12 @@ library(keras)
 library(dplyr)
 library(ggplot2)
 library(purrr)
+```
+
+Data_Producer will use:
+
+```{r eval=FALSE}
+library(reticulate)
 ```
 
 And Fruit_model_run_with_my_data will use
