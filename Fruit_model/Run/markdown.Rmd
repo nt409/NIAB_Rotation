@@ -27,7 +27,15 @@ To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. T
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
-source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  
+source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')
+```
+
+```{r, echo=FALSE}
+evaluate_scripts <- FALSE
+evaluate_scripts2<- TRUE
+```
+
+```{r, eval=evaluate_scripts}
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
 ```
 
@@ -69,17 +77,35 @@ library(ggplot2)
 library(tidyr)
 ```
 
-## Model G
+We can load the data files previously saved by script 'Data_producer'.
+
+```{r}
+Train_data_saved <- readRDS("fruit_train_data.Rda")
+Train_labels_saved <- readRDS("fruit_train_labels.Rda")
+Test_data_saved <- readRDS("fruit_test_data.Rda")
+Test_labels_saved <- readRDS("fruit_test_labels.Rda")
+```
+
+
+The model is set up to identify single fruits - it has not been trained on images with multiple fruits and the probabilities it gives sum to 1 for prediciting individual fruits.
+
+
+
+## Model R
 
 ### Fit Model R
 
 Our data comes in from script 'Data_Producer'. Now we fit the model.
 
 ```{r}
-model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+params$channels = 1
+params$channel_no = 1
+```
+
+```{r, eval=evaluate_scripts}
+model_my_own <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
 model_my_own %>% summary()
-model_my_own %>% save_model_hdf5(model_name)
+model_my_own %>% save_model_hdf5("fruit_model_r.h5")
 ```
 
 ### Load Saved Model
@@ -87,109 +113,144 @@ model_my_own %>% save_model_hdf5(model_name)
 We load saved models by using the code below.
 
 ```{r}
-new_model <- load_model_hdf5(model_name)
-new_model %>% summary()
+model_r <- load_model_hdf5("fruit_model_r.h5")
+model_r %>% summary()
 ```
 
 ### Test Model R
 
 ```{r}
-results <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+results_r <- model_r %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
 ### Obtain Predictions R
 
 ```{r}
-data <- image_tester(internet_path,"Walnut")
+data <- image_tester(internet_path,"Banana")
 ```
 
 ```{r}
-res2 <- model_my_own %>% predict(data)
-preds(res2)
-mpreds1<-multipreds(res2,number_probs)
+res_r <- model_r %>% predict(data)
+preds(res_r)
+mpreds_r<-multipreds(res_r,number_probs)
 ```
+
+
 
 ## Model G
 
 ### Fit Model G
-config$channel = 2
-```{r results='hide', echo=FALSE}
-model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
-model_my_own %>% summary()
-model_my_own %>% save_model_hdf5(model_name)
+
+```{r}
+params$channel_no = 2
 ```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts}
+model_g <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_g %>% summary()
+model_g %>% save_model_hdf5("fruit_model_g.h5")
+```
+
+```{r}
+model_g <- load_model_hdf5("fruit_model_g.h5")
+model_g %>% summary()
+```
+
 
 ### Test Model G
 
 ```{r results='hide', echo=FALSE}
-results2 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+results_g <- model_g %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
 ### Obtain Predictions G
 
 ```{r results='hide', echo=FALSE}
-res2 <- model_my_own %>% predict(data)
-preds(res2)
-mpreds2<-multipreds(res2,number_probs)
+res_g <- model_g %>% predict(data)
+preds(res_g)
+mpreds_g<-multipreds(res_g,number_probs)
 ```
+
+
 
 ## Model B
 
 ### Fit Model B
-config$channel = 3
-```{r results='hide', echo=FALSE}
-model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
-model_my_own %>% summary()
-model_my_own %>% save_model_hdf5(model_name)
+
+```{r}
+params$channel = 3
 ```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts}
+model_b <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_b %>% summary()
+model_b %>% save_model_hdf5("fruit_model_b.h5")
+```
+
+```{r}
+model_b <- load_model_hdf5("fruit_model_b.h5")
+model_b %>% summary()
+```
+
 
 ### Test Model B
 
 ```{r results='hide', echo=FALSE}
-results3 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+results_b <- model_b %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
 ### Obtain Predictions B
 
 ```{r results='hide', echo=FALSE}
-res2 <- model_my_own %>% predict(data)
-preds(res2)
-mpreds3<-multipreds(res2,number_probs)
+res_b <- model_b %>% predict(data)
+preds(res_b)
+mpreds_b<-multipreds(res_b,number_probs)
 ```
 
 ### Fit Model RGB
-config$channels = 3
-config$channel  = 1:3
-```{r results='hide', echo=FALSE}
-model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-model_my_own <-create_fruit_model(Train_data_reshaped[,,,config$channel_no,drop = F],Train_labels,Test_data_reshaped[,,,config$channel_no,drop = F],Test_labels,config$channels) # drop = F stops R collapsing array to 3 dimensions not 4
-model_my_own %>% summary()
-model_my_own %>% save_model_hdf5(model_name)
+
+```{r}
+params$channels = 3
+params$channel_no  = 1:3
 ```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts}
+model_rgb <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_rgb %>% summary()
+model_rgb %>% save_model_hdf5("fruit_model_rgb.h5")
+```
+
+```{r}
+model_rgb <- load_model_hdf5("fruit_model_rgb.h5")
+model_rgb %>% summary()
+```
+
 
 ### Test Model RGB
 
 ```{r results='hide', echo=FALSE}
-results2 <- model_my_own %>% evaluate(Test_data_reshaped[,,,config$channel_no,drop=F], Test_labels)
+results_rgb <- model_rgb %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
 ### Obtain Predictions RGB
 
+```{r}
+data <- image_tester(internet_path,"Banana")
+```
+
 ```{r results='hide', echo=FALSE}
-res2 <- model_my_own %>% predict(data)
-preds(res2)
-mpreds2<-multipreds(res2,number_probs)
+res_rgb <- model_rgb %>% predict(data)
+preds(res_rgb)
+mpreds_rgb<-multipreds(res_rgb,number_probs)
 ```
 
 ## Summary
 
 ```{r echo=FALSE}
-frame<-as.data.frame(results)
-frame<-rbind(frame,as.data.frame(results2),as.data.frame(results3))
+frame<-as.data.frame(results_r)
+frame<-rbind(frame,as.data.frame(results_g),as.data.frame(results_b),as.data.frame(results_rgb))
 colnames(frame)<-c("Loss","Accuracy")
-frame$Model<-c("R only","G only","B only")
+frame$Model<-c("R only","G only","B only","RGB")
 frame<-frame[c("Model","Loss","Accuracy")]
 ```
 
@@ -198,11 +259,174 @@ knitr::kable(frame, caption = "Summary")
 ```
 
 ```{r echo=FALSE}
-knitr::kable(mpreds1, caption = "Table Of Predictions")
+knitr::kable(mpreds_r, caption = "Table Of Predictions R")
 ```
 ```{r echo=FALSE}
-knitr::kable(mpreds2, caption = "Table Of Predictions")
+knitr::kable(mpreds_g, caption = "Table Of Predictions G")
 ```
 ```{r echo=FALSE}
-knitr::kable(mpreds3, caption = "Table Of Predictions")
+knitr::kable(mpreds_b, caption = "Table Of Predictions B")
+```
+```{r echo=FALSE}
+knitr::kable(mpreds_rgb, caption = "Table Of Predictions RGB")
+```
+
+
+## Image Sizes
+
+### 100 x 100
+
+```{r}
+params$xshape <- 100
+params$yshape <- 100
+params$train_data_name  <- "fruit_train_data100.Rda"
+params$train_label_name <- "fruit_train_labels100.Rda"
+params$test_data_name   <- "fruit_test_data100.Rda"
+params$test_label_name  <- "fruit_test_labels100.Rda"
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+```
+
+```{r, echo=FALSE}
+Train_data_saved <- readRDS("fruit_train_data100.Rda")
+Train_labels_saved <- readRDS("fruit_train_labels100.Rda")
+Test_data_saved <- readRDS("fruit_test_data100.Rda")
+Test_labels_saved <- readRDS("fruit_test_labels100.Rda")
+```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts2}
+model_rgb100 <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_rgb100 %>% summary()
+model_rgb100 %>% save_model_hdf5("fruit_model_rgb100.h5")
+```
+
+
+```{r}
+model_rgb100 <- load_model_hdf5("fruit_model_rgb100.h5")
+model_rgb100 %>% summary()
+```
+
+
+```{r results='hide', echo=FALSE}
+results_rgb100 <- model_rgb100 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
+```
+
+### 50 x 50
+
+```{r}
+params$xshape <- 50
+params$yshape <- 50
+params$train_data_name  <- "fruit_train_data50.Rda"
+params$train_label_name <- "fruit_train_labels50.Rda"
+params$test_data_name   <- "fruit_test_data50.Rda"
+params$test_label_name  <- "fruit_test_labels50.Rda"
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+```
+
+```{r, echo=FALSE}
+Train_data_saved   <- readRDS("fruit_train_data50.Rda")
+Train_labels_saved <- readRDS("fruit_train_labels50.Rda")
+Test_data_saved    <- readRDS("fruit_test_data50.Rda")
+Test_labels_saved  <- readRDS("fruit_test_labels50.Rda")
+```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts2}
+model_rgb50 <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_rgb50 %>% summary()
+model_rgb50 %>% save_model_hdf5("fruit_model_rgb50.h5")
+```
+
+```{r}
+model_rgb50 <- load_model_hdf5("fruit_model_rgb50.h5")
+model_rgb50 %>% summary()
+```
+
+
+```{r results='hide', echo=FALSE}
+results_rgb50 <- model_rgb50 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
+```
+
+### 28 x 28
+
+```{r}
+params$xshape <- 28
+params$yshape <- 28
+params$train_data_name  <- "fruit_train_data28.Rda"
+params$train_label_name <- "fruit_train_labels28.Rda"
+params$test_data_name   <- "fruit_test_data28.Rda"
+params$test_label_name  <- "fruit_test_labels28.Rda"
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+```
+
+```{r, echo=FALSE}
+Train_data_saved   <- readRDS("fruit_train_data28.Rda")
+Train_labels_saved <- readRDS("fruit_train_labels28.Rda")
+Test_data_saved    <- readRDS("fruit_test_data28.Rda")
+Test_labels_saved  <- readRDS("fruit_test_labels28.Rda")
+```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts2}
+model_rgb28 <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_rgb28 %>% summary()
+model_rgb28 %>% save_model_hdf5("fruit_model_rgb28.h5")
+```
+
+
+```{r}
+model_rgb28 <- load_model_hdf5("fruit_model_rgb28.h5")
+model_rgb28 %>% summary()
+```
+
+
+```{r results='hide', echo=FALSE}
+results_rgb28 <- model_rgb28 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
+```
+
+### 12 x 12
+
+```{r}
+params$xshape <- 12
+params$yshape <- 12
+params$train_data_name  <- "fruit_train_data12.Rda"
+params$train_label_name <- "fruit_train_labels12.Rda"
+params$test_data_name   <- "fruit_test_data12.Rda"
+params$test_label_name  <- "fruit_test_labels12.Rda"
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
+```
+
+```{r, echo=FALSE}
+Train_data_saved   <- readRDS("fruit_train_data12.Rda")
+Train_labels_saved <- readRDS("fruit_train_labels12.Rda")
+Test_data_saved    <- readRDS("fruit_test_data12.Rda")
+Test_labels_saved  <- readRDS("fruit_test_labels12.Rda")
+```
+
+```{r results='hide', echo=FALSE, eval=evaluate_scripts2}
+model_rgb12 <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_rgb12 %>% summary()
+model_rgb12 %>% save_model_hdf5("fruit_model_rgb12.h5")
+```
+
+
+```{r}
+model_rgb12 <- load_model_hdf5("fruit_model_rgb12.h5")
+model_rgb12 %>% summary()
+```
+
+
+```{r results='hide', echo=FALSE}
+results_rgb12 <- model_rgb12 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
+```
+
+## Summary
+
+```{r echo=FALSE}
+frame<-as.data.frame(results_rgb100)
+frame<-rbind(frame,as.data.frame(results_rgb50),as.data.frame(results_rgb28),as.data.frame(results_rgb12))
+colnames(frame)<-c("Loss","Accuracy")
+frame$Model<-c("100","50","28","12")
+frame<-frame[c("Image Size","Loss","Accuracy")]
+```
+
+```{r echo=FALSE}
+knitr::kable(frame, caption = "RGB model, different image sizes")
 ```

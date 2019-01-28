@@ -45,6 +45,12 @@ resize_method <- 'bilinear'           # or 'nearest'
 
 number_probs <- 4      # this many probabilities quoted by multipred
 
+###
+
+train_data_name<- "fruit_train_data.Rda"
+train_label_name<-"fruit_train_labels.Rda"
+test_data_name<-  "fruit_test_data.Rda"
+test_label_name<- "fruit_test_labels.Rda"
 ##################################################
 
 params <- list('pathname' = pathname,
@@ -65,5 +71,9 @@ params <- list('pathname' = pathname,
   'output_n'= output_n,
   'xshape' = xshape,
   'yshape' = yshape,
-  'resize_method' = resize_method
+  'resize_method' = resize_method,
+  'train_data_name' = train_data_name,
+  'train_label_name' = train_label_name,
+  'test_data_name' = test_data_name,
+  'test_label_name' = test_label_name
 )

@@ -11,10 +11,10 @@ library(tidyr)
 
 # data comes in from Data_Producer
 
-Train_data_saved <- readRDS("fruit_train_data.Rda")
-Train_labels_saved <- readRDS("fruit_train_labels.Rda")
-Test_data_saved <- readRDS("fruit_test_data.Rda")
-Test_labels_saved <- readRDS("fruit_test_labels.Rda")
+Train_data_saved <-   readRDS(params$train_data_name)
+Train_labels_saved <- readRDS(params$train_label_name)
+Test_data_saved <-    readRDS(params$test_data_name)
+Test_labels_saved <-  readRDS(params$test_label_name)
 
 
 ############################################
@@ -34,7 +34,7 @@ results
 
 results <- model_my_own %>% predict_classes(Test_data_saved[,,,params$channel_no,drop = F]) # drop = F stops R collapsing array to 3 dimensions not 4
 ############################################
-data <- image_tester(params$internet_path,"Walnut")
+data <- image_tester(params$internet_path,"Banana")
 res2 <- model_my_own %>% predict(data)
 preds(res2)
 multipreds(res2,params$number_probs)

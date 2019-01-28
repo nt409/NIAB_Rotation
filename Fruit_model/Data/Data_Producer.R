@@ -23,7 +23,7 @@ Test_total  <- Test_data_and_labels$total_no
 Train_data_reshaped <- array_reshape(Train_data,c(Train_total,params$xshape,params$yshape,3),order=c("F"))
 Test_data_reshaped <- array_reshape(Test_data,c(Test_total,params$xshape,params$yshape,3),order=c("F"))
 
-saveRDS(Train_data_reshaped,file="fruit_train_data.Rda")
-saveRDS(Train_labels,file="fruit_train_labels.Rda")
-saveRDS(Test_data_reshaped,file="fruit_test_data.Rda")
-saveRDS(Test_labels,file="fruit_test_labels.Rda")
+saveRDS(Train_data_reshaped,file=params$train_data_name)
+saveRDS(Train_labels,file=params$train_label_name)
+saveRDS(Test_data_reshaped,file=params$test_data_name)
+saveRDS(Test_labels,file=params$test_label_name)
