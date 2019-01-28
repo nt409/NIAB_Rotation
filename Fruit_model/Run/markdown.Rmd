@@ -1,13 +1,15 @@
 ---
 title: "Fruit Model"
 output: html_document
-params:
-  channels: 1   # how many channels? - 1, 2 or 3
-  channel_no: 1 # which of these channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
-  xshape: 40 # image size, can't influence from here though?
-  yshape: 40 # image size, can't influence from here though?
-  labels_to_be_tested: c(12,46) # can't actually influence from here?
 ---
+
+<!-- params: -->
+<!--   channels: 1   # how many channels? - 1, 2 or 3 -->
+<!--   channel_no: 1 # which of these channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels -->
+<!--   xshape: 40 # image size, can't influence from here though? -->
+<!--   yshape: 40 # image size, can't influence from here though? -->
+<!--   labels_to_be_tested: c(12,46) # can't actually influence from here? -->
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -32,9 +34,7 @@ To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. T
 ```{r results='hide'}
 #setwd('~/GitHub/NIAB_Rotation/Fruit_model')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
-#source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')
-#Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get()
+source('~/GitHub/NIAB_Rotation/Fruit_model/Run/Parameters.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/config.yml')   
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R')
