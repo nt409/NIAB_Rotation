@@ -13,13 +13,13 @@ library(dplyr)
 
 ##################################################
 # file/path parameters
-pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360"
-training_folder <- "Training"
-test_folder <- "Test"
-filetype <- ".jpg" # working with ".jpg" or ".png"?
-internet_path <- "C:/Users/Administrator/Documents/Rotation/Photos_to_test_model"
-internet_file_type <- ".jpg"
-class_names <- folder_names(pathname,training_folder)
+pathname <- "C:/Users/Administrator/Documents/Rotation/fruits-360" ## In params
+training_folder <- "Training" ## In params
+test_folder <- "Test"         ## In params
+filetype <- ".jpg"            ## In params  # working with ".jpg" or ".png"?
+internet_path <- "C:/Users/Administrator/Documents/Rotation/Photos_to_test_model" ## In params
+internet_file_type <- ".jpg"  ## In params
+class_names <- folder_names(pathname,training_folder) ## In params
 
 ##################################################
 # get label numbers after specify categories we want
@@ -27,30 +27,30 @@ fruit_list <- c("Apple_Braeburn","Banana") #,"Orange","Grape_White","Kiwi")
 class_names_frame <- cbind(class_names,seq(length(class_names)))
 class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
 colnames(class_names_frame) <- c('Fruit','label')
-labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2]) # or e.g. 20:21, or 1:(length(class_names))
+labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2]) ## In params
+# or labels... =  e.g. c(13,48), or 20:30, or 1:(length(class_names))
 
 ##################################################
 # model parameters
-channels   <- 1        # how many channels? - 1, 2 or 3
-channel_no <- 3        # which of these channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
-My_filter_number <- 32    # model parameters from here downwards
-My_kernel_size <- c(3,3)
-My_batch_size  <- 32
-My_epoch_number <- 5 # 5
-output_n <- 1 + length(class_names)   # number of outputs, # number of classes plus one since don't cast to 0?
+channel_no <- 3          ## In params # which channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
+My_filter_number <- 32   ## In params
+My_kernel_size <- c(3,3) ## In params
+My_batch_size  <- 32     ## In params
+My_epoch_number <- 5 # 5 ## In params
+output_n <- 1 + length(class_names)   ## In params # number of outputs, # number of classes plus one since don't cast to 0?
 # needs to include label values? eg 14, 81 -> is max
-xshape   <- 40                        # image size
-yshape   <- 40                        # image size
-resize_method <- 'bilinear'           # or 'nearest'
+xshape   <- 40                        ## In params # image size
+yshape   <- 40                        ## In params # image size
+resize_method <- 'bilinear'           ## In params # or 'nearest'
 
-number_probs <- 4      # this many probabilities quoted by multipred
+number_probs <- 4      ## In params # this many probabilities quoted by multipred
 
 ###
 
-train_data_name<- "fruit_train_data.Rda"
-train_label_name<-"fruit_train_labels.Rda"
-test_data_name<-  "fruit_test_data.Rda"
-test_label_name<- "fruit_test_labels.Rda"
+train_data_name<- "fruit_train_data.Rda"  ## In params
+train_label_name<-"fruit_train_labels.Rda"## In params 
+test_data_name<-  "fruit_test_data.Rda"   ## In params
+test_label_name<- "fruit_test_labels.Rda" ## In params
 ##################################################
 
 params <- list('pathname' = pathname,
@@ -61,9 +61,7 @@ params <- list('pathname' = pathname,
   'internet_file_type' = internet_file_type,
   'class_names'= class_names,
   'labels_to_be_tested' = labels_to_be_tested,
-  'channels'  = channels,
   'channel_no' = channel_no,
-  'number_probs' = number_probs,
   'My_filter_number' = My_filter_number,
   'My_kernel_size' = My_kernel_size,
   'My_batch_size'  = My_batch_size,
@@ -72,6 +70,7 @@ params <- list('pathname' = pathname,
   'xshape' = xshape,
   'yshape' = yshape,
   'resize_method' = resize_method,
+  'number_probs' = number_probs,
   'train_data_name' = train_data_name,
   'train_label_name' = train_label_name,
   'test_data_name' = test_data_name,

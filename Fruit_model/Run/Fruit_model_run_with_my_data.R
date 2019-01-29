@@ -11,18 +11,19 @@ library(tidyr)
 
 # data comes in from Data_Producer
 
-Train_data_saved <-   readRDS(params$train_data_name)
+Train_data_saved   <- readRDS(params$train_data_name)
 Train_labels_saved <- readRDS(params$train_label_name)
-Test_data_saved <-    readRDS(params$test_data_name)
-Test_labels_saved <-  readRDS(params$test_label_name)
+Test_data_saved    <- readRDS(params$test_data_name)
+Test_labels_saved  <- readRDS(params$test_label_name)
 
 
 ############################################
 # fit model
 model_name <- "fruit_model_new.h5" # "fruit_model.h5"
-model_my_own <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved,params$channels) # drop = F stops R collapsing array to 3 dimensions not 4
+model_my_own <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved) # drop = F stops R collapsing array to 3 dimensions not 4
 model_my_own %>% summary()
 model_my_own %>% save_model_hdf5(model_name)
+
 
 
 # below model has all fruits

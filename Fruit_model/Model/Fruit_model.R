@@ -7,12 +7,12 @@ library(purrr)
 
 # contains function 'create_fruit_model'
 
-create_fruit_model <- function(train_data,train_labels,test_data,test_labels,channels) {
+create_fruit_model <- function(train_data,train_labels,test_data,test_labels) {
 
 model <- keras_model_sequential()
 
 model %>%
-  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size,padding="same",input_shape = c(params$xshape, params$yshape, channels)) %>%
+  layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size,padding="same",input_shape = c(params$xshape, params$yshape, length(params$channel_no))) %>%
   layer_activation("relu") %>%
   layer_conv_2d(filter=params$My_filter_number, kernel_size= params$My_kernel_size, padding="same") %>%
   layer_activation_leaky_relu(0.5) %>%
