@@ -3,7 +3,7 @@ source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
 
 library(reticulate)
 
-Train_data_and_labels <- Cluster_data_in_final_form(params$pathname,params$training_folder,params$labels_to_be_tested,params$filetype)
+# Train_data_and_labels <- Cluster_data_in_final_form(params$pathname,params$training_folder,params$labels_to_be_tested,params$filetype)
 
 Train_data_and_labels <- Data_in_final_form(params$pathname,params$training_folder,params$labels_to_be_tested,params$filetype)
 
