@@ -52,7 +52,8 @@ cl<-makeCluster(no_cores) # Initiate cluster
 registerDoParallel(cl)
 
 shape<-foreach(exponent = 2:4, 
-        .combine = acomb,.packages=c('OpenImageR','dplyr','abind'))  %dopar%  
+        .combine = acomb,
+        .packages=c('OpenImageR','dplyr','abind'))  %dopar%  
   clustering(exponent)
 
 shape
