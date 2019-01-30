@@ -75,7 +75,7 @@ Data_in_final_form <- function(pathname_of_images,folder,list_of_labels_to_be_te
     im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
     new_data <- as.data.frame(im)
     
-    data <- abind(data,new_data,along=3)
+    data  <- abind(data,new_data,along=3)
     label <- rbind(label,j)
   }
   }
@@ -83,26 +83,9 @@ Data_in_final_form <- function(pathname_of_images,folder,list_of_labels_to_be_te
   return(list('Image_array'=data,'label_vector'=label))
 }
 
-##################################################
 
-cluster_data <- function(data,label,Fruit_frame,pathname_of_images,folder,j){
-  print(paste('Set number',j)) # gives idea of progress.
-  Fruit_filtered_data<-filter(Fruit_frame,Label==j)
-  number_of_files_filtered <- length(Fruit_filtered_data[,2])
-  
-  for(i in 1:number_of_files_filtered){
-    image_number <- i
-    path <- paste(pathname_of_images,folder,params$class_names[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
-    
-    im <- readImage(path)
-    im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
-    new_data <- as.data.frame(im)
-    
-    data <- abind(data,new_data,along=3)
-    label <- rbind(label,j)
-  }
-  return(list('Image_array'=data,'label_vector'=label))
-}
+
+
 
 ##################################################
 
@@ -155,13 +138,52 @@ Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_
   # Initiate cluster
   cl <- makeCluster(no_cores)
   
-  data <-  clusterApply(cl, data,label,Fruit_frame,pathname_of_images,folder, list_of_labels_to_be_tested[-1], cluster_data)
+  ##################################################
   
+  acomb <- function(...) abind(..., along=3)
   
-  stopCluster(cl)  
+  cluster_function <- function(j){
+    print(paste('Set number',j)) # gives idea of progress.
+    Fruit_filtered_data<-filter(Fruit_frame[,2],j) #  frame,Label==j
+    number_of_files_filtered <- length(Fruit_filtered_data[,2])
+    
+    image_number <- 1
+    path <- paste(pathname_of_images,folder,params$class_names[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    
+    im <- readImage(path)
+    im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
+    new_data <- as.data.frame(im)
+    data <- abind(data,new_data,along=3)
+    label <- rbind(label,j)
+    
+    for(i in 2:number_of_files_filtered){
+      image_number <- i
+      path <- paste(pathname_of_images,folder,params$class_names[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+      
+      im <- readImage(path)
+      im <- resizeImage(im, width = params$xshape, height = params$yshape, method = params$resize_method)
+      new_data <- as.data.frame(im)
+      
+      data <- abind(data,new_data,along=3)
+      label <- rbind(label,j)
+    }
+  data
+  }
+
+#data <-  clusterApply(cl, data,label,Fruit_frame,pathname_of_images,folder, list_of_labels_to_be_tested[-1], cluster_function)
+  
+output <- foreach(input = list_of_labels_to_be_tested[-1], 
+                .combine = acomb, .multicombine=TRUE)  %dopar%
+  cluster_function(input)  
+
+data <- output
+print(output)
+#label <- output[[2]]
+
+stopCluster(cl)
 
   
-  return(list('Image_array'=data,'label_vector'=label))
+  return(output) # list('Image_array'=data,'label_vector'=label))
 }
 
 

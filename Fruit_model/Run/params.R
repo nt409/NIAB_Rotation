@@ -23,13 +23,13 @@ class_names <- folder_names(pathname,training_folder) ## In params
 
 ##################################################
 # get label numbers after specify categories we want
-fruit_list <- c("Apple_Braeburn","Banana") #,"Orange","Grape_White","Kiwi")
-class_names_frame <- cbind(class_names,seq(length(class_names)))
-class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
-colnames(class_names_frame) <- c('Fruit','label')
-labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2]) ## In params
+# fruit_list <- c("Apple_Braeburn","Banana") #,"Orange","Grape_White","Kiwi")
+# class_names_frame <- cbind(class_names,seq(length(class_names)))
+# class_names_frame <- as.data.frame(class_names_frame,stringsAsFactors=F)
+# colnames(class_names_frame) <- c('Fruit','label')
+# labels_to_be_tested <- as.numeric(filter(class_names_frame,Fruit %in% fruit_list)[,2]) ## In params
 # or labels... =  e.g. c(13,48), or 20:30, or 1:(length(class_names))
-
+labels_to_be_tested <- 1:4
 ##################################################
 # model parameters
 channel_no <- 3          ## In params # which channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels
