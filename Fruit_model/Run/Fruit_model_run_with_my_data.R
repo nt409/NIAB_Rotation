@@ -1,5 +1,6 @@
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions, 'labeller', 'Data_in_final_form'
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions, 'labeller', 'Data_in_final_form'
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Cluster_data_functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') # contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'
 source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')  # needs params   # contains function 'create_fruit_model' # needs to be before data_producer, so library(keras) is before library(reticulate)?
 source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Producer.R') # slow to run, saves train & test data & labels
@@ -35,7 +36,7 @@ results
 
 results <- model_my_own %>% predict_classes(Test_data_saved[,,,params$channel_no,drop = F]) # drop = F stops R collapsing array to 3 dimensions not 4
 ############################################
-data <- image_tester(params$internet_path,"Banana")
+data <- image_tester(params$internet_path,"Apricot")
 res2 <- model_my_own %>% predict(data)
 preds(res2)
 multipreds(res2,params$number_probs)

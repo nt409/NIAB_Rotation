@@ -1,4 +1,5 @@
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')# contains functions, 'labeller', 'Data_in_final_form'
 
 library(abind)
 library(OpenImageR)
@@ -21,7 +22,11 @@ framer <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_ty
 
 Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_type){
   
-  
+  # pathname_of_images<-params$pathname
+  # folder<-params$training_folder
+  # list_of_labels_to_be_tested<-params$labels_to_be_tested
+  # file_type<-params$filetype
+
   ###
   # not sure why this step is necessary?
   pathname_of_images_env <- pathname_of_images
@@ -36,33 +41,45 @@ Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_
   # not sure why this step is necessary?
   ###
   
-  Fruit_frame <- framer(pathname_of_images,folder,list_of_labels_to_be_tested,file_type)
+  Fruit_frame <- framer(pathname_of_images_env,folder_env,list_of_labels_to_be_tested_env,file_type_env)
   
   ##################################################
-  acomb <- function(...) abind(..., along=3)
+  acomb <- function(...){
+    Arguments <- list(...)
+    datas<-Arguments[[1]]$Data_j
+    labels<-Arguments[[1]]$Label_j
+    if(length(Arguments)>1){
+    for(i in 2:length(Arguments)){
+    datas<-abind(datas,Arguments[[i]]$Data_j, along=3)
+    labels<-rbind(labels,Arguments[[i]]$Label_j)
+    }
+    }
+    return(list('Data'=datas,'Labels'=labels))
+  }
   ##################################################
   
   clustering <- function(j){
-    Fruit_filtered_data<- filter(Fruit_frame,Label==j) #  frame,Label==j
-    print(Fruit_filtered_data)
+    Fruit_filtered_data<- filter(Fruit_frame,Label==j)
     number_of_files_filtered <- length(Fruit_filtered_data[,2])
     
-    images <- function(i){
+    image_number<-1
+    path <- paste(pathname_of_images_env,folder_env,classnames_env[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
+    im <- readImage(path)
+    im <- resizeImage(im, width = xshape_env, height = yshape_env, method = resize_method_env)
+    data <- as.data.frame(im)
+    label <- as.data.frame(j)
+    
+    for(i in 2:number_of_files_filtered){
       image_number <- i
       path <- paste(pathname_of_images_env,folder_env,classnames_env[j],as.character(Fruit_filtered_data[image_number,1]),sep = '/')
       
       im <- readImage(path)
       im <- resizeImage(im, width = xshape_env, height = yshape_env, method = resize_method_env)
       new_data <- as.data.frame(im)
-      return(new_data)
+      data <- abind(data,new_data,along=3)
+      label <- rbind(label,j)
     }
-    
-    data <- foreach(in_put = 1:number_of_files_filtered,
-                     .combine = acomb,
-                     .packages=c('OpenImageR','dplyr','abind'))  %dopar%
-      images(in_put)
-    
-    return(data)
+    return(list('Data_j'=data,'Label_j'=label))
   }
   ##################################################
   no_cores <- detectCores() - 1
@@ -71,7 +88,8 @@ Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_
   
   array <- foreach(input = list_of_labels_to_be_tested_env,
                  .combine = acomb,
-                 .packages=c('OpenImageR','dplyr','abind','foreach'))  %dopar%
+                 .multicombine = TRUE,
+                 .packages=c('OpenImageR','dplyr','abind'))  %dopar%
     clustering(input)
   
   ## need to get labels coming out in the same order.
@@ -82,3 +100,4 @@ Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_
 }
 
 # system.time(Train_data_and_labels <- Cluster_data_in_final_form(params$pathname,params$training_folder,params$labels_to_be_tested,params$filetype))
+# Train_data_and_labels <- Cluster_data_in_final_form(params$pathname,params$training_folder,params$labels_to_be_tested,params$filetype)
