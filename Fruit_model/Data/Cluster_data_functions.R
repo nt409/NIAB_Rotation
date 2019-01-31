@@ -19,13 +19,13 @@ framer <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_ty
 }
 
 ##################################################
-
-Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_type){
-  
+  # for initial testing
   # pathname_of_images<-params$pathname
   # folder<-params$training_folder
   # list_of_labels_to_be_tested<-params$labels_to_be_tested
   # file_type<-params$filetype
+
+Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_type){
 
   ###
   # not sure why this step is necessary?
@@ -49,10 +49,10 @@ Cluster_data_in_final_form <- function(pathname_of_images,folder,list_of_labels_
     datas<-Arguments[[1]]$Data_j
     labels<-Arguments[[1]]$Label_j
     if(length(Arguments)>1){
-    for(i in 2:length(Arguments)){
-    datas<-abind(datas,Arguments[[i]]$Data_j, along=3)
-    labels<-rbind(labels,Arguments[[i]]$Label_j)
-    }
+      for(i in 2:length(Arguments)){
+        datas<-abind(datas,Arguments[[i]]$Data_j, along=3)
+        labels<-rbind(labels,Arguments[[i]]$Label_j)
+      }
     }
     return(list('Data'=datas,'Labels'=labels))
   }

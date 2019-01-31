@@ -36,7 +36,7 @@ results
 
 results <- model_my_own %>% predict_classes(Test_data_saved[,,,params$channel_no,drop = F]) # drop = F stops R collapsing array to 3 dimensions not 4
 ############################################
-data <- image_tester(params$internet_path,"Apricot")
+data <- image_tester(params$internet_path,"Braeburn")
 res2 <- model_my_own %>% predict(data)
 preds(res2)
 multipreds(res2,params$number_probs)
