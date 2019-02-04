@@ -1,38 +1,45 @@
 ---
 title: "Fruit Model"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Running The Model
+## Introduction
 
-To run the model, run the file 'Fruit_model_run_with_my_data' in folder 'Run'. The parameters can be adjusted in the file 'Parameters' in folder 'Run'. The other scripts and functions involved are found in 'Analysis/Functions', 'Data/Data_Functions', 'Data/Data_Producer' and 'Model/Fruit_model'.
+Here we introduce the fruit classification model. The model could theoretically be adapted to for any training images containing single objects to be classified. We will first explain the purpose of each of the scripts we will be using in Section 'Initialising', before explaining how to run the model in Section 'How To Run The Model', and then exploring some of the functionality of it and what choice of colour channels and image size works best in the remainder of this file.
 
-## Initialise
+## Initialising
 
-'Data_Functions.R' contains functions 'labeller', 'Data_in_final_form'. These are used to import the images we use to train or test our model. They produce
+'params.R' contains the parameters we will need. These are then put into a list and called using params$parameter_name. These are broken down by file/path parameters, fruit label numbers we want to test, and model parameters. The file/path parameters will specify which folders we want to extract the images from. The label numbers will specify which fruits we are intend to include in the model. The model parameters will prescribe things like image size, number of training epochs, and which colour channels we want to use in model training.
 
-'params.R' contains the parameters we will need. These are then put into a list and called using params$parameter_name.
+'Data_Functions.R' contains functions 'labeller', 'Data_in_final_form'. These are used to import the images we use to train or test our model. They produce an array with slices corresponding to the intensities of the R, G and B channels for each particular image. We also obtain a list of labels corresponding to these images.
 
-'Functions.R' contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'.
+'Cluster_data_functions.R' is an updated version of 'Data_Functions.R' that is designed to run in parallel. On this laptop, using 7 cores, we obtain a run time that is nearly 7 times faster than the original script was. We can check this using the command 'system.time()'.
 
-'Data_Producer.R' is slow to run.
+'Functions.R' contains functions 'image_tester', 'preds', 'multipreds', 'image_predictor'. These functions allow us to feed in an image and obtain probabilities assigned by the model that the image belongs to a particular category. Function 'multipreds', for example, will give up to n predictions of which category the image belongs to, in descending order of likelihood, where n is specified by 'params$number_probs'.
 
-'Fruit_model.R' needs parameters, contains function 'create_fruit_model'.
+'Data_Producer.R' is slow to run. Currently set up to run in parallel which is faster than the commented out older version which used 'Data_Functions.R' which was not parallelized. It uses functions from 'Cluster_data_functions.R' to produce and save the test and training data we will need for the model.
+
+'Fruit_model.R' contains function 'create_fruit_model'. This gives the full description of the model.
+
+Another file that is in the `Fruit_model' folder is 'Bigger_model/Master_model'. This is an initial mock up of how we might fit a multinomial logistic regression once we have obtained our image recognition predictions. This contains some made-up data that might be representative of data that would be the input of our eventual model. However this will likely be replaced with something more sophisticated like an SVM?
 
 ```{r results='hide'}
-source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Run/params.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Data_Functions.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Data/Cluster_data_Functions.R')
 source('~/GitHub/NIAB_Rotation/Fruit_model/Analysis/Functions.R') 
 source('~/GitHub/NIAB_Rotation/Fruit_model/Model/Fruit_model.R')
 ```
 
 ```{r, echo=FALSE}
-evaluate_scripts <- FALSE
-evaluate_scripts2<- FALSE
+evaluate_scripts <- TRUE
+evaluate_scripts2<- TRUE
 ```
 
 ```{r, eval=evaluate_scripts}
@@ -89,6 +96,23 @@ Test_labels_saved  <- readRDS("fruit_test_labels.Rda")
 
 The model is set up to identify single fruits - it has not been trained on images with multiple fruits and the probabilities it gives sum to 1 for prediciting individual fruits.
 
+## How To Run The Model
+
+If we simply run the file 'Fruit_model_run_with_my_data.R', with whatever parameters we want to specify in the 'params.R' file, then we will fit a model that can distinguish between the fruit types specified by 'labels_to_be_tested'. This data and the model will be saved, which can be loaded at a later date provided we save it with a unique file name that doesn't get overwritten. We can also test our model against any .jpeg image obtained online or otherwise and saved within a folder that we can access via changing 'internet_path' and 'internet_file_type' and specifying the folder name.
+
+```{r eval=FALSE}
+data <- image_tester(params$internet_path,"Braeburn")
+res2 <- model_my_own %>% predict(data)
+preds(res2)
+multipreds(res2,params$number_probs)
+```
+
+
+
+
+
+
+## Analysis
 
 ## Comparison Between Colour Choices
 
@@ -103,7 +127,7 @@ params$channel_no = 1
 ```
 
 ```{r, eval=evaluate_scripts}
-model_my_own <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels)
+model_my_own <-create_fruit_model(Train_data_saved[,,,params$channel_no,drop = F],Train_labels_saved,Test_data_saved[,,,params$channel_no,drop = F],Test_labels_saved)
 model_my_own %>% summary()
 model_my_own %>% save_model_hdf5("fruit_model_r.h5")
 ```
@@ -304,7 +328,7 @@ knitr::kable(mpreds_rgb, caption = "Table Of Predictions RGB")
 ```
 
 
-## Summary
+### Summary Of Colour Channel Choices
 
 ```{r echo=FALSE}
 frame<-as.data.frame(results_r)
@@ -573,7 +597,7 @@ model_rgb12 %>% summary()
 results_rgb12 <- model_rgb12 %>% evaluate(Test_data_saved[,,,params$channel_no,drop=F], Test_labels_saved)
 ```
 
-## Summary
+### Summary Of Image Size Choice
 
 ```{r echo=FALSE}
 frame<-as.data.frame(results_rgb100)

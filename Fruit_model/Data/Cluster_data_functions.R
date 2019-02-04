@@ -5,6 +5,9 @@ library(abind)
 library(OpenImageR)
 library(dplyr)
 library(parallel)
+library(doParallel)
+
+# contains functions 'framer', 'Cluster_data_in_final_form' (functions 'acomb', 'clustering' are nested within this)
 
 ##################################################
 framer <- function(pathname_of_images,folder,list_of_labels_to_be_tested,file_type){
