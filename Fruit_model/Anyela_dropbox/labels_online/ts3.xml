@@ -1,0 +1,74 @@
+<annotation>
+  <folder>Test_pics_online</folder>
+  <filename>ts3</filename>
+  <path>C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Test_pics_online/ts3.jpg</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>3550</width>
+    <height>1950</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>Leaf</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>843</xmin>
+      <ymin>695</ymin>
+      <xmax>3140</xmax>
+      <ymax>1798</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Tan Spot</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>2000</xmin>
+      <ymin>925</ymin>
+      <xmax>2460</xmax>
+      <ymax>1071</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Tan Spot</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>2486</xmin>
+      <ymin>835</ymin>
+      <xmax>3083</xmax>
+      <ymax>1035</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Tan Spot</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1733</xmin>
+      <ymin>895</ymin>
+      <xmax>1953</xmax>
+      <ymax>1018</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Tan Spot</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>1976</xmin>
+      <ymin>785</ymin>
+      <xmax>2180</xmax>
+      <ymax>841</ymax>
+    </bndbox>
+  </object>
+</annotation>

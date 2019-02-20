@@ -33,7 +33,7 @@ class_names <- folder_names(pathname,training_folder) ## In params
 #######
 ### or we can just specify fruit numbers e.g. c(13,48), or 20:30, or 1:(length(class_names))
 #######
-labels_to_be_tested <- 29:30 # comment line if using the name method above to denote which fruits to test
+labels_to_be_tested <- 40:50 # comment line if using the name method above to denote which fruits to test
 ##################################################
 # model parameters
 channel_no <- 1:3        ## In params # which channels? 1,2,3 or: e.g. c(1,2) or 1:3 depending on how many channels

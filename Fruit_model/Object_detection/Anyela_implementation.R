@@ -135,14 +135,21 @@ model %>% fit_generator(
 ##########################################
 
 
-for (i in 1:2) {
+#for (i in 1:2) {
+  i<-3
   preds <-
     model %>% predict(
       load_and_preprocess_image(imageinfo[i, "file_name"], 
                                 target_height, target_width),
       batch_size = 1
     )
-  plot_image_with_boxes(img_dir, imagesc[i,],
+  
+  box_p <- c(1,10,15,30)
+  class_p <- 'hello'
+  
+  plot_image_with_boxes(img_dir,
+                        imagesc[i,],
                         scaled = TRUE,
-                        box_pred = c(1,10,15,30))
-}
+                        box_pred = box_p,
+                        class_pred = class_p)
+#}
