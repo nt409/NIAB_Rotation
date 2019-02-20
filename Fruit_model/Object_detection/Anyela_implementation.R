@@ -131,84 +131,8 @@ model %>% fit_generator(
 
 
 
-###########################################
-# me, using https://blogs.rstudio.com/tensorflow/posts/2018-11-05-naming-locating-objects/
 
-
-load_and_preprocess_image <- function(image_name, target_height, target_width) {
-  img_array <- image_load(
-    file.path(img_dir, image_name),
-    target_size = c(target_height, target_width)
-  ) %>%
-    image_to_array() %>%
-    xception_preprocess_input() 
-  dim(img_array) <- c(1, dim(img_array))
-  img_array
-}
-
-
-################################
-
-# 
-# plot_image_with_boxes <- function(file_name,
-#                                   object_class,
-#                                   box,
-#                                   scaled = FALSE,
-#                                   class_pred = NULL,
-#                                   box_pred = NULL) {
-#   img <- image_read(file.path(img_dir, file_name))
-#   #print(img)
-#   if(scaled) img <- image_resize(img, geometry = "224x224!")
-#   #print(img)
-#   img <- image_draw(img)
-#   #print(img)
-#   x_left <- box[1]
-#   y_bottom <- box[2]
-#   x_right <- box[3]
-#   y_top <- box[4]
-#   rect(
-#     x_left,
-#     y_bottom,
-#     x_right,
-#     y_top,
-#     border = "cyan",
-#     lwd = 2.5
-#   )
-#   text(
-#     x_left,
-#     y_top,
-#     object_class,
-#     offset = 1,
-#     pos = 2,
-#     cex = 1.5,
-#     col = "cyan"
-#   )
-#   #print(img)
-#   if (!is.null(box_pred))
-#     rect(box_pred[1],
-#          box_pred[2],
-#          box_pred[3],
-#          box_pred[4],
-#          border = "yellow",
-#          lwd = 2.5)
-#   if (!is.null(class_pred))
-#     text(
-#       box_pred[1],
-#       box_pred[2],
-#       class_pred,
-#       offset = 0,
-#       pos = 4,
-#       cex = 1.5,
-#       col = "yellow")
-#   dev.off()
-#   #print(img)
-#   img %>% image_write(paste0("preds_", file_name))
-#   image_draw(img)
-#   #plot(img)
-#   return(img) # me
-# }
-
-
+##########################################
 
 
 for (i in 1:2) {
@@ -219,31 +143,6 @@ for (i in 1:2) {
       batch_size = 1
     )
   plot_image_with_boxes(img_dir, imagesc[i,],
-                        box_pred = NULL)
+                        scaled = TRUE,
+                        box_pred = c(1,10,15,30))
 }
-
-
-trainer <- imagesc[1:2, c("file_name",
-                               "name",
-                               "xl",
-                               "yt",
-                               "xr",
-                               "yb")]
-
-#for( i in 1:2){
-i<-1
-preds <- model %>% predict(
-  load_and_preprocess_image(trainer[i,"file_name"], 
-                            target_height, target_width),
-  batch_size = 1
-)
-library(magrittr)
-
-nick <- plot_image_with_boxes(trainer$file_name[i],
-                     trainer$name[i],
-                     trainer[i,3:6]  %>% as.matrix(), # trainer[i,3:6]
-                     scaled = TRUE,
-                     box_pred = NULL)
-#}
-iris2<-trainer[1,3][1]
-iris2 %>% pull(0)
