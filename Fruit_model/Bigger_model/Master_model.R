@@ -75,11 +75,11 @@ multi.rrr
 
 # works - even if looks like d1, if it's sandy will predict next best.
 weather<-'wet'
-soil<-'clay'
+soil<-'sandy'
 location<-'Midlands'
-d1sc<-0.1
-d2sc<-0.9
-d3sc<-0.2
+d1sc<-0.95
+d2sc<-0.03
+d3sc<-0.02
 
 dis<- c('d1_score'=d1sc,'d2_score'=d2sc,'d3_score'=d3sc,'location'=location,'weather'=weather,'soil_type'=soil)
 dis<-t(dis)

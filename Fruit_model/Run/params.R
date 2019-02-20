@@ -47,6 +47,8 @@ xshape   <- 40                        ## In params # image size
 yshape   <- 40                        ## In params # image size
 resize_method <- 'bilinear'           ## In params # or 'nearest'
 
+### !!! input layer should be power of 2? so image size power of 2?
+
 number_probs <- 4      ## In params # this many probabilities quoted by multipred
 
 ###

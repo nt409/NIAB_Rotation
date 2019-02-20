@@ -1,0 +1,38 @@
+<annotation>
+  <folder>ENT Ear Photos</folder>
+  <filename>Ent052e</filename>
+  <path>C:\Users\x992029\share\ENT Ear Photos\Ent052e.jpg</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>3456</width>
+    <height>5184</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>oat</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>411</xmin>
+      <ymin>3522</ymin>
+      <xmax>594</xmax>
+      <ymax>5000</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>tag</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>628</xmin>
+      <ymin>4628</ymin>
+      <xmax>1855</xmax>
+      <ymax>4983</ymax>
+    </bndbox>
+  </object>
+</annotation>

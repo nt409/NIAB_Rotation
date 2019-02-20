@@ -1,0 +1,62 @@
+<annotation>
+  <folder>Test_pics_online</folder>
+  <filename>yr1</filename>
+  <path>C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Test_pics_online/yr1.jpg</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>1315</width>
+    <height>1655</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <name>Leaf</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>565</xmin>
+      <ymin>16</ymin>
+      <xmax>1196</xmax>
+      <ymax>1627</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Yellow Rust</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>596</xmin>
+      <ymin>53</ymin>
+      <xmax>770</xmax>
+      <ymax>1269</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Yellow Rust</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>728</xmin>
+      <ymin>32</ymin>
+      <xmax>907</xmax>
+      <ymax>1648</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>Yellow Rust</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <bndbox>
+      <xmin>907</xmin>
+      <ymin>732</ymin>
+      <xmax>1075</xmax>
+      <ymax>1622</ymax>
+    </bndbox>
+  </object>
+</annotation>
