@@ -3,6 +3,7 @@ title: "Fruit Model"
 output: 
   html_document:
     toc: true
+    keep_tex: yes
 ---
 
 ```{r setup, include=FALSE}

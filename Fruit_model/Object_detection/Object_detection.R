@@ -1,4 +1,5 @@
 library(keras)
+library(tensorflow)
 library(rjson)
 library(magick)
 library(purrr)
@@ -115,8 +116,8 @@ imageinfo_maxbb <- imageinfo %>%
   filter(which.max(area) == row_number())
 
 
-n_samples<-2501 # me
-train_indices <- sample(1:n_samples, 0.8 * n_samples)
+n_samples<-250 # me
+train_indices <- sample(1:n_samples, 0.1 * n_samples)
 train_data <- imageinfo_maxbb[train_indices,]
 validation_data <- imageinfo_maxbb[-train_indices,]
 

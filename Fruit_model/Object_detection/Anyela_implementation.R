@@ -2,7 +2,7 @@ source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela
 
 
 img_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Test_pics_online"
-annot_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/labels_online" # not used?
+#annot_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/labels_online" # not used?
 annot_file <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Annotation_online/online.json"
 
 
@@ -101,6 +101,18 @@ model <- keras_model(
   inputs = r_res$input,
   outputs = list(class_output, bbox_output)
 )
+# 
+# model <- keras_model(
+#   inputs = r_res$input,
+#   outputs = list(
+#     bbox_output[1,1,],
+#     bbox_output[2,2,],
+#     bbox_output[3,3,],
+#     class_output_1x1, 
+#     class_output_2x2, 
+#     class_output_4x4)
+#   #outputs = list(class_output, bbox_output)
+# ) # 3 bounding boxes out of 16?
 
 model %>% freeze_weights()
 model %>% unfreeze_weights(from = "head_conv1_1")
@@ -144,12 +156,35 @@ model %>% fit_generator(
       batch_size = 1
     )
   
-  box_p <- c(1,10,15,30)
-  class_p <- 'hello'
+  
+##########################################
+  category<-10
+  
+  imageinfo_modified_table <- as.data.frame(imageinfo$id)
+  colnames(imageinfo_modified_table) <- "id"
+  imageinfo_modified_table$image_height <- imageinfo$image_height
+  imageinfo_modified_table$image_width <- imageinfo$image_width
+  imageinfo_modified <- imageinfo_modified_table %>% distinct(id, image_height, image_width, .keep_all = TRUE)
+  
+  height<- unique(imageinfo_modified$image_height)[i]
+  width <- unique(imageinfo_modified$image_width)[i]
+  
+  box_p <- preds[[2]][,,][category,]
+  box_p
+  box_p <- (height)*box_p #c(1,10,15,30)
+  box_p[1] <- (width/height)*box_p[1]
+  box_p[3] <- (width/height)*box_p[3]
+  class_p <- 'category name'
+  box_p
+  
   
   plot_image_with_boxes(img_dir,
                         imagesc[i,],
-                        scaled = TRUE,
+                        scaled = FALSE,
                         box_pred = box_p,
                         class_pred = class_p)
+
 #}
+
+  
+  

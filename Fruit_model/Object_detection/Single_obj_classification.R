@@ -1,4 +1,5 @@
 library(keras)
+install_keras() #install_keras(tensorflow = "gpu")
 library(rjson)
 library(magick)
 library(purrr)
@@ -7,6 +8,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(stringr)
+
 
 img_dir <- "C:/Users/Administrator/Documents/Nick/VOCtrainval_06-Nov-2007/VOCdevkit/VOC2007/JPEGImages"
 annot_file <- "C:/Users/Administrator/Documents/PASCAL_VOC/pascal_train2007.json"
@@ -115,8 +117,8 @@ imageinfo_maxbb <- imageinfo %>%
   filter(which.max(area) == row_number())
 
 
-n_samples<-2501 # me
-train_indices <- sample(1:n_samples, 0.8 * n_samples)
+n_samples<-2000 # me
+train_indices <- sample(1:n_samples, 0.01 * n_samples)
 train_data <- imageinfo_maxbb[train_indices,]
 validation_data <- imageinfo_maxbb[-train_indices,]
 

@@ -77,8 +77,8 @@ multi.rrr
 weather<-'wet'
 soil<-'sandy'
 location<-'Midlands'
-d1sc<-0.95
-d2sc<-0.03
+d1sc<-0.8
+d2sc<-0.17
 d3sc<-0.02
 
 dis<- c('d1_score'=d1sc,'d2_score'=d2sc,'d3_score'=d3sc,'location'=location,'weather'=weather,'soil_type'=soil)
