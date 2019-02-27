@@ -9,8 +9,8 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'batch_size' = 2, #10 #1
                'proportion_of_samples' = 0.15,
                'threshold' = 0.4,
-               'class_background' = 21, #21
-               'cl_output' = 20,
+               'class_background' = 2, #21
+               'cl_output' = 2, # 20
                'epochs' = 2,
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights"
 )
