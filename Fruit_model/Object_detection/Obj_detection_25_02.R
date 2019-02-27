@@ -1,51 +1,49 @@
 setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox")
-
-# source('image_library.R')
-# 
-# 
-# img_dir <- 'C:/Users/x992029/Downloads/VOCtrainval_06-Nov-2007/VOCdevkit/VOC2007/JPEGImages'
-# "C:/Users/x992029/share/ENT Ear Photos/" # images
-# #annot_dir <- "C:/Users/x992029/share/ENT Ear Photos/labels/" # labels
-# # annotation file
-# annot_file <- 'C:/Users/x992029/Downloads/PASCAL_VOC/pascal_train2007.json'
-#"C:/Users/x992029/share/ENT Ear Photos/annotation/instances.json"
-
-
 source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/image_library.R')
 
-img_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Test_pics_online"
-#annot_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/labels_online" # not used?
-annot_file <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Annotation_online/online.json"
+## source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Object_detection/Obj_detection_25_02.R')
+
+# img_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Test_pics_online"
+#### annot_dir <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/labels_online" # not used?
+# annot_file <- "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Annotation_online/online.json"
+
+img_dir <- "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2"
+annot_file <- "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
 
 
 
-#I was successful when I went to Tensorflow 1.5, cudNN 7.0, cuda 8.0.
+# I was successful when I went to Tensorflow 1.5, cudNN 7.0, cuda 8.0.
+# annotations <- fromJSON(txt=annot_file)
 
-annotations <- fromJSON(txt = annot_file)
+annotations <- jsonlite::fromJSON(txt=annot_file)
 
+params <- list('target_height' = 224,
+               'target_width' = 224,
+               'batch_size' = 2, #10 #1
+               'proportion_of_samples' = 0.6,
+               'threshold' = 0.4, # not used?
+               'class_background' = 21 # not used?
+)
 
 # create image object
 imageinfo <- create_image_container(annotations)
 
 # Scale bbox
-target_height <- 224
-target_width <- 224
-imageinfo <- scale_image_boundingbox(imageinfo, target_height, target_width)
+imageinfo <- scale_image_boundingbox(imageinfo, params$target_height, params$target_width)
 
-#iimagesc <- select_scale_image(imageinfo, "scaled")
+# iimagesc <- select_scale_image(imageinfo, "scaled")
 
 n_samples <- nrow(imageinfo)
-train_indices <- sample(1:n_samples, 0.5 * n_samples)
+train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 train_data <- imageinfo[train_indices,]
 validation_data <- imageinfo[-train_indices,]
 #anchor_list  <- create_anchors(cells_per_row)
 
 # Data generator
-batch_size <- 10#1
-image_size <- target_width # same as height
-threshold <- 0.4
+
+image_size <- params$target_width # same as height
 #n_classes <- 2
-class_background <- 21
+
 
 
 feature_extractor <- application_xception(
@@ -61,7 +59,7 @@ model <- keras_model_sequential() %>%
   layer_flatten() %>%
   layer_batch_normalization() %>%
   layer_dropout(rate = 0.25) %>%
-  layer_dense(units = 80, activation = "relu") %>% #80 # 512
+  layer_dense(units = 20, activation = "relu") %>% #80 # 512
   layer_batch_normalization() %>%
   layer_dropout(rate = 0.5) %>%
   layer_dense(units = 4)
@@ -130,17 +128,17 @@ localization_generator <-
   }
 
 train_gen <- localization_generator(train_data,
-  target_height = target_height,
-  target_width = target_width,
+  target_height = params$target_height,
+  target_width = params$target_width,
   shuffle = TRUE,
-  batch_size = batch_size
+  batch_size = params$batch_size
 )
 
 valid_gen <- localization_generator(validation_data,
-  target_height = target_height,
-  target_width = target_width,
+  target_height = params$target_height,
+  target_width = params$target_width,
   shuffle = FALSE,
-  batch_size = batch_size
+  batch_size = params$batch_size
 )
 
 plot_image_with_boxes <- function(file_name,
@@ -206,9 +204,9 @@ train_1_8 <- train_data[1:3, c("file_name",
 model %>% fit_generator(
     train_gen,
     epochs = 20,
-    steps_per_epoch = nrow(train_data) / batch_size,
+    steps_per_epoch = nrow(train_data) / params$batch_size,
     validation_data = valid_gen,
-    validation_steps = nrow(validation_data) / batch_size,
+    validation_steps = nrow(validation_data) / params$batch_size,
     callbacks = list(
       callback_model_checkpoint(
         file.path("C:/Users/Administrator/Documents/GitHub/Weights", "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
@@ -217,15 +215,14 @@ model %>% fit_generator(
     )
   )
 
-k<-3
+k<-2
 for (i in k:k) {
   preds <-
     model %>% predict(
       load_and_preprocess_image(train_1_8[i, "file_name"], 
-                                target_height, target_width),
+                                params$target_height, params$target_width),
       batch_size = 1
     )
-  print(preds)
   plot_image_with_boxes(train_1_8$file_name[i],
                         train_1_8$name[i],
                         train_1_8[i, 3:6] %>% as.matrix(),

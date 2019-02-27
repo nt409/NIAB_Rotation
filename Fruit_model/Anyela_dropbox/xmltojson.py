@@ -169,8 +169,8 @@ def parseXmlFiles(xml_path):
 
 if __name__ == '__main__':
   
-  xml_path = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/labels_online"
-  json_file = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/Annotation_online/online.json"
+  xml_path = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/New folder"
+  json_file = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
   'hello'
   parseXmlFiles(xml_path)
   json.dump(coco, open(json_file, 'w'))
