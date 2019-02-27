@@ -507,11 +507,12 @@ plot_image_with_boxes_single <- function(file_name,
          border = "yellow",
          lwd = 2.5)
   if (!is.null(class_pred))
+    label_no <- which(class_pred == max(class_pred))
     text(
       box_pred[1],
       box_pred[2],
-      which(class_pred == max(class_pred)),
-      offset = 0,
+      params$label_names[label_no], #'text',#      which(class_pred == max(class_pred)      ),
+      offset = 1,
       pos = 4,
       cex = 1.5,
       col = "yellow")

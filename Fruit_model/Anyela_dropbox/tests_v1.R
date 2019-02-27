@@ -2,6 +2,8 @@ setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_
 
 source('image_library_v1.R')
 
+class_list <- c("MSD","BS")
+
 params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",
                'target_height' = 224,
@@ -12,7 +14,9 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'class_background' = 2, #21
                'cl_output' = 2, # 20
                'epochs' = 2,
-               'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights"
+               'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
+               'label_names' = class_list,
+               'layer_units' = 20 # 30
 )
 
 
@@ -50,12 +54,14 @@ common <- feature_extractor$output %>%
   layer_flatten(name = "flatten") %>%
   layer_activation_relu() %>%
   layer_dropout(rate = 0.25) %>%
-  layer_dense(units = 30, activation = "relu") %>%
-  layer_batch_normalization() %>%
+  layer_dense(units = params$layer_units, activation = "relu") %>%
+  #layer_batch_normalization() %>% #!!!
   layer_dropout(rate = 0.5)
 
 regression_output <-
   layer_dense(common, units = 4, name = "regression_output") # Bounding box
+
+
 class_output <- layer_dense(
   common,
   units = params$cl_output, # was 20
@@ -183,8 +189,8 @@ model %>% fit_generator(
                                 "y_bottom_scaled")]
  
 
-
-for (i in 4:4) {
+k <- 7 #4
+for (i in k:k) {
   preds <-
     model %>% predict(
       load_and_preprocess_image(train_1_8[i, "file_name"], 
@@ -195,9 +201,8 @@ for (i in 4:4) {
                         train_1_8$name[i],
                         train_1_8[i, 3:6] %>% as.matrix(),
                         scaled = TRUE,
-                        box_pred = preds[[1]],
+                        box_pred = preds[[1]], # should be just preds[[1]]
                         class_pred = preds[[2]]
                         )
 }
-
-
+preds[[1]]
