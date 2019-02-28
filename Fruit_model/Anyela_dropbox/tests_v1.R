@@ -194,9 +194,9 @@ preds<-  model %>% predict(
                             params$target_height, params$target_width),
   batch_size = 1
 )
-plot_image_with_boxes_single(train_1_8$file_name[i],
-                             train_1_8$name[i],
-                             train_1_8[i, 3:6] %>% as.matrix(),
+plot_image_with_boxes_single(train_1_8$file_name[1],
+                             train_1_8$name[1],
+                             train_1_8[1, 3:6] %>% as.matrix(),
                              scaled = TRUE, # FALSE?
                              box_pred = preds[[1]], # should be just preds[[1]]
                              class_pred = preds[[2]]
@@ -220,6 +220,7 @@ class_preds <- rbind(class_preds,cl_preds2)
 
 train_1_8[1:8, 3:6]
 box_predictions
+
 colnames(box_predictions)<-c("xl_pred","yt_pred","xr_pred","yb_pred")
 class_preds1<-class_preds
 colnames(class_preds) <- c('MSD','BS')
@@ -229,6 +230,7 @@ colnames(data_labels)<-"label"
 class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
 class_preds<-cbind(class_preds,data_labels)
 class_preds
+
 corners<-cbind(train_1_8[1:8, 3:6],box_predictions)
 corners$xl_error <- corners[,1]-corners[,5]
 corners$yt_error <- corners[,2]-corners[,6]
@@ -236,17 +238,22 @@ corners$xr_error <- corners[,3]-corners[,7]
 corners$yb_error <- corners[,4]-corners[,8]
 corners
 
+dev.off() # allows new plot to open
 par(mfrow=c(2,2))
 boxplot(corners$xl_error)
 boxplot(corners$yt_error)
 boxplot(corners$xr_error)
 boxplot(corners$yb_error)
 
-i<-8
+dev.off() # allows new plot to open
+par(mfrow=c(2,2))
+
+for(i in 1:4){
 plot_image_with_boxes_single(train_1_8$file_name[i],
                              train_1_8$name[i],
                              train_1_8[i, 3:6] %>% as.matrix(),
-                             scaled = TRUE, # FALSE?
+                             scaled = TRUE, # FALSE? - probably not
                              box_pred = box_predictions[i,], # should be just preds[[1]]
                              class_pred = class_preds1[i,]
 )
+}
