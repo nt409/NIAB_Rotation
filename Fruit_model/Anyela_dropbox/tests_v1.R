@@ -19,7 +19,7 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
                'label_names' = class_list,
                'layer_units' = 64, # 30
-               'patience' = 4
+               'patience' = 8
 )
 
 
@@ -36,7 +36,6 @@ n_samples <- nrow(imageinfo)
 train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 train_data <- imageinfo[train_indices,]
 validation_data <- imageinfo[-train_indices,]
-#anchor_list  <- create_anchors(cells_per_row)
 
 # Data generator
 image_size <- params$target_width # same as height
@@ -54,7 +53,7 @@ common <- feature_extractor$output %>%
   layer_activation_relu() %>%
   layer_dropout(rate = 0.25) %>%
   layer_dense(units = params$layer_units, activation = "relu") %>%
-  #layer_batch_normalization() %>% #turn off??
+  #layer_batch_normalization() %>% #turn off?? - probably yes otherwise output is centred around 0,0 i.e box is always small in top left corner
   layer_dropout(rate = 0.5)
 
 # Bounding box
@@ -64,9 +63,9 @@ regression_output <-
 # Class prediction
 class_output <- layer_dense(
   common,
-  units = params$cl_output, # was 20
+  units = params$cl_output,
   activation = "softmax",
-  name = "class_output" # class probs
+  name = "class_output"
 )
 
 model <- keras_model(
@@ -99,9 +98,6 @@ model %>% freeze_weights(to = "flatten")
 model %>% compile(
   optimizer = "adam",
   loss = list("mae", "sparse_categorical_crossentropy"),
-  #loss_weights = list(
-  #  regression_output = 0.05,
-  #  class_output = 0.95),
   metrics = list(
     regression_output = custom_metric("iou", metric_iou),
     class_output = "accuracy"
@@ -134,7 +130,7 @@ loc_class_generator <-
           load_and_preprocess_image(data[[indices[j], "file_name"]], 
                                     target_height, target_width)
         y1[j, ] <-
-          data[indices[j], c("x_left_scaled", "y_top_scaled", "x_right_scaled", "y_bottom_scaled")] %>% as.matrix() # _scaled?
+          data[indices[j], c("x_left_scaled", "y_top_scaled", "x_right_scaled", "y_bottom_scaled")] %>% as.matrix() # _scaled? - probably yes? We want to work with scaled images so that output is in (0,224)
         y2[j, ] <-
           data[[indices[j], "category_id"]] - 1
       }
@@ -170,7 +166,7 @@ model %>% fit_generator(
   epochs = params$epochs,
   steps_per_epoch = nrow(train_data) / params$batch_size,
   validation_data = valid_gen,
-  validation_steps = nrow(validation_data) / params$batch_size, #100,
+  validation_steps = nrow(validation_data) / params$batch_size,
   callbacks = list(
     callback_model_checkpoint(
       file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
@@ -238,8 +234,13 @@ corners$xl_error <- corners[,1]-corners[,5]
 corners$yt_error <- corners[,2]-corners[,6]
 corners$xr_error <- corners[,3]-corners[,7]
 corners$yb_error <- corners[,4]-corners[,8]
+corners
 
-
+par(mfrow=c(2,2))
+boxplot(corners$xl_error)
+boxplot(corners$yt_error)
+boxplot(corners$xr_error)
+boxplot(corners$yb_error)
 
 i<-8
 plot_image_with_boxes_single(train_1_8$file_name[i],
