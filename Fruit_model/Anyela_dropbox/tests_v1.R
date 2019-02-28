@@ -2,6 +2,8 @@ setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_
 
 source('image_library_v1.R')
 
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/tests_v1.R')
+
 class_list <- c("MSD","BS")
 
 params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
@@ -13,7 +15,7 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'threshold' = 0.4,
                'class_background' = 2, #21
                'cl_output' = 2, # 20
-               'epochs' = 2,
+               'epochs' = 4,
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
                'label_names' = class_list,
                'layer_units' = 20 # 30
@@ -55,7 +57,7 @@ common <- feature_extractor$output %>%
   layer_activation_relu() %>%
   layer_dropout(rate = 0.25) %>%
   layer_dense(units = params$layer_units, activation = "relu") %>%
-  #layer_batch_normalization() %>% #!!!
+  #layer_batch_normalization() %>% #turn off??
   layer_dropout(rate = 0.5)
 
 regression_output <-
@@ -134,7 +136,7 @@ loc_class_generator <-
           load_and_preprocess_image(data[[indices[j], "file_name"]], 
                                     target_height, target_width)
         y1[j, ] <-
-          data[indices[j], c("x_left", "y_top", "x_right", "y_bottom")] %>% as.matrix()
+          data[indices[j], c("x_left", "y_top", "x_right", "y_bottom")] %>% as.matrix() # _scaled?
         y2[j, ] <-
           data[[indices[j], "category_id"]] - 1
       }
@@ -189,7 +191,7 @@ model %>% fit_generator(
                                 "y_bottom_scaled")]
  
 
-k <- 7 #4
+k <- 8 #4
 for (i in k:k) {
   preds <-
     model %>% predict(
@@ -200,9 +202,10 @@ for (i in k:k) {
   plot_image_with_boxes_single(train_1_8$file_name[i],
                         train_1_8$name[i],
                         train_1_8[i, 3:6] %>% as.matrix(),
-                        scaled = TRUE,
+                        scaled = TRUE, # FALSE?
                         box_pred = preds[[1]], # should be just preds[[1]]
                         class_pred = preds[[2]]
                         )
 }
 preds[[1]]
+train_1_8[i, 3:6]

@@ -513,7 +513,7 @@ plot_image_with_boxes_single <- function(file_name,
       box_pred[2],
       params$label_names[label_no], #'text',#      which(class_pred == max(class_pred)      ),
       offset = 1,
-      pos = 4,
+      pos = 2,
       cex = 1.5,
       col = "yellow")
   dev.off()
