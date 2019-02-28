@@ -15,10 +15,11 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'threshold' = 0.4,
                'class_background' = 2, #21
                'cl_output' = 2, # 20
-               'epochs' = 4,
+               'epochs' = 20,
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
                'label_names' = class_list,
-               'layer_units' = 20 # 30
+               'layer_units' = 64, # 30
+               'patience' = 4
 )
 
 
@@ -136,7 +137,7 @@ loc_class_generator <-
           load_and_preprocess_image(data[[indices[j], "file_name"]], 
                                     target_height, target_width)
         y1[j, ] <-
-          data[indices[j], c("x_left", "y_top", "x_right", "y_bottom")] %>% as.matrix() # _scaled?
+          data[indices[j], c("x_left_scaled", "y_top_scaled", "x_right_scaled", "y_bottom_scaled")] %>% as.matrix() # _scaled?
         y2[j, ] <-
           data[[indices[j], "category_id"]] - 1
       }
@@ -177,7 +178,7 @@ model %>% fit_generator(
     callback_model_checkpoint(
       file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
     ),
-    callback_early_stopping(patience = 2)
+    callback_early_stopping(patience = params$patience)
   )
 )
 
@@ -209,3 +210,4 @@ for (i in k:k) {
 }
 preds[[1]]
 train_1_8[i, 3:6]
+preds[[2]]
