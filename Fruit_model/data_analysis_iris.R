@@ -1,4 +1,3 @@
-
 library(data.table)
 library(psych)
 library(outliers)
@@ -6,6 +5,9 @@ library(glmnet)
 library(rminer)
 library(dplyr)
 library(e1071)
+library(xgboost)
+
+# addded in family = multinomial to both glmnet and cv.glmnet
 
 build_model <- function() {
   
@@ -44,8 +46,6 @@ tune_svm <- function(sdata, f){
 #' @param f formula
 run_svm <- function(train_data, test_data, cn, dl, f, tuned_par){
   
- 
- 
   svm_model <- svm(f, train_data, gamma = tuned_par$gamma, 
                    epsilon = tuned_par$epsilon, 
                    cost=tuned_par$cost, kernel = 'radial')
@@ -108,11 +108,13 @@ run_LASSO <- function(train_data, test_data, cn, dl){
   lambda <- 10^seq(10, -2, length = 100)
   cv.out <- cv.glmnet(as.matrix(train_data[,-ncol(train_data), with=FALSE]), 
                       as.matrix(train_data[,ncol(train_data), with=FALSE]), 
+                      family="multinomial",
                       alpha = 0)
   
   
   lasso.mod <- glmnet(as.matrix(train_data[,-ncol(train_data), with=FALSE]), 
-                      as.matrix(train_data[,ncol(train_data), with=FALSE]), 
+                      as.matrix(train_data[,ncol(train_data), with=FALSE]),
+                      family="multinomial",
                       alpha = 1, lambda = lambda)
   
  
@@ -126,7 +128,6 @@ run_LASSO <- function(train_data, test_data, cn, dl){
   res <- caret::postResample(as.numeric(test_data[[class_name]]), lasso.pred)
   print(res)
   return(lasso.pred)
-  
 }
 
 
@@ -159,19 +160,19 @@ run_gboosting <- function(train_data, test_data, class_name){
   
   xgmodel <- xgboost(data = data.matrix(train_data[,-n, with = FALSE]), 
                      label = train.y, 
-                     objective = "reg:linear",
-                     booster = 'gblinear',
-                     max.depth = 2, 
-                     eta = 1, 
-                     nthread = 2, 
-                     nround = 2, 
-                     min_child_weight = 1, 
-                     subsample = 0.5, 
-                     colsample_bytree = 1, 
+                     objective = "reg:linear", # "multi:softmax", # was ,
+                     #num_class = 2, # N-1
+                     max.depth = 2,
+                     eta = 1,
+                     nthread = 2,
+                     min_child_weight = 1,
+                     subsample = 0.5,
+                     colsample_bytree = 1,
                      num_parallel_tree = 1,
-                     eval_metric = 'rmse'
+                     nrounds = 2, 
+                     booster =  'gblinear', #'gbtree', # was gblinear
+                     eval_metric = 'rmse'  #'mlogloss' # 'rmse'
                      )
-  
 
   
   
@@ -220,6 +221,7 @@ par(mfrow = c(3,1))
 resSVM <- run_svm(train_data, test_data, class_name, 
                   descriptor_list, f, 
                   tuned_par)
+resSVM # should accuracy, kappa not be NA?
 resLASSO <-  run_LASSO(train_data, test_data, class_name, 
                        descriptor_list)
 resGB <- run_gboosting(train_data, test_data, class_name)
