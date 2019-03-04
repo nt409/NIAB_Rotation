@@ -4,22 +4,22 @@ source('image_library_v1.R')
 
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/tests_v1.R')
 
-class_list <- c("MSD","BS")
+class_list <- c("MSD","BS","YR")
 
 params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",
                'target_height' = 224,
                'target_width' = 224,
                'batch_size' = 2, #10 #1
-               'proportion_of_samples' = 0.15,
+               'proportion_of_samples' = 0.25,
                'threshold' = 0.4,
-               'class_background' = 2, #21
-               'cl_output' = 2, # 20
+               'class_background' = 3, #21
+               'cl_output' = 3, # 20
                'epochs' = 20,
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
                'label_names' = class_list,
                'layer_units' = 64, # 30
-               'patience' = 8
+               'patience' = 2 # was 8, but that's quite slow
 )
 
 
@@ -205,6 +205,7 @@ preds[[1]]
 preds[[2]]
 box_predictions<-as.data.frame(preds[[1]])
 class_preds <- as.data.frame(preds[[2]])
+#class_preds$actual_category<-train_1_8$name[1]
 for (i in 2:8) {
   preds <-
     model %>% predict(
@@ -214,6 +215,7 @@ for (i in 2:8) {
     )
 preds2<-as.data.frame(preds[[1]])
 cl_preds2<-as.data.frame(preds[[2]])
+#cl_preds2$actual_category<-train_1_8$name[i]
 box_predictions<- rbind(box_predictions,preds2)
 class_preds <- rbind(class_preds,cl_preds2)
 }
@@ -222,12 +224,12 @@ train_1_8[1:8, 3:6]
 box_predictions
 
 colnames(box_predictions)<-c("xl_pred","yt_pred","xr_pred","yb_pred")
-class_preds1<-class_preds
-colnames(class_preds) <- c('MSD','BS')
+
+colnames(class_preds) <- params$label_names
+class_preds1<-class_preds #[-actual_category]
+class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
 data_labels<-as.data.frame(train_1_8$name[1:8])
 colnames(data_labels)<-"label"
-
-class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
 class_preds<-cbind(class_preds,data_labels)
 class_preds
 

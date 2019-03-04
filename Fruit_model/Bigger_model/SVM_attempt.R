@@ -80,7 +80,7 @@ svm_all$tune$best.performance
 svm_no_images$tune$best.performance
 svm_im_only$tune$best.performance
 
-
+################################################
 ### plots don't look right?
 # dev.off() # allows new plot to open
 # par(mfrow=c(2,2))
@@ -89,8 +89,7 @@ plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.color
 plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
 plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
-
-
+################################################
 # mock prediction with new input data
 preds<-  model %>% predict(
   load_and_preprocess_image(train_1_8[1, "file_name"], 
@@ -106,7 +105,7 @@ plot_image_with_boxes_single(train_1_8$file_name[1],
 )
 
 
-# the output predictions are far too confident
+# the output predictions are far too confident - scale or modify using validation set accuracy?
 d1_sc<-preds[[2]][1]
 d2_sc<-preds[[2]][2]
 d3_sc<-0
