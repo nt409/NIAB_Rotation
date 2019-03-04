@@ -81,8 +81,8 @@ svm_no_images$tune$best.performance
 svm_im_only$tune$best.performance
 
 ################################################
-### plots don't look right?
-# dev.off() # allows new plot to open
+### plots don't seem to look right?
+dev.off() # closes old plots
 # par(mfrow=c(2,2))
 plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 #,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)
@@ -91,14 +91,15 @@ plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
 plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
 ################################################
 # mock prediction with new input data
+i<-3
 preds<-  model %>% predict(
-  load_and_preprocess_image(train_1_8[1, "file_name"], 
+  load_and_preprocess_image(train_example[i, "file_name"], 
                             params$target_height, params$target_width),
   batch_size = 1
 )
-plot_image_with_boxes_single(train_1_8$file_name[1],
-                             train_1_8$name[1],
-                             train_1_8[1, 3:6] %>% as.matrix(),
+plot_image_with_boxes_single(train_example$file_name[i],
+                             train_example$name[i],
+                             train_example[i, 3:6] %>% as.matrix(),
                              scaled = TRUE, # FALSE?
                              box_pred = preds[[1]], # should be just preds[[1]]
                              class_pred = preds[[2]]
@@ -108,7 +109,7 @@ plot_image_with_boxes_single(train_1_8$file_name[1],
 # the output predictions are far too confident - scale or modify using validation set accuracy?
 d1_sc<-preds[[2]][1]
 d2_sc<-preds[[2]][2]
-d3_sc<-0
+d3_sc<-preds[[2]][3]
 test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
                                 'd2_score'=d2_sc,
                                 'd3_score'=d3_sc,
