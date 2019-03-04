@@ -7,7 +7,7 @@ source('~/GitHub/NIAB_Rotation/Fruit_model/Bigger_model/Disease_fake_data.R')
 ################################################
 #fn to create svm model, and a tuned svm model. Could improve tuning.
 svm_creator<-function(data_to_use,predictor_data_to_use){
-  svm_model_within_function <- svm(category_id~., data=data_to_use)
+  svm_model_within_function <- svm(category_id~., data=data_to_use,probability=TRUE)
   summary(svm_model_within_function)
   
   pred_within_function <- predict(svm_model_within_function,predictor_data_to_use)
@@ -22,7 +22,7 @@ svm_creator<-function(data_to_use,predictor_data_to_use){
   resulting_gamma_within_function<-as.numeric(svm_tune_within_function$best.parameters[2]) # get from svm_tune
   ##
   
-  svm_model_after_tune_within_function <- svm(category_id ~ ., data=data_to_use, kernel="radial", cost=resulting_cost_within_function, gamma=resulting_gamma_within_function)
+  svm_model_after_tune_within_function <- svm(category_id ~ ., data=data_to_use, kernel="radial", cost=resulting_cost_within_function, gamma=resulting_gamma_within_function,probability=TRUE)
   summary(svm_model_after_tune_within_function)
   
   pred_within_function_tuned <- predict(svm_model_after_tune_within_function,predictor_data_to_use)
@@ -76,7 +76,59 @@ table(svm_all$pred_tuned,class_labels)
 table(svm_no_images$pred_tuned,class_labels)
 table(svm_im_only$pred_tuned,class_labels)
 
-
 svm_all$tune$best.performance
 svm_no_images$tune$best.performance
 svm_im_only$tune$best.performance
+
+# dev.off() # allows new plot to open
+# par(mfrow=c(2,2))
+plot(svm_all$svm_tuned,data,mean_temp~rainfall,fill=TRUE)
+plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
+plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=TRUE)
+
+
+# mock prediction with new input data
+preds<-  model %>% predict(
+  load_and_preprocess_image(train_1_8[1, "file_name"], 
+                            params$target_height, params$target_width),
+  batch_size = 1
+)
+plot_image_with_boxes_single(train_1_8$file_name[1],
+                             train_1_8$name[1],
+                             train_1_8[1, 3:6] %>% as.matrix(),
+                             scaled = TRUE, # FALSE?
+                             box_pred = preds[[1]], # should be just preds[[1]]
+                             class_pred = preds[[2]]
+)
+preds[[2]][1]
+preds[[2]][2]
+preds[[2]][3]
+
+d1_sc<-0.8
+d2_sc<-0.09
+d3_sc<-0.01
+test_sample<- as.data.frame(t(c('d1_score'=0.8,
+                                'd2_score'=0.09,
+                                'd3_score'=0.01,
+                                'location'="East_Anglia",
+                                'rainfall'=50,
+                                'mean_temp'=16,
+                                'crop_variety'="WB2",
+                                'soil_type'="sandy")))
+test_sample$d1_score <- as.numeric(as.character(test_sample$d1_score))
+test_sample$d2_score <- as.numeric(as.character(test_sample$d2_score))
+test_sample$d3_score <- as.numeric(as.character(test_sample$d3_score))
+test_sample$rainfall <- as.numeric(as.character(test_sample$rainfall))
+test_sample$mean_temp <- as.numeric(as.character(test_sample$mean_temp))
+
+test_sample <- mutate(test_sample,
+                    Loc_EA_indic = ifelse(location=="East_Anglia",1,0),
+                    Loc_Midlands_indic = ifelse(location=="Midlands",1,0),
+                    WB_1_indic = ifelse(crop_variety=="WB1",1,0),
+                    WB_2_indic = ifelse(crop_variety=="WB2",1,0),
+                    ST_clay_indic = ifelse(soil_type=="clay",1,0),
+                    ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
+)
+
+predz<-predict(svm_all$svm_tuned,test_sample,probability=TRUE)
+head(attr(predz,"probabilities"))
