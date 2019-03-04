@@ -80,11 +80,15 @@ svm_all$tune$best.performance
 svm_no_images$tune$best.performance
 svm_im_only$tune$best.performance
 
+
+### plots don't look right?
 # dev.off() # allows new plot to open
 # par(mfrow=c(2,2))
-plot(svm_all$svm_tuned,data,mean_temp~rainfall,fill=TRUE)
+plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
+#,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)
+plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
-plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=TRUE)
+plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
 
 
 # mock prediction with new input data
@@ -100,16 +104,15 @@ plot_image_with_boxes_single(train_1_8$file_name[1],
                              box_pred = preds[[1]], # should be just preds[[1]]
                              class_pred = preds[[2]]
 )
-preds[[2]][1]
-preds[[2]][2]
-preds[[2]][3]
 
-d1_sc<-0.8
-d2_sc<-0.09
-d3_sc<-0.01
-test_sample<- as.data.frame(t(c('d1_score'=0.8,
-                                'd2_score'=0.09,
-                                'd3_score'=0.01,
+
+# the output predictions are far too confident
+d1_sc<-preds[[2]][1]
+d2_sc<-preds[[2]][2]
+d3_sc<-0
+test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
+                                'd2_score'=d2_sc,
+                                'd3_score'=d3_sc,
                                 'location'="East_Anglia",
                                 'rainfall'=50,
                                 'mean_temp'=16,

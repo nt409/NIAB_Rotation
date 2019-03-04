@@ -17,17 +17,17 @@
 # irrigation
 
 # mean values
-d1_av1<-0.9
-d1_av2<-0.05
-d1_av3<-0.05
+d1_av1<-0.98
+d1_av2<-0.01
+d1_av3<-0.01
 
-d2_av1<-0.05
-d2_av2<-0.9
-d2_av3<-0.05
+d2_av1<-0.01
+d2_av2<-0.98
+d2_av3<-0.01
 
-d3_av1<-0.05
-d3_av2<-0.05
-d3_av3<-0.9
+d3_av1<-0.01
+d3_av2<-0.01
+d3_av3<-0.98
 #rainfall av
 r1_av<-40
 r2_av<-50
@@ -43,7 +43,7 @@ d_sd_1<-0.2
 d_sd_2<-0.2
 d_sd_3<-0.2
 
-d_var2<-0.05
+d_var2<-0.005
 
 ## d1 - clay soil only, preference for wet, Midlands , Wheat Breed 2
 q<-rnorm(1,mean=0,sd=1)
