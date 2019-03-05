@@ -1,46 +1,39 @@
-# setwd(params$folder_containing_scripts)
-# source('Image_classifier_functions.R')
-library(keras)
-
-setwd(params$folder_to_save_model_in)
-CNN_model <- load_model_hdf5(params$model_name)
 setwd(params$folder_containing_scripts)
+source('CNN_data_generator_and_model_functions.R')
+source('Image_classifier_functions.R')
+library(keras)
+library(rjson)
+library(magick)
+library(purrr)
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(XML)
+library(xml2)
+library(jsonlite)
+library(tensorflow)
 
-# CNN_model <- model
 
-# if(params$save ==1){
-#   CNN_model <- model
-#   CNN_model %>% summary()
-# }else{
-#   CNN_model <- load_model_hdf5(params$model_name)
-#   CNN_model %>% summary()
-# }
+if(params$load == 1){ # if not running CNN_model_trainer, load model previously saved
+setwd(params$folder_to_save_model_in)
+CNN_model <- load_model_hdf5(params$model_name,custom_objects=c("iou" = metric_iou))
+setwd(params$folder_containing_scripts)
+}else{
+CNN_model <- model # as model is already in the environment
+}
 
 # analyse CNN output
-tr_data <- train_data[, c("file_name", # or train_data if preferred
-                                "name",
-                                "x_left_scaled",
-                                "y_top_scaled",
-                                "x_right_scaled",
-                                "y_bottom_scaled")]
 
-val_data <- validation_data[, c("file_name", # or train_data if preferred
-                                "name",
-                                "x_left_scaled",
-                                "y_top_scaled",
-                                "x_right_scaled",
-                                "y_bottom_scaled")]
-# dev.new()
-###
 CNN_analysis <- function(testing_data){
 preds<-  CNN_model %>% predict(
   load_and_preprocess_image(testing_data[1, "file_name"], 
                             params$target_height, params$target_width),
   batch_size = 1
 )
-#dev.off()
-#dev.new()
-#par(new = T)
+#### new plot
+# dev.off()
 par(mfrow=c(1,1))
 plot_image_with_boxes_single(testing_data$file_name[1],
                              testing_data$name[1],
@@ -85,8 +78,8 @@ corners$xr_error <- corners[,3]-corners[,7]
 corners$yb_error <- corners[,4]-corners[,8]
 corners # predicted bbox coordinates
 #### boxplot
-# dev.off() # dev.new() #
-#par(new = T)
+# dev.off()
+##
 par(mfrow=c(1,1))
 boxplot(corners$xl_error,
         corners$yt_error,
@@ -96,7 +89,7 @@ boxplot(corners$xl_error,
 #####################################################################################
 #### plot image output
 # dev.off()
-#par(new = T)
+##
 par(mfrow=c(2,2))
 for(i in 1:4){
   plot_image_with_boxes_single(testing_data$file_name[i],
@@ -106,6 +99,7 @@ for(i in 1:4){
                                box_pred = box_predictions[i,], # should be just preds[[1]]
                                class_pred = class_preds1[i,]
   )
+# dev.off()
 }
 return(list('class_predictions' = class_preds,'corners' = corners))
 }

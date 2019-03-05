@@ -1,7 +1,9 @@
-#source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline/parameters.R')
+#source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline/parameters.R') # don't need?
 setwd(params$folder_containing_scripts)
 source('CNN_data_generator_and_model_functions.R')
 source('Image_classifier_functions.R')
+
+# how many of these necessary?
 library(keras)
 library(rjson)
 library(magick)
@@ -29,7 +31,6 @@ model %>% fit_generator(
     callback_early_stopping(patience = params$patience)
   )
 )
-# model %>% summary()
 
 ##########
 # save?

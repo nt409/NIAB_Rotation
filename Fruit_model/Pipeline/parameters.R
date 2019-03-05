@@ -18,5 +18,6 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'layer_units' = 16, #256, # 30
                'patience' = 2, # was 8, but that's quite slow
                'save' = 1, #save model?
+               'load' = 1, #load a saved model?
                'model_name' = "disease_image_classifier.h5"
 )

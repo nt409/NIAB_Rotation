@@ -15,21 +15,15 @@ library(xml2)
 library(jsonlite)
 library(tensorflow)
 
-setwd(params$folder_to_save_model_in)
-CNN_model <- load_model_hdf5(params$model_name)
-setwd(params$folder_containing_scripts)
+if(params$load == 1){ # if not running CNN_model_trainer, load model previously saved
+  setwd(params$folder_to_save_model_in)
+  CNN_model <- load_model_hdf5(params$model_name,custom_objects=c("iou" = metric_iou))
+  setwd(params$folder_containing_scripts)
+}else{
+  CNN_model <- model # as model is already in the environment
+}
 
 source('SVM.R')
-
-# CNN_model <- model
-
-# if(params$save ==1){
-#   CNN_model <- model
-#   CNN_model %>% summary()
-# }else{
-#   CNN_model <- load_model_hdf5(params$model_name)
-#   CNN_model %>% summary()
-# }
 
 
 #########################################################
@@ -41,7 +35,7 @@ preds<-  CNN_model %>% predict(
                             params$target_height, params$target_width),
   batch_size = 1
 )
-par(new = T) #par(mfrow = c(1,1))
+par(mfrow = c(1,1))
 plot_image_with_boxes_single(val_data$file_name[i],
                              val_data$name[i],
                              val_data[i, 3:6] %>% as.matrix(),

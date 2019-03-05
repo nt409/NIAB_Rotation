@@ -1,6 +1,8 @@
 setwd(params$folder_containing_scripts)
 source('parameters.R')
 source('Image_classifier_functions.R')
+
+# how many of these necessary?
 library(keras)
 library(rjson)
 library(magick)
@@ -16,7 +18,6 @@ library(jsonlite)
 library(tensorflow)
 
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
-
 
 ######################################################################
 annotations <- jsonlite::fromJSON(txt = params$annot_file)
@@ -88,7 +89,7 @@ metric_iou <- function(y_true, y_pred) {
   k_mean(iou)
   
 }
-
+attr(metric_iou, "py_function_name") <- "metric_iou"
 
 model %>% freeze_weights(to = "flatten")
 
@@ -154,3 +155,19 @@ valid_gen <- loc_class_generator(
   shuffle = FALSE,
   batch_size = params$batch_size
 )
+
+
+# used later for testing
+tr_data <- train_data[, c("file_name", # or train_data if preferred
+                          "name",
+                          "x_left_scaled",
+                          "y_top_scaled",
+                          "x_right_scaled",
+                          "y_bottom_scaled")]
+
+val_data <- validation_data[, c("file_name", # or train_data if preferred
+                                "name",
+                                "x_left_scaled",
+                                "y_top_scaled",
+                                "x_right_scaled",
+                                "y_bottom_scaled")]
