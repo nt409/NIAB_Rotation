@@ -4,8 +4,8 @@ library(e1071)
 source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Disease_fake_data.R')
 # do we need prevalence data??
 
-################################################
-#fn to create svm model, and a tuned svm model. Could improve tuning.
+#########################################################
+#fn to create svm model, and a tuned svm model. Could improve tuning aspect.
 svm_creator<-function(data_to_use,predictor_data_to_use){
   svm_model_within_function <- svm(category_id~., data=data_to_use,probability=TRUE)
   summary(svm_model_within_function)
@@ -28,8 +28,8 @@ svm_creator<-function(data_to_use,predictor_data_to_use){
   pred_within_function_tuned <- predict(svm_model_after_tune_within_function,predictor_data_to_use)
   return(list('svm'=svm_model_within_function,'svm_tuned'=svm_model_after_tune_within_function,'pred'=pred_within_function,'pred_tuned'=pred_within_function_tuned,'tune'=svm_tune_within_function))
 }
-################################################
 
+#########################################################
 data <- dis_data2 # comes in from Disease_fake_data.R
 category_id<-dis_data2$disease
 names(data)[names(data)=="disease"] <- "category_id"
@@ -43,19 +43,12 @@ head(data_use)
 ################################################
 svm_all<-svm_creator(data_use,predictor_data)
 
-# table(svm_all$pred,class_labels) # confusion matrices
-# table(svm_all$pred_tuned,class_labels) # confusion matrices
-
 ################################################
 # without disease images
 data_use_without_images<- subset(data, select = c(-location,-crop_variety,-soil_type,-d1_score,-d2_score,-d3_score))
 predictor_data_without_images <- subset(data_use_without_images, select = c(-category_id))
 
 svm_no_images<-svm_creator(data_use_without_images,predictor_data_without_images)
-
-# table(svm_no_images$pred,class_labels) # confusion matrices
-# table(svm_no_images$pred_tuned,class_labels) # confusion matrices
-
 ################################################
 # only with images
 data_use_images_only<- subset(data, select = c(category_id,d1_score,d2_score,d3_score))
@@ -63,11 +56,12 @@ predictor_data_images_only <- subset(data_use_images_only, select = c(-category_
 
 svm_im_only<-svm_creator(data_use_images_only,predictor_data_images_only)
 
-# table(svm_im_only$pred,class_labels) # confusion matrices
-# table(svm_im_only$pred_tuned,class_labels) # confusion matrices
+
+
+
 
 ################################################
-# comparison:
+# comparison of the three SVM models - before and after tuning:
 table(svm_all$pred,class_labels)
 table(svm_no_images$pred,class_labels)
 table(svm_im_only$pred,class_labels)
@@ -90,53 +84,3 @@ plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain
 plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
 plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
 ################################################
-# mock prediction with new input data
-
-
-# new script
-# stage of disease?
-
-i<-3
-preds<-  model %>% predict(
-  load_and_preprocess_image(train_example[i, "file_name"], 
-                            params$target_height, params$target_width),
-  batch_size = 1
-)
-plot_image_with_boxes_single(train_example$file_name[i],
-                             train_example$name[i],
-                             train_example[i, 3:6] %>% as.matrix(),
-                             scaled = TRUE, # FALSE?
-                             box_pred = preds[[1]], # should be just preds[[1]]
-                             class_pred = preds[[2]]
-)
-
-
-# the output predictions are far too confident - scale or modify using validation set accuracy?
-d1_sc<-preds[[2]][1]
-d2_sc<-preds[[2]][2]
-d3_sc<-preds[[2]][3]
-test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
-                                'd2_score'=d2_sc,
-                                'd3_score'=d3_sc,
-                                'location'="East_Anglia",
-                                'rainfall'=50,
-                                'mean_temp'=16,
-                                'crop_variety'="WB2",
-                                'soil_type'="sandy")))
-test_sample$d1_score <- as.numeric(as.character(test_sample$d1_score))
-test_sample$d2_score <- as.numeric(as.character(test_sample$d2_score))
-test_sample$d3_score <- as.numeric(as.character(test_sample$d3_score))
-test_sample$rainfall <- as.numeric(as.character(test_sample$rainfall))
-test_sample$mean_temp <- as.numeric(as.character(test_sample$mean_temp))
-
-test_sample <- mutate(test_sample,
-                    Loc_EA_indic = ifelse(location=="East_Anglia",1,0),
-                    Loc_Midlands_indic = ifelse(location=="Midlands",1,0),
-                    WB_1_indic = ifelse(crop_variety=="WB1",1,0),
-                    WB_2_indic = ifelse(crop_variety=="WB2",1,0),
-                    ST_clay_indic = ifelse(soil_type=="clay",1,0),
-                    ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
-)
-
-predz<-predict(svm_all$svm_tuned,test_sample,probability=TRUE)
-head(attr(predz,"probabilities"))
