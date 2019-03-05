@@ -2,6 +2,9 @@ class_list <- c("YR","MSD","BS") # from json
 
 params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",
+               'folder_containing_scripts' = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline",
+               'folder_to_save_model_in' = "C:/Users/Administrator/Documents/GitHub",
+               'folder_to_save_images_in' = "C:/Users/Administrator/Documents/GitHub/Pipeline_resulting_images",
                'target_height' = 224,
                'target_width' = 224,
                'batch_size' = 1, #10 #1 # low is faster but less accurate?   ### 4

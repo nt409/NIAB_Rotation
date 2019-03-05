@@ -517,9 +517,9 @@ plot_image_with_boxes_single <- function(file_name,
       cex = 1.5,
       col = "yellow")
   dev.off()
-  setwd("C:/Users/Administrator/Documents/GitHub/Pipeline_resulting_images") # needed?
+  setwd(params$folder_to_save_images_in)
   img %>% image_write(paste0("preds_", file_name))
-  setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+  setwd(params$folder_containing_scripts)
   plot(img)
 }
 

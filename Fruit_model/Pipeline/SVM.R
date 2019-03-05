@@ -1,7 +1,7 @@
 library(e1071)
-# attach(iris)
 
-source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Disease_fake_data.R')
+setwd(params$folder_containing_scripts)
+source('Disease_fake_data.R')
 
 #########################################################
 #fn to create svm model, and a tuned svm model. Could improve tuning aspect.

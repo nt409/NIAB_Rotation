@@ -1,6 +1,19 @@
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
+setwd(params$folder_containing_scripts)
 source('parameters.R')
 source('Image_classifier_functions.R')
+library(keras)
+library(rjson)
+library(magick)
+library(purrr)
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(XML)
+library(xml2)
+library(jsonlite)
+library(tensorflow)
 
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
 
@@ -19,6 +32,7 @@ set.seed(142) # seed
 train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 train_data <- imageinfo[train_indices,]
 validation_data <- imageinfo[-train_indices,]
+
 
 # Data generator
 image_size <- params$target_width # same as height
@@ -87,6 +101,9 @@ model %>% compile(
   )
 )
 
+
+
+
 loc_class_generator <-
   function(data,
            target_height,
@@ -122,8 +139,6 @@ loc_class_generator <-
     }
   }
 
-
-
 train_gen <- loc_class_generator(
   train_data,
   target_height = params$target_height,
@@ -139,28 +154,3 @@ valid_gen <- loc_class_generator(
   shuffle = FALSE,
   batch_size = params$batch_size
 )
-
-
-
-model %>% fit_generator(
-  train_gen,
-  epochs = params$epochs,
-  steps_per_epoch = nrow(train_data) / params$batch_size,
-  validation_data = valid_gen,
-  validation_steps = nrow(validation_data) / params$batch_size,
-  callbacks = list(
-    callback_model_checkpoint(
-      file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5")
-    ),
-    callback_early_stopping(patience = params$patience)
-  )
-)
-# model %>% summary()
-# dev.off()
-##########
-# save?
-if(params$save == 1){
-setwd("C:/Users/Administrator/Documents/GitHub") # needed?
-model %>% save_model_hdf5(params$model_name)
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
-}

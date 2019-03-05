@@ -1,10 +1,11 @@
-# setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
+# setwd(params$folder_containing_scripts)
 # source('Image_classifier_functions.R')
+library(keras)
 
-
-setwd("C:/Users/Administrator/Documents/GitHub") # needed?
+setwd(params$folder_to_save_model_in)
 CNN_model <- load_model_hdf5(params$model_name)
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+setwd(params$folder_containing_scripts)
+
 # CNN_model <- model
 
 # if(params$save ==1){

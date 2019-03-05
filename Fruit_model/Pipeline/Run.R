@@ -1,4 +1,5 @@
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
+source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline/parameters.R')
+setwd(params$folder_containing_scripts)
 
 library(keras)
 
@@ -8,20 +9,19 @@ library(keras)
 
 
 run_xml_to_json<-0
-run_im_classifier<-1
+run_im_classifier<-0
 run_analyse_CNN_output<-1
 run_analyse_SVM_output<-1
 
 if(run_xml_to_json==1){
   system("python xmltojson.py")
 }
-source('parameters.R')
-source('Image_classifier_functions.R')
 
-# source('CNN_image_classifier.R') ##
+source('Image_classifier_functions.R')
+source('CNN_data_generator_and_model_functions.R')
 
 if(run_im_classifier==1){
-source('CNN_image_classifier.R') # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
+source('CNN_model_trainer.R') # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
 }
 
 
@@ -31,8 +31,6 @@ if(run_analyse_CNN_output==1){
  corners
 }
 
-# source('CNN_output_analysis.R') ##
-
 source('Disease_fake_data.R') # feeds into
 source('SVM.R') # feeds into
 
@@ -40,6 +38,3 @@ if(run_analyse_SVM_output==1){
   source('SVM_output_analysis.R')
   head(attr(predz,"probabilities")) # predicted class
 }
-
-# source('SVM_output_analysis.R')
-

@@ -1,11 +1,26 @@
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
-source('SVM.R')
-# source('Image_classifier_functions.R')
-# source('CNN_image_classifier.R')
+setwd(params$folder_containing_scripts)
+source('CNN_data_generator_and_model_functions.R')
+source('Image_classifier_functions.R')
+library(keras)
+library(rjson)
+library(magick)
+library(purrr)
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(XML)
+library(xml2)
+library(jsonlite)
+library(tensorflow)
 
-setwd("C:/Users/Administrator/Documents/GitHub") # needed?
+setwd(params$folder_to_save_model_in)
 CNN_model <- load_model_hdf5(params$model_name)
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+setwd(params$folder_containing_scripts)
+
+source('SVM.R')
+
 # CNN_model <- model
 
 # if(params$save ==1){
@@ -22,14 +37,14 @@ setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipelin
 # include stage of disease??
 i<-3
 preds<-  CNN_model %>% predict(
-  load_and_preprocess_image(testing_data[i, "file_name"], 
+  load_and_preprocess_image(val_data[i, "file_name"], 
                             params$target_height, params$target_width),
   batch_size = 1
 )
 par(new = T) #par(mfrow = c(1,1))
-plot_image_with_boxes_single(testing_data$file_name[i],
-                             testing_data$name[i],
-                             testing_data[i, 3:6] %>% as.matrix(),
+plot_image_with_boxes_single(val_data$file_name[i],
+                             val_data$name[i],
+                             val_data[i, 3:6] %>% as.matrix(),
                              scaled = TRUE, # FALSE?
                              box_pred = preds[[1]], # should be just preds[[1]]
                              class_pred = preds[[2]]
