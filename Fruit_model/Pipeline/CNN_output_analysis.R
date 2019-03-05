@@ -2,25 +2,36 @@
 # source('Image_classifier_functions.R')
 
 if(params$save ==1){
-CNN_model <- load_model_hdf5(params$model_name)
-CNN_model %>% summary()
+  CNN_model <- model
+  CNN_model %>% summary()
 }else{
-CNN_model <- model
+  CNN_model <- load_model_hdf5(params$model_name)
+  CNN_model %>% summary()
 }
 
 # analyse CNN output
-testing_data <- validation_data[, c("file_name", # or train_data if preferred
+tr_data <- train_data[, c("file_name", # or train_data if preferred
                                 "name",
                                 "x_left_scaled",
                                 "y_top_scaled",
                                 "x_right_scaled",
                                 "y_bottom_scaled")]
+
+val_data <- validation_data[, c("file_name", # or train_data if preferred
+                                "name",
+                                "x_left_scaled",
+                                "y_top_scaled",
+                                "x_right_scaled",
+                                "y_bottom_scaled")]
+
 ###
+CNN_analysis <- function(testing_data){
 preds<-  CNN_model %>% predict(
   load_and_preprocess_image(testing_data[1, "file_name"], 
                             params$target_height, params$target_width),
   batch_size = 1
 )
+par(mfrow=c(1,1))
 plot_image_with_boxes_single(testing_data$file_name[1],
                              testing_data$name[1],
                              testing_data[1, 3:6] %>% as.matrix(),
@@ -65,6 +76,7 @@ corners$yb_error <- corners[,4]-corners[,8]
 corners # predicted bbox coordinates
 #### boxplot
 # dev.off?
+par(mfrow=c(1,1))
 boxplot(corners$xl_error,
         corners$yt_error,
         corners$xr_error,
@@ -83,3 +95,8 @@ for(i in 1:4){
                                class_pred = class_preds1[i,]
   )
 }
+return(list('class_predictions' = class_preds,'corners' = corners))
+}
+
+tr_analysis <- CNN_analysis(tr_data)
+val_analysis <- CNN_analysis(val_data)

@@ -160,5 +160,6 @@ model %>% summary()
 ##########
 # save?
 if(params$save == 1){
+setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
 model %>% save_model_hdf5(params$model_name)
 }

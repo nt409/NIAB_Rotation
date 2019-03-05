@@ -4,17 +4,17 @@ source('SVM.R')
 # source('CNN_image_classifier.R')
 
 if(params$save ==1){
-  CNN_model <- load_model_hdf5(params$model_name)
+  CNN_model <- model
   CNN_model %>% summary()
 }else{
-  CNN_model <- model
+  CNN_model <- load_model_hdf5(params$model_name)
+  CNN_model %>% summary()
 }
 
 
 #########################################################
 # mock prediction with new input data
 # include stage of disease??
-
 i<-3
 preds<-  CNN_model %>% predict(
   load_and_preprocess_image(testing_data[i, "file_name"], 
