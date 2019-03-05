@@ -1,6 +1,5 @@
 setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
-
-source('image_library_v1.R')
+source('Image_classifier_functions.R')
 
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
 
@@ -19,7 +18,9 @@ params <- list('img_dir' = "C:/Users/Administrator/Documents/GitHub/test_images_
                'weight_file_path' = "C:/Users/Administrator/Documents/GitHub/Weights",
                'label_names' = class_list,
                'layer_units' = 256, # 30
-               'patience' = 6 # was 8, but that's quite slow
+               'patience' = 6, # was 8, but that's quite slow
+               'save' = 1, #save model?
+               'model_name' = "disease_image_classifier.h5"
 )
 
 ######################################################################
@@ -174,86 +175,10 @@ model %>% fit_generator(
     callback_early_stopping(patience = params$patience)
   )
 )
+model %>% summary()
 
-
-######################################################################
-
-
-# analyse output - note this is for images that the model was trained on
-
-train_example <- train_data[, c("file_name",
-                                "name",
-                                "x_left_scaled",
-                                "y_top_scaled",
-                                "x_right_scaled",
-                                "y_bottom_scaled")]
- 
-
-preds<-  model %>% predict(
-  load_and_preprocess_image(train_example[1, "file_name"], 
-                            params$target_height, params$target_width),
-  batch_size = 1
-)
-plot_image_with_boxes_single(train_example$file_name[1],
-                             train_example$name[1],
-                             train_example[1, 3:6] %>% as.matrix(),
-                             scaled = TRUE, # FALSE?
-                             box_pred = preds[[1]], # should be just preds[[1]]
-                             class_pred = preds[[2]]
-)
-preds[[1]]
-preds[[2]]
-box_predictions<-as.data.frame(preds[[1]])
-class_preds <- as.data.frame(preds[[2]])
-for (i in 2:length(train_example$name)) {
-  preds <-
-    model %>% predict(
-      load_and_preprocess_image(train_example[i, "file_name"], 
-                                params$target_height, params$target_width),
-      batch_size = 1
-    )
-preds2<-as.data.frame(preds[[1]])
-cl_preds2<-as.data.frame(preds[[2]])
-box_predictions<- rbind(box_predictions,preds2)
-class_preds <- rbind(class_preds,cl_preds2)
-}
-
-train_example[, 3:6]
-box_predictions
-
-colnames(box_predictions)<-c("xl_pred","yt_pred","xr_pred","yb_pred")
-
-colnames(class_preds) <- params$label_names
-class_preds1<-class_preds #[-actual_category]
-class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
-data_labels<-as.data.frame(train_example$name)
-colnames(data_labels)<-"label"
-class_preds<-cbind(class_preds,data_labels)
-class_preds
-
-corners<-cbind(train_example[, 3:6],box_predictions)
-corners$xl_error <- corners[,1]-corners[,5]
-corners$yt_error <- corners[,2]-corners[,6]
-corners$xr_error <- corners[,3]-corners[,7]
-corners$yb_error <- corners[,4]-corners[,8]
-corners
-
-# dev.off?
-boxplot(corners$xl_error,
-        corners$yt_error,
-        corners$xr_error,
-        corners$yb_error,
-        names=c("Left Error","Top Error","Right Error","Bottom Error"), main= 'Corner Errors')
-
-# dev.off?
-par(mfrow=c(2,2))
-
-for(i in 1:4){
-plot_image_with_boxes_single(train_example$file_name[i],
-                             train_example$name[i],
-                             train_example[i, 3:6] %>% as.matrix(),
-                             scaled = TRUE, # FALSE? - probably not
-                             box_pred = box_predictions[i,], # should be just preds[[1]]
-                             class_pred = class_preds1[i,]
-)
+##########
+# save?
+if(params$save == 1){
+model %>% save_model_hdf5(params$model_name)
 }
