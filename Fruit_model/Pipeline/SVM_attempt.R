@@ -1,7 +1,7 @@
 library(e1071)
 # attach(iris)
 
-source('~/GitHub/NIAB_Rotation/Fruit_model/Bigger_model/Disease_fake_data.R')
+source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Disease_fake_data.R')
 # do we need prevalence data??
 
 ################################################

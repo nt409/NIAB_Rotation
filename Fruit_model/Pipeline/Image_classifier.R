@@ -1,8 +1,8 @@
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox")
+setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
 
 source('image_library_v1.R')
 
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Anyela_dropbox/tests_v1.R')
+# source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
 
 class_list <- c("YR","MSD","BS") # json
 
