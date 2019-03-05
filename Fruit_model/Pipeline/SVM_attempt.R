@@ -91,6 +91,11 @@ plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
 plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
 ################################################
 # mock prediction with new input data
+
+
+# new script
+# stage of disease?
+
 i<-3
 preds<-  model %>% predict(
   load_and_preprocess_image(train_example[i, "file_name"], 

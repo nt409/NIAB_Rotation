@@ -3,6 +3,7 @@
 # independently and randomly sampled data
 # prevalence data?
 # independence issues? esp with eg location and weather
+# so need broad data set
 
 # inputs:
 # image data (with date and location tag?),
