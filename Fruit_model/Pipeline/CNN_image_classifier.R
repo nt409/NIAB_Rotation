@@ -1,6 +1,6 @@
 setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
-source('Image_classifier_functions.R')
 source('parameters.R')
+source('Image_classifier_functions.R')
 
 # source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
 
@@ -14,8 +14,8 @@ imageinfo <- create_image_container(annotations)
 # Scale bbox
 imageinfo <- scale_image_boundingbox(imageinfo, params$target_height, params$target_width)
 
-set.seed(142) # seed
 n_samples <- nrow(imageinfo)
+set.seed(142) # seed
 train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 train_data <- imageinfo[train_indices,]
 validation_data <- imageinfo[-train_indices,]

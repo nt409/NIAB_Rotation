@@ -2,7 +2,6 @@ library(e1071)
 # attach(iris)
 
 source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Disease_fake_data.R')
-# do we need prevalence data??
 
 #########################################################
 #fn to create svm model, and a tuned svm model. Could improve tuning aspect.
@@ -76,7 +75,7 @@ svm_im_only$tune$best.performance
 
 ################################################
 ### plots don't seem to look right?
-dev.off() # closes old plots
+dev.new() # closes old plots
 # par(mfrow=c(2,2))
 plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 #,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)

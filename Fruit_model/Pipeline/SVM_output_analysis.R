@@ -1,7 +1,7 @@
 setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
 source('SVM.R')
 # source('Image_classifier_functions.R')
-# source('Image_classifier.R')
+# source('CNN_image_classifier.R')
 
 if(params$save ==1){
   CNN_model <- load_model_hdf5(params$model_name)
