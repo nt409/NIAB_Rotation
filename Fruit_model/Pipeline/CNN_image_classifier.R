@@ -155,11 +155,12 @@ model %>% fit_generator(
     callback_early_stopping(patience = params$patience)
   )
 )
-model %>% summary()
-
+# model %>% summary()
+dev.off()
 ##########
 # save?
 if(params$save == 1){
-setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+setwd("C:/Users/Administrator/Documents/GitHub") # needed?
 model %>% save_model_hdf5(params$model_name)
+setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
 }

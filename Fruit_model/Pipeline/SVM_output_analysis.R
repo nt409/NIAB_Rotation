@@ -3,13 +3,16 @@ source('SVM.R')
 # source('Image_classifier_functions.R')
 # source('CNN_image_classifier.R')
 
-if(params$save ==1){
-  CNN_model <- model
-  CNN_model %>% summary()
-}else{
-  CNN_model <- load_model_hdf5(params$model_name)
-  CNN_model %>% summary()
-}
+# ???? CNN_model <- load_model_hdf5(params$model_name)
+CNN_model <- model
+
+# if(params$save ==1){
+#   CNN_model <- model
+#   CNN_model %>% summary()
+# }else{
+#   CNN_model <- load_model_hdf5(params$model_name)
+#   CNN_model %>% summary()
+# }
 
 
 #########################################################
@@ -21,6 +24,7 @@ preds<-  CNN_model %>% predict(
                             params$target_height, params$target_width),
   batch_size = 1
 )
+par(new = T) #par(mfrow = c(1,1))
 plot_image_with_boxes_single(testing_data$file_name[i],
                              testing_data$name[i],
                              testing_data[i, 3:6] %>% as.matrix(),

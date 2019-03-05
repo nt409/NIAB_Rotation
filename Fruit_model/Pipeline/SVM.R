@@ -75,7 +75,9 @@ svm_im_only$tune$best.performance
 
 ################################################
 ### plots don't seem to look right?
-par(mfrow=c(1,1))
+#dev.new() #?
+par(new = T)
+#par(mfrow=c(1,1))
 plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 #,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)
 plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)

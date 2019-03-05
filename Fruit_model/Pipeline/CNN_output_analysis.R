@@ -1,13 +1,18 @@
 # setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
 # source('Image_classifier_functions.R')
 
-if(params$save ==1){
-  CNN_model <- model
-  CNN_model %>% summary()
-}else{
-  CNN_model <- load_model_hdf5(params$model_name)
-  CNN_model %>% summary()
-}
+####?? CNN_model <- load_model_hdf5(params$model_name)
+####?? CNN_model %>% summary()
+
+CNN_model <- model
+
+# if(params$save ==1){
+#   CNN_model <- model
+#   CNN_model %>% summary()
+# }else{
+#   CNN_model <- load_model_hdf5(params$model_name)
+#   CNN_model %>% summary()
+# }
 
 # analyse CNN output
 tr_data <- train_data[, c("file_name", # or train_data if preferred
@@ -31,6 +36,9 @@ preds<-  CNN_model %>% predict(
                             params$target_height, params$target_width),
   batch_size = 1
 )
+# dev.off()
+#dev.new()
+#par(new = T)
 par(mfrow=c(1,1))
 plot_image_with_boxes_single(testing_data$file_name[1],
                              testing_data$name[1],
@@ -75,7 +83,8 @@ corners$xr_error <- corners[,3]-corners[,7]
 corners$yb_error <- corners[,4]-corners[,8]
 corners # predicted bbox coordinates
 #### boxplot
-# dev.off?
+# dev.off() # dev.new() #
+#par(new = T)
 par(mfrow=c(1,1))
 boxplot(corners$xl_error,
         corners$yt_error,
@@ -84,7 +93,8 @@ boxplot(corners$xl_error,
         names=c("Left Error","Top Error","Right Error","Bottom Error"), main= 'Corner Errors')
 #####################################################################################
 #### plot image output
-# dev.off?
+# dev.off()
+#par(new = T)
 par(mfrow=c(2,2))
 for(i in 1:4){
   plot_image_with_boxes_single(testing_data$file_name[i],
