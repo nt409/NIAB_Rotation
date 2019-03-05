@@ -156,7 +156,7 @@ model %>% fit_generator(
   )
 )
 # model %>% summary()
-dev.off()
+# dev.off()
 ##########
 # save?
 if(params$save == 1){

@@ -18,28 +18,28 @@ if(run_xml_to_json==1){
 source('parameters.R')
 source('Image_classifier_functions.R')
 
-source('CNN_image_classifier.R') ##
+# source('CNN_image_classifier.R') ##
 
-# if(run_im_classifier==1){
-# source('CNN_image_classifier.R') # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
-# }
-# model %>% save_model_hdf5(params$model_name)
+if(run_im_classifier==1){
+source('CNN_image_classifier.R') # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
+}
 
-# if(run_analyse_CNN_output==1){
-#   source('CNN_output_analysis.R')
-#   class_preds
-#   corners
-# }
 
-source('CNN_output_analysis.R') ##
+if(run_analyse_CNN_output==1){
+ source('CNN_output_analysis.R')
+ class_preds
+ corners
+}
+
+# source('CNN_output_analysis.R') ##
 
 source('Disease_fake_data.R') # feeds into
 source('SVM.R') # feeds into
 
-# if(run_analyse_SVM_output==1){
-#   source('SVM_output_analysis.R')
-#   head(attr(predz,"probabilities")) # predicted class
-# }
+if(run_analyse_SVM_output==1){
+  source('SVM_output_analysis.R')
+  head(attr(predz,"probabilities")) # predicted class
+}
 
-source('SVM_output_analysis.R')
+# source('SVM_output_analysis.R')
 

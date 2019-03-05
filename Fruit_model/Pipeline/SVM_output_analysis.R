@@ -3,8 +3,10 @@ source('SVM.R')
 # source('Image_classifier_functions.R')
 # source('CNN_image_classifier.R')
 
-# ???? CNN_model <- load_model_hdf5(params$model_name)
-CNN_model <- model
+setwd("C:/Users/Administrator/Documents/GitHub") # needed?
+CNN_model <- load_model_hdf5(params$model_name)
+setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+# CNN_model <- model
 
 # if(params$save ==1){
 #   CNN_model <- model

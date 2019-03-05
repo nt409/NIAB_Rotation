@@ -1,10 +1,11 @@
 # setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline")
 # source('Image_classifier_functions.R')
 
-####?? CNN_model <- load_model_hdf5(params$model_name)
-####?? CNN_model %>% summary()
 
-CNN_model <- model
+setwd("C:/Users/Administrator/Documents/GitHub") # needed?
+CNN_model <- load_model_hdf5(params$model_name)
+setwd("C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline") # needed?
+# CNN_model <- model
 
 # if(params$save ==1){
 #   CNN_model <- model
@@ -28,7 +29,7 @@ val_data <- validation_data[, c("file_name", # or train_data if preferred
                                 "y_top_scaled",
                                 "x_right_scaled",
                                 "y_bottom_scaled")]
-
+# dev.new()
 ###
 CNN_analysis <- function(testing_data){
 preds<-  CNN_model %>% predict(
@@ -36,7 +37,7 @@ preds<-  CNN_model %>% predict(
                             params$target_height, params$target_width),
   batch_size = 1
 )
-# dev.off()
+#dev.off()
 #dev.new()
 #par(new = T)
 par(mfrow=c(1,1))
