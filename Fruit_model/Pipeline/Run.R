@@ -19,7 +19,7 @@ library(tensorflow)
 # train_indicies = [6 70 80 23 14  3 15 51  2  1 30 62 28 74 20 32 33 38 46  8 84 52  7 45 82]
 
 run_model_trainer<-0 # do we want to train model, or just load an existing one?
-params$load <- 1     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
+params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
 
 run_xml_to_json<-0
 run_analyse_CNN_output<-1
@@ -45,5 +45,14 @@ source('SVM.R',echo= TRUE) # feeds into
 
 if(run_analyse_SVM_output==1){
   source('SVM_output_analysis.R',echo= TRUE)
+  
+# now can predict for 'new data'
+  categorical_test_sample<-list('location'="East_Anglia",
+                                'rainfall'=50,
+                                'mean_temp'=16,
+                                'crop_variety'="WB2",
+                                'soil_type'="sandy")
+
+  SVM_predictor(svm_all$svm_tuned,CNN_model,val_data,categorical_test_sample$location,categorical_test_sample$rainfall,categorical_test_sample$mean_temp,categorical_test_sample$crop_variety,categorical_test_sample$soil_type)
 }
 

@@ -38,10 +38,14 @@ plot_image_with_boxes_single(v_data$file_name[1],
                              box_pred = preds[[1]], # should be just preds[[1]]
                              class_pred = preds[[2]]
 )
-####
+#### image scores
 d1_sc<-preds[[2]][1]
 d2_sc<-preds[[2]][2]
 d3_sc<-preds[[2]][3]
+
+disease_im_scores<- as.data.frame(t(c('d1_score'=d1_sc,
+                                      'd2_score'=d2_sc,
+                                      'd3_score'=d3_sc)))
 
 test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
                                 'd2_score'=d2_sc,
@@ -56,13 +60,5 @@ head(test_sample) # preview test_sample
 #########################################################
 predz<-predict(svm_input,test_sample,probability=TRUE)
 head_of_preds<-head(attr(predz,"probabilities")) # gives predicted classes
-return(head_of_preds)
+return(list('SVM_pred' = head_of_preds,'Disease_image_scores'=disease_im_scores))
 }
-
-categorical_test_sample<-list('location'="East_Anglia",
-                 'rainfall'=50,
-                 'mean_temp'=16,
-                 'crop_variety'="WB2",
-                 'soil_type'="sandy")
-
-SVM_predictor(svm_all$svm_tuned,CNN_model,val_data,categorical_test_sample$location,categorical_test_sample$rainfall,categorical_test_sample$mean_temp,categorical_test_sample$crop_variety,categorical_test_sample$soil_type)
