@@ -1,6 +1,6 @@
 setwd(params$folder_containing_scripts)
-source('CNN_data_generator_and_model_functions.R')
-source('Image_classifier_functions.R')
+# source('CNN_data_generator_and_model_functions.R')
+# source('Image_classifier_functions.R')
 library(keras)
 library(rjson)
 library(magick)
@@ -23,8 +23,7 @@ if(params$load == 1){ # if not running CNN_model_trainer, load model previously 
   CNN_model <- model # as model is already in the environment
 }
 
-source('SVM.R')
-
+# source('SVM.R')
 
 #########################################################
 # mock prediction with new input data

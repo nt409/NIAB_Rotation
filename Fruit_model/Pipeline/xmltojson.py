@@ -2,6 +2,12 @@ import xml.etree.ElementTree as ET
 import os
 import json
 
+
+### these need to match the path taken on whichever device we run the model on
+xml_path  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/New folder"
+json_file  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
+###
+
 coco = dict()
 coco['images'] = []
 coco['type'] = 'instances'
@@ -168,9 +174,7 @@ def parseXmlFiles(xml_path):
               addAnnoItem(object_name, current_image_id, current_category_id, bbox )
 
 if __name__ == '__main__':
-  
-  xml_path = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/New folder"
-  json_file = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
+
   'hello'
   parseXmlFiles(xml_path)
   json.dump(coco, open(json_file, 'w'))

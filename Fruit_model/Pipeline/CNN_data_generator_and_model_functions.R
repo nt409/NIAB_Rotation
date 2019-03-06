@@ -1,6 +1,6 @@
 setwd(params$folder_containing_scripts)
 source('parameters.R')
-source('Image_classifier_functions.R')
+# source('Image_classifier_functions.R')
 
 # how many of these necessary?
 library(keras)
@@ -16,8 +16,6 @@ library(XML)
 library(xml2)
 library(jsonlite)
 library(tensorflow)
-
-# source('~/GitHub/NIAB_Rotation/Fruit_model/Pipeline/Image_classifier.R')
 
 ######################################################################
 annotations <- jsonlite::fromJSON(txt = params$annot_file)
