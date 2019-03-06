@@ -105,4 +105,10 @@ return(list('class_predictions' = class_preds,'corners' = corners))
 }
 
 tr_analysis <- CNN_analysis(tr_data)
+table(tr_analysis$class_predictions$predicted_disease,tr_analysis$class_predictions$label)
+
 val_analysis <- CNN_analysis(val_data)
+table(val_analysis$class_predictions$predicted_disease,val_analysis$class_predictions$label)
+
+val_analysis$class_predictions <- arrange(val_analysis$class_predictions,label)
+val_analysis$class_predictions

@@ -18,8 +18,8 @@ library(tensorflow)
 # with set.seed(142) we should get in CNN_data_generator_and_model_functions
 # train_indicies = [77 60 81 47 67 71 23 54 34 78 66 82 57 41 38 40 11 37 84 12 62 61  4 29 56]
 
-run_model_trainer<-0 # train model?
-params$load <- 0 # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
+run_model_trainer<-1 # do we want to train model, or just load an existing one?
+params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
 
 run_xml_to_json<-0
 run_analyse_CNN_output<-1
@@ -38,8 +38,6 @@ source('CNN_model_trainer.R',echo= TRUE) # sources 'Image_classifier_functions.R
 
 if(run_analyse_CNN_output==1){
  source('CNN_output_analysis.R',echo= TRUE)
- val_analysis$class_predictions
- val_analysis$corners
 }
 
 source('Disease_fake_data.R',echo= TRUE) # feeds into
@@ -47,6 +45,5 @@ source('SVM.R',echo= TRUE) # feeds into
 
 if(run_analyse_SVM_output==1){
   source('SVM_output_analysis.R',echo= TRUE)
-  head(attr(predz,"probabilities")) # predicted class
 }
 
