@@ -12,7 +12,6 @@ library(xml2)
 library(jsonlite)
 library(tensorflow)
 
-
 #' Plot image and bounding boxes
 #' @param image_obj image
 

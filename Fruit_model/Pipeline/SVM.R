@@ -1,5 +1,5 @@
 library(e1071)
-setwd(params$folder_containing_scripts)
+# setwd(params$folder_containing_scripts)
 # source('Disease_fake_data.R')
 library(keras)
 library(rjson)
@@ -66,9 +66,7 @@ data_use_images_only<- subset(data, select = c(category_id,d1_score,d2_score,d3_
 predictor_data_images_only <- subset(data_use_images_only, select = c(-category_id))
 
 svm_im_only<-svm_creator(data_use_images_only,predictor_data_images_only)
-
-
-
+################################################
 
 
 ################################################
@@ -87,15 +85,9 @@ svm_im_only$tune$best.performance
 
 ################################################
 ### plots don't seem to look right?
-#dev.new() #?
-#par(new = T)
 par(mfrow=c(1,1))
 plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 #,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)
 plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
 plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)
-
-# while (dev.cur()>1) dev.off()
-# dev.off() # ?
-################################################

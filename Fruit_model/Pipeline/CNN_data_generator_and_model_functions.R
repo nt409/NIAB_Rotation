@@ -1,5 +1,5 @@
-setwd(params$folder_containing_scripts)
-source('parameters.R')
+# setwd(params$folder_containing_scripts)
+# source('parameters.R')
 # source('Image_classifier_functions.R')
 
 # how many of these necessary?

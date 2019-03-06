@@ -142,10 +142,11 @@ for(i in 1:200){
 }
 dis_data2
 
-dis_data2$d1_score <- as.numeric(as.character(dis_data2$d1_score))
-dis_data2$d2_score <- as.numeric(as.character(dis_data2$d2_score))
-dis_data2$d3_score <- as.numeric(as.character(dis_data2$d3_score))
-dis_data2$rainfall <- as.numeric(as.character(dis_data2$rainfall))
+# make sure values are correct format
+dis_data2$d1_score  <- as.numeric(as.character(dis_data2$d1_score))
+dis_data2$d2_score  <- as.numeric(as.character(dis_data2$d2_score))
+dis_data2$d3_score  <- as.numeric(as.character(dis_data2$d3_score))
+dis_data2$rainfall  <- as.numeric(as.character(dis_data2$rainfall))
 dis_data2$mean_temp <- as.numeric(as.character(dis_data2$mean_temp))
 
 # make categorical data into numeric data taking values 0 or 1
