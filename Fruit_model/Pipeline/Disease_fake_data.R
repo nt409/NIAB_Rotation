@@ -1,3 +1,17 @@
+library(keras)
+library(rjson)
+library(magick)
+library(purrr)
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(XML)
+library(xml2)
+library(jsonlite)
+library(tensorflow)
+
 # mock training data
 
 # only one disease at a time
@@ -142,21 +156,6 @@ for(i in 1:200){
 }
 dis_data2
 
-# make sure values are correct format
-dis_data2$d1_score  <- as.numeric(as.character(dis_data2$d1_score))
-dis_data2$d2_score  <- as.numeric(as.character(dis_data2$d2_score))
-dis_data2$d3_score  <- as.numeric(as.character(dis_data2$d3_score))
-dis_data2$rainfall  <- as.numeric(as.character(dis_data2$rainfall))
-dis_data2$mean_temp <- as.numeric(as.character(dis_data2$mean_temp))
-
-# make categorical data into numeric data taking values 0 or 1
-dis_data2 <- mutate(dis_data2,
-                    Loc_EA_indic = ifelse(location=="East_Anglia",1,0),
-                    Loc_Midlands_indic = ifelse(location=="Midlands",1,0),
-                    WB_1_indic = ifelse(crop_variety=="WB1",1,0),
-                    WB_2_indic = ifelse(crop_variety=="WB2",1,0),
-                    ST_clay_indic = ifelse(soil_type=="clay",1,0),
-                    ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
-                    )
+dis_data2<-format_data(dis_data2) # gets it into the right form
 
 head(dis_data2)

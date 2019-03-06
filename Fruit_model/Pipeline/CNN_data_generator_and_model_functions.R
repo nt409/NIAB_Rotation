@@ -169,3 +169,38 @@ val_data <- validation_data[, c("file_name", # or train_data if preferred
                                 "y_top_scaled",
                                 "x_right_scaled",
                                 "y_bottom_scaled")]
+
+
+# load model or use one in environment
+load_model <- function(load){
+  if(load == 1){ # if not running CNN_model_trainer, load model previously saved
+    setwd(params$folder_to_save_model_in)
+    conv_nn_model <- load_model_hdf5(params$model_name,custom_objects=c("iou" = metric_iou))
+    setwd(params$folder_containing_scripts)
+  }else{
+    conv_nn_model <- model # as model is already in the environment
+  }
+  return(conv_nn_model)
+}
+
+
+# SVM fake data formatter
+format_data <- function(dataframe){
+  # make sure values are correct format
+  dataframe$d1_score  <- as.numeric(as.character(dataframe$d1_score))
+  dataframe$d2_score  <- as.numeric(as.character(dataframe$d2_score))
+  dataframe$d3_score  <- as.numeric(as.character(dataframe$d3_score))
+  dataframe$rainfall  <- as.numeric(as.character(dataframe$rainfall))
+  dataframe$mean_temp <- as.numeric(as.character(dataframe$mean_temp))
+  
+  # make categorical data into numeric data taking values 0 or 1
+  dataframe <- mutate(dataframe,
+                      Loc_EA_indic = ifelse(location=="East_Anglia",1,0),
+                      Loc_Midlands_indic = ifelse(location=="Midlands",1,0),
+                      WB_1_indic = ifelse(crop_variety=="WB1",1,0),
+                      WB_2_indic = ifelse(crop_variety=="WB2",1,0),
+                      ST_clay_indic = ifelse(soil_type=="clay",1,0),
+                      ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
+  )
+  return(dataframe)
+}
