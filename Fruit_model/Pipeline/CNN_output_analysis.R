@@ -20,7 +20,8 @@ CNN_model <- load_model(params$load)
 # analyse CNN output. It is far too confident of it's predictions. Is there a way to scale or use these more sensibly?
 
 CNN_analysis <- function(testing_data){
-
+###
+###
 box_predictions_individual<-list()
 class_preds_individual<-list()
 for (i in 1:length(testing_data$name)) {
@@ -36,8 +37,8 @@ box_predictions<- do.call(rbind, box_predictions_individual)
 class_preds    <- do.call(rbind, class_preds_individual)
 # now have model predictions for all of our data
 ###
+###
 colnames(class_preds) <- params$label_names
-# class_preds1<-class_preds
 class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
 data_labels<-as.data.frame(testing_data$name)
 colnames(data_labels)<-"label"
@@ -60,7 +61,7 @@ boxplot(corners$xl_error,
         corners$yb_error,
         names=c("Left Error","Top Error","Right Error","Bottom Error"), main= 'Corner Errors')
 #####################################################################################
-#### plot image output
+#### plot image output for first 4 images
 par(mfrow=c(2,2))
 for(i in 1:4){
   plot_image_with_boxes_single(testing_data$file_name[i],
@@ -75,10 +76,13 @@ return(list('class_predictions' = class_preds,'corners' = corners))
 }
 
 tr_analysis <- CNN_analysis(tr_data)
-table(tr_analysis$class_predictions$predicted_disease,tr_analysis$class_predictions$label)
+table_train<-table(tr_analysis$class_predictions$predicted_disease,tr_analysis$class_predictions$label)
+
+tr_analysis$class_predictions <- arrange(tr_analysis$class_predictions,label)
+tr_analysis$class_predictions
 
 val_analysis <- CNN_analysis(val_data)
-table(val_analysis$class_predictions$predicted_disease,val_analysis$class_predictions$label)
+table_val<-table(val_analysis$class_predictions$predicted_disease,val_analysis$class_predictions$label)
 
 val_analysis$class_predictions <- arrange(val_analysis$class_predictions,label)
 val_analysis$class_predictions

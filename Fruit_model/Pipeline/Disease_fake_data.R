@@ -56,14 +56,14 @@ loc_bias[[2]]  <-  0   # no preference
 loc_bias[[3]]  <- -0.1 # usually Midlands
 # crop variety bias
 crop_bias <- list()
-crop_bias[[1]] <-  0.1 # usually clay
-crop_bias[[2]] <- -0.1 # usually sandy
-crop_bias[[3]] <- -100 # always sandy
+crop_bias[[1]] <-  0.1 # usually WB1
+crop_bias[[2]] <- -0.1 # usually WB2
+crop_bias[[3]] <- -100 # always WB2
 # soil type bias
 soil_bias <- list()
-soil_bias[[1]] <- -100 # always WB2
-soil_bias[[2]] <- -0.1 # usually WB2
-soil_bias[[3]] <- -0.1 # usually WB1
+soil_bias[[1]] <- -100 # always sandy
+soil_bias[[2]] <- -0.1 # usually sandy
+soil_bias[[3]] <- -0.1 # usually sandy
 ###############################################################################################
 # name of d1, d2, d3 ... di
 name_disease <- list()

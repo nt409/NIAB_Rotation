@@ -22,10 +22,7 @@ library(tensorflow)
 
 create_image_container <- function(annotation){
   
-  
-  
   imageinfo <- annotation$images %>% {
-    
     tibble(
       id = map_dbl(.$id, c),
       file_name = map_chr(.$file_name, c),
@@ -51,18 +48,15 @@ create_image_container <- function(annotation){
   boxinfo <- boxinfo %>% mutate_all(as.numeric)
   
   #As usual in image processing, the y axis starts from the top.
-  
   boxinfo <- boxinfo %>% 
     mutate(y_bottom = y_top + bbox_height - 1, x_right = x_left + bbox_width - 1)
   
   #Finally, we still need to match class ids to class names.
-  
   catinfo <- annotation$categories %>%  {
     tibble(id = map_dbl(.$id, c), name = map_chr(.$name, c))
   }
   
   #So, putting it all together:
-  
   imageinfo <- imageinfo %>%
     inner_join(boxinfo, by = c("id" = "image_id")) %>%
     inner_join(catinfo, by = c("category_id" = "id"))
@@ -71,7 +65,6 @@ create_image_container <- function(annotation){
 }
 
 scale_image_boundingbox <- function(imageinfo, target_height, target_width){
-  
   
   imageinfo <- imageinfo %>% mutate(
     x_left_scaled = (x_left / image_width * target_width) %>% round(),
@@ -169,6 +162,7 @@ model %>% compile(
 )
 
 
+######################################################################
 ###
 # added from image_classifier_functions
 load_and_preprocess_image <- function(image_name, target_height, target_width) {
@@ -184,13 +178,9 @@ load_and_preprocess_image <- function(image_name, target_height, target_width) {
 }
 
 ###
+######################################################################
 
-loc_class_generator <-
-  function(data,
-           target_height,
-           target_width,
-           shuffle,
-           batch_size) {
+loc_class_generator <-  function(data,target_height,target_width,shuffle,batch_size) {
     i <- 1
     function() {
       if (shuffle) {
@@ -236,7 +226,7 @@ valid_gen <- loc_class_generator(
   batch_size = params$batch_size
 )
 
-
+######################################################################
 # used later for testing
 tr_data <- train_data[, c("file_name", # or train_data if preferred
                           "name",
@@ -253,6 +243,7 @@ val_data <- validation_data[, c("file_name", # or train_data if preferred
                                 "y_bottom_scaled")]
 
 
+######################################################################
 # load model or use one in environment
 load_model <- function(load){
   if(load == 1){ # if not running CNN_model_trainer, load model previously saved
@@ -265,6 +256,7 @@ load_model <- function(load){
   return(conv_nn_model)
 }
 
+######################################################################
 # svm fake data creator
 fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av){
   datalist = list()
@@ -288,19 +280,21 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
     if(ll > L_bias){location='Midlands'}
     if(ss > S_bias){soil='sandy'}
     if(ww > WB_bias){WB='WB2'}
-    # add into data frame
     
+    # add into data frame
     dat<-as.data.frame(t(c('disease'=name_to_use,'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
     datalist[[i]] <- dat # add to list of data frames
   }
+  
   big_data <- do.call(rbind, datalist)
+  
   if(length(dataframe_to_use)>0){
   dataframe_to_use<-rbind(dataframe_to_use,big_data)
   return(dataframe_to_use)
   }else(return(big_data))
 }
 
-
+######################################################################
 # SVM fake data formatter
 format_data <- function(dataframe){
   # make sure values are correct format
@@ -326,7 +320,8 @@ format_data <- function(dataframe){
 }
 
 
-####
+
+######################################################################
 # image plotter
 plot_image_with_boxes_single <- function(file_name,
                                          object_class,
@@ -370,7 +365,7 @@ plot_image_with_boxes_single <- function(file_name,
   text(
     box_pred[1],
     box_pred[2],
-    params$label_names[label_no], #'text',#      which(class_pred == max(class_pred)      ),
+    params$label_names[label_no],
     offset = 1,
     pos = 4,
     cex = 1.5,
