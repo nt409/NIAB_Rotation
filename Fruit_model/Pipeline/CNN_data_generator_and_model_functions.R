@@ -183,6 +183,42 @@ load_model <- function(load){
   return(conv_nn_model)
 }
 
+# svm fake data creator
+fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av){
+  datalist = list()
+  for(i in 1:length(image_data_to_use$label)){
+    #initialise random variables
+    rr<-rnorm(1,mean=0,sd=1)
+    tt<-rnorm(1,mean=0,sd=1)
+    ll<-rnorm(1,mean=0,sd=1)
+    ss<-rnorm(1,mean=0,sd=1)
+    ww<-rnorm(1,mean=0,sd=1)
+    # data
+    location<-'East_Anglia'
+    soil<-"clay"
+    WB <- 'WB1'
+    rainfall <- Rain_av+rainfall_sd*rr
+    mean_temp<- Temp_av+temp_sd*tt
+    d1_score<-image_data_to_use[i,1]
+    d2_score<-image_data_to_use[i,2]
+    d3_score<-image_data_to_use[i,3]
+    # adjustments
+    if(ll > L_bias){location='Midlands'}
+    if(ss > S_bias){soil='sandy'}
+    if(ww > WB_bias){WB='WB2'}
+    # add into data frame
+    
+    dat<-as.data.frame(t(c('disease'=name_to_use,'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
+    datalist[[i]] <- dat # add to list of data frames
+    
+  }
+  big_data = do.call(rbind, datalist)
+  if(length(dataframe_to_use)>0){
+  dataframe_to_use<-rbind(dataframe_to_use,big_data)
+  return(dataframe_to_use)
+  }else(return(big_data))
+}
+
 
 # SVM fake data formatter
 format_data <- function(dataframe){
@@ -206,33 +242,4 @@ format_data <- function(dataframe){
                       ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
   )
   return(dataframe)
-}
-
-
-
-fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,start_no,L_bias,WB_bias,S_bias,Rain_av,Temp_av){
-  for(i in start_no:length(image_data_to_use$label)){
-    #initialise random variables
-    rr<-rnorm(1,mean=0,sd=1)
-    tt<-rnorm(1,mean=0,sd=1)
-    ll<-rnorm(1,mean=0,sd=1)
-    ss<-rnorm(1,mean=0,sd=1)
-    ww<-rnorm(1,mean=0,sd=1)
-    # data
-    location<-'East_Anglia'
-    soil<-"clay"
-    WB <- 'WB1'
-    rainfall <- Rain_av+rainfall_sd*rr
-    mean_temp<- Temp_av+temp_sd*tt
-    d1_score<-image_data_to_use[i,1]
-    d2_score<-image_data_to_use[i,2]
-    d3_score<-image_data_to_use[i,3]
-    # adjustments
-    if(ll > L_bias){location='Midlands'}
-    if(ss > S_bias){soil='sandy'}
-    if(ww > WB_bias){WB='WB2'}
-    # add into data frame
-    dataframe_to_use<-rbind(dataframe_to_use,t(c('disease'=name_to_use,'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
-  }
-  return(dataframe_to_use)
 }

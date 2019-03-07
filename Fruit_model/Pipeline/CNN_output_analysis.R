@@ -26,8 +26,6 @@ preds<-  CNN_model %>% predict(
   batch_size = 1
 )
 ###
-preds[[1]]
-preds[[2]]
 box_predictions<-as.data.frame(preds[[1]])
 class_preds <- as.data.frame(preds[[2]])
 for (i in 2:length(testing_data$name)) {

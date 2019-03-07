@@ -39,19 +39,20 @@ plot_image_with_boxes_single(v_data$file_name[1],
                              class_pred = preds[[2]]
 )
 #### image scores
-d1_sc<-preds[[2]][1]
-d2_sc<-preds[[2]][2]
-d3_sc<-preds[[2]][3]
+d_sc<-list()
+for(i in 1:length(params$label_names)){
+d_sc[[i]]<-preds[[2]][i]
+}
 
-disease_im_scores<- as.data.frame(t(c('d1_score'=d1_sc,
-                                      'd2_score'=d2_sc,
-                                      'd3_score'=d3_sc)))
+disease_im_scores<- as.data.frame(t(c('d1_score'=d_sc[[1]],
+                                      'd2_score'=d_sc[[2]],
+                                      'd3_score'=d_sc[[3]])))
 
 colnames(disease_im_scores)<-c(name_1,name_2,name_3) # name_1,name_2,name_3 from disease fake data
 
-test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
-                                'd2_score'=d2_sc,
-                                'd3_score'=d3_sc,
+test_sample<- as.data.frame(t(c('d1_score'=d_sc[[1]],
+                                'd2_score'=d_sc[[2]],
+                                'd3_score'=d_sc[[3]],
                                 'location'=loc,
                                 'rainfall'=rain,
                                 'mean_temp'=m_t,
