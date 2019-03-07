@@ -47,6 +47,8 @@ disease_im_scores<- as.data.frame(t(c('d1_score'=d1_sc,
                                       'd2_score'=d2_sc,
                                       'd3_score'=d3_sc)))
 
+colnames(disease_im_scores)<-c(name_1,name_2,name_3) # name_1,name_2,name_3 from disease fake data
+
 test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
                                 'd2_score'=d2_sc,
                                 'd3_score'=d3_sc,
@@ -55,10 +57,10 @@ test_sample<- as.data.frame(t(c('d1_score'=d1_sc,
                                 'mean_temp'=m_t,
                                 'crop_variety'=w_b,
                                 'soil_type'=s_t)))
-test_sample<-format_data(test_sample)
-head(test_sample) # preview test_sample
+test_sample<-format_data(test_sample) # format data so can input
+head(test_sample) # preview test_sample, which is now in correct format
 #########################################################
-predz<-predict(svm_input,test_sample,probability=TRUE)
+predz<-predict(svm_input,test_sample,probability=TRUE) # use svm to predict
 head_of_preds<-head(attr(predz,"probabilities")) # gives predicted classes
 return(list('SVM_pred' = head_of_preds,'Disease_image_scores'=disease_im_scores))
 }

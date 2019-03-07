@@ -31,131 +31,58 @@ library(tensorflow)
 # treatments applied (and when),
 # irrigation
 
+
+# default is
+# location<-'East_Anglia'
+# soil<-"clay"
+# WB <- 'WB1'
 # mean values
-d1_av1<-0.98
-d1_av2<-0.01
-d1_av3<-0.01
-
-d2_av1<-0.01
-d2_av2<-0.98
-d2_av3<-0.01
-
-d3_av1<-0.01
-d3_av2<-0.01
-d3_av3<-0.98
-#rainfall av
+# rainfall av
 r1_av<-40
 r2_av<-50
-r3_av<-60
-#temp av
+r3_av<-60  # wetter
+# temp av
 t1_av<-16
-t2_av<-18
-t3_av<-14
-
+t2_av<-18  # hottest
+t3_av<-14  # coldest
+# weather standard dev
 rainfall_sd<-10
 temp_sd<-1
-d_sd_1<-0.2
-d_sd_2<-0.2
-d_sd_3<-0.2
+# start numbers
+start_no_1  <- 2
+start_no_2  <- 1
+start_no_3  <- 1
+# location bias
+loc_bias_1  <-  0.1 # usually EA
+loc_bias_2  <-  0   # no preference
+loc_bias_3  <- -0.1 # usually Midlands
+# crop variety bias
+crop_bias_1 <-  0.1 # usually clay
+crop_bias_2 <- -0.1 # usually sandy
+crop_bias_3 <- -100 # always sandy
+# soil type bias
+soil_bias_1 <- -100 # always WB2
+soil_bias_2 <- -0.1 # usually WB2
+soil_bias_3 <- -0.1 # usually WB1
 
-d_var2<-0.005
+name_1<-colnames(tr_analysis$class_predictions)[1]
+name_2<-colnames(tr_analysis$class_predictions)[2]
+name_3<-colnames(tr_analysis$class_predictions)[3]
 
-## d1 - clay soil only, preference for wet, Midlands , Wheat Breed 2
-q<-rnorm(1,mean=0,sd=1)
-data<- as.data.frame(t(c('disease'="d1",'d1_score'=d1_av1+d_var2*q,'d2_score'=d1_av2-d_var2*q,'d3_score'=d1_av3,'location'="East_Anglia",'rainfall'=50,'mean_temp'=16,'crop_variety'="WB1",'soil_type'="clay")))
+image_data_1 <- filter(tr_analysis$class_predictions,label==name_1)
+image_data_2 <- filter(tr_analysis$class_predictions,label==name_2)
+image_data_3 <- filter(tr_analysis$class_predictions,label==name_3)
+
+# first data entry
+data<- as.data.frame(t(c('disease'=name_1,'d1_score'=image_data_1[1,1],'d2_score'=image_data_1[1,2],'d3_score'=image_data_1[1,3],'location'="East_Anglia",'rainfall'=50,'mean_temp'=16,'crop_variety'="WB1",'soil_type'="clay")))
+#data<- as.data.frame(t(c(disease=numeric(0),d1_score=numeric(0),d2_score=numeric(0),d3_score=numeric(0),location=numeric(0),rainfall=numeric(0),mean_temp=numeric(0),crop_variety=numeric(0),soil_type=numeric(0))))
 dis_data2<-data
 
-for(i in 2:200){
-  #initialise random variables
-  q<-rnorm(1,mean=0,sd=1)
-  q2<-rnorm(1,mean=0,sd=1)
-  w<-rnorm(1,mean=0,sd=1)
-  w2<-rnorm(1,mean=0,sd=1)
-  l<-rnorm(1,mean=0,sd=1)
-  s<-rnorm(1,mean=0,sd=1)
-  t<-rnorm(1,mean=0,sd=1)
-  # data
-  location<-'East_Anglia'
-  soil<-"clay"
-  WB <- 'WB1'
-  rainfall <- r1_av+rainfall_sd*w
-  mean_temp<-t1_av+temp_sd*w2
-  d1_score<-d1_av1+d_sd_1*q
-  d2_score<-d1_av2-d_sd_1*q
-  d3_score<-d1_av3
-  # adjustments
-  if(l>-0.1){location='Midlands'}
-  if(t>-0.1){WB='WB2'}
-  if(q>0.1){d1_score<-0.05
-  d2_score<-0.7+d_var2*q2
-  d3_score<-0.5-d_var2*q2} # image classifier gets it completely wrong in this case
-  # add into data frame
-  dis_data2<-rbind(dis_data2,t(c('disease'="d1",'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
-}
+#dis_data2<-fake_data_creator(name_1,image_data_1,start_number,loc_bias,crop_bias,soil_bias)
+dis_data2<-fake_data_creator(dis_data2,name_1,image_data_1,start_no_1,loc_bias_1,crop_bias_1,soil_bias_1,r1_av,t1_av) # add d1
+dis_data2<-fake_data_creator(dis_data2,name_2,image_data_2,start_no_2,loc_bias_2,crop_bias_2,soil_bias_2,r2_av,t2_av) # add d2
+dis_data2<-fake_data_creator(dis_data2,name_3,image_data_3,start_no_3,loc_bias_3,crop_bias_3,soil_bias_3,r3_av,t3_av) # add d3
 
-## d2 - occurs in both locations, both weathers, both soil types but with preferences
-## d2 preference for sandy, midlands, wet, WB2
-for(i in 1:200){
-  #initialise random variables
-  q<-rnorm(1,mean=0,sd=1)
-  q2<-rnorm(1,mean=0,sd=1)
-  w<-rnorm(1,mean=0,sd=1)
-  w2<-rnorm(1,mean=0,sd=1)
-  l<-rnorm(1,mean=0,sd=1)
-  s<-rnorm(1,mean=0,sd=1)
-  t<-rnorm(1,mean=0,sd=1)
-  # data
-  location<-'East_Anglia'
-  soil<-'clay'
-  WB <- 'WB1'
-  rainfall <- r2_av+rainfall_sd*w
-  mean_temp<-t2_av+temp_sd*w2
-  d1_score<-d2_av1-d_sd_2*q
-  d2_score<-d2_av2+d_sd_2*q
-  d3_score<-d2_av3
-  # adjustments
-  if(l>-0.5){location='Midlands'}
-  if(s>-0.4){soil='sandy'}
-  if(t>-0.5){WB='WB2'}
-  if(q>0.05){d1_score<-0.25+d_var2*q2
-  d2_score<-0.05
-  d3_score<-0.7-d_var2*q2} # image classifier gets it completely wrong in this case
-  # add into data frame
-  dis_data2<-rbind(dis_data2,t(c('disease'="d2",'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
-}
-
-## d3 - occurs in both locations, both soil types but with preferences
-# d3 preference for dry, EA, clay, WB1
-for(i in 1:200){
-  #initialise random variables
-  q<-rnorm(1,mean=0,sd=1)
-  q2<-rnorm(1,mean=0,sd=1)
-  w<-rnorm(1,mean=0,sd=1)
-  w2<-rnorm(1,mean=0,sd=1)
-  l<-rnorm(1,mean=0,sd=1)
-  s<-rnorm(1,mean=0,sd=1)
-  t<-rnorm(1,mean=0,sd=1)
-  # data
-  location<-'East_Anglia'
-  soil<-'clay'
-  WB <- 'WB1'
-  rainfall <- r3_av+rainfall_sd*w
-  mean_temp<-t3_av+temp_sd*w2
-  d1_score<-d3_av1-d_sd_3*q
-  d2_score<-d3_av2
-  d3_score<-d3_av3+d_sd_3*q
-  # adjustments
-  if(l>0.3){location='Midlands'}
-  if(s>0.5){soil='sandy'}
-  if(t>0.5){WB='WB2'}
-  if(q>0.05){d1_score<-0.8+d_var2*q2
-  d2_score<-0.15-d_var2*q2
-  d3_score<-0.05} # image classifier gets it completely wrong in this case
-  # add into data frame
-  dis_data2<-rbind(dis_data2,t(c('disease'="d3",'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
-}
-dis_data2
 
 dis_data2<-format_data(dis_data2) # gets it into the right form
-
 head(dis_data2)

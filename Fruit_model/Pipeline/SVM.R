@@ -17,7 +17,8 @@ library(tensorflow)
 
 #########################################################
 #fn to create svm model, and a tuned svm model. Could improve tuning aspect.
-svm_creator<-function(data_to_use,predictor_data_to_use){
+svm_creator<-function(data_to_use){
+  predictor_data_to_use <- subset(data_to_use, select = c(-category_id))
   svm_model_within_function <- svm(category_id~., data=data_to_use,probability=TRUE)
   summary(svm_model_within_function)
   
@@ -47,25 +48,22 @@ names(data)[names(data)=="disease"] <- "category_id"
 #########################################################
 raw_data <- subset(data, select = c(category_id,d1_score,d2_score,d3_score,location,rainfall,mean_temp,crop_variety,soil_type))
 data_use<- subset(data, select = c(-location,-crop_variety,-soil_type))
-predictor_data <- subset(data_use, select = c(-category_id))
 class_labels <- category_id
 
 head(data_use)
 ################################################
-svm_all<-svm_creator(data_use,predictor_data)
+svm_all<-svm_creator(data_use)
 
 ################################################
 # without disease images
 data_use_without_images<- subset(data, select = c(-location,-crop_variety,-soil_type,-d1_score,-d2_score,-d3_score))
-predictor_data_without_images <- subset(data_use_without_images, select = c(-category_id))
 
-svm_no_images<-svm_creator(data_use_without_images,predictor_data_without_images)
+svm_no_images<-svm_creator(data_use_without_images)
 ################################################
 # only with images
 data_use_images_only<- subset(data, select = c(category_id,d1_score,d2_score,d3_score))
-predictor_data_images_only <- subset(data_use_images_only, select = c(-category_id))
 
-svm_im_only<-svm_creator(data_use_images_only,predictor_data_images_only)
+svm_im_only<-svm_creator(data_use_images_only)
 ################################################
 
 

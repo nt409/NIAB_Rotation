@@ -36,9 +36,9 @@ if(run_model_trainer==1){
 source('CNN_model_trainer.R',echo= TRUE) # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
 }
 
-if(run_analyse_CNN_output==1){
- source('CNN_output_analysis.R',echo= TRUE)
-}
+source('CNN_output_analysis.R',echo= TRUE)
+#if(run_analyse_CNN_output==1){ # actually we need this for disease_fake_data.R now
+#}
 
 source('Disease_fake_data.R',echo= TRUE) # feeds into
 source('SVM.R',echo= TRUE) # feeds into
