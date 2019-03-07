@@ -37,7 +37,7 @@ class_preds    <- do.call(rbind, class_preds_individual)
 # now have model predictions for all of our data
 ###
 colnames(class_preds) <- params$label_names
-class_preds1<-class_preds
+# class_preds1<-class_preds
 class_preds$predicted_disease <- names(class_preds)[apply(class_preds, 1, which.max)]
 data_labels<-as.data.frame(testing_data$name)
 colnames(data_labels)<-"label"
@@ -68,7 +68,7 @@ for(i in 1:4){
                                testing_data[i, 3:6] %>% as.matrix(),
                                scaled = TRUE,
                                box_pred = box_predictions[i,],
-                               class_pred = class_preds1[i,]
+                               class_pred = class_preds$predicted_disease[i]
   )
 }
 return(list('class_predictions' = class_preds,'corners' = corners))

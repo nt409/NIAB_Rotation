@@ -18,6 +18,74 @@ library(jsonlite)
 library(tensorflow)
 
 ######################################################################
+# added from image_classifier_functions
+
+create_image_container <- function(annotation){
+  
+  
+  
+  imageinfo <- annotation$images %>% {
+    
+    tibble(
+      id = map_dbl(.$id, c),
+      file_name = map_chr(.$file_name, c),
+      image_height = map_dbl(.$height, c),
+      image_width = map_dbl(.$width, c)
+    )
+  }
+  
+  # Load bounding box
+  boxinfo <- annotation$annotations %>% {
+    tibble(
+      image_id = map_dbl(.$image_id, c),
+      category_id = map_dbl(.$category_id, c),
+      bbox = map(.$bbox, c)
+    )
+  }
+  
+  
+  boxinfo <- boxinfo %>% 
+    mutate(bbox = unlist(map(.$bbox, function(x) paste(x, collapse = " "))))
+  boxinfo <- boxinfo %>% 
+    separate(bbox, into = c("x_left", "y_top", "bbox_width", "bbox_height"))
+  boxinfo <- boxinfo %>% mutate_all(as.numeric)
+  
+  #As usual in image processing, the y axis starts from the top.
+  
+  boxinfo <- boxinfo %>% 
+    mutate(y_bottom = y_top + bbox_height - 1, x_right = x_left + bbox_width - 1)
+  
+  #Finally, we still need to match class ids to class names.
+  
+  catinfo <- annotation$categories %>%  {
+    tibble(id = map_dbl(.$id, c), name = map_chr(.$name, c))
+  }
+  
+  #So, putting it all together:
+  
+  imageinfo <- imageinfo %>%
+    inner_join(boxinfo, by = c("id" = "image_id")) %>%
+    inner_join(catinfo, by = c("category_id" = "id"))
+  
+  return(imageinfo)
+}
+
+scale_image_boundingbox <- function(imageinfo, target_height, target_width){
+  
+  
+  imageinfo <- imageinfo %>% mutate(
+    x_left_scaled = (x_left / image_width * target_width) %>% round(),
+    x_right_scaled = (x_right / image_width * target_width) %>% round(),
+    y_top_scaled = (y_top / image_height * target_height) %>% round(),
+    y_bottom_scaled = (y_bottom / image_height * target_height) %>% round(),
+    bbox_width_scaled =  (bbox_width / image_width * target_width) %>% round(),
+    bbox_height_scaled = (bbox_height / image_height * target_height) %>% round()
+  )
+  
+  return(imageinfo)
+}
+
+######################################################################
 annotations <- jsonlite::fromJSON(txt = params$annot_file)
 
 # create image object
@@ -101,7 +169,21 @@ model %>% compile(
 )
 
 
+###
+# added from image_classifier_functions
+load_and_preprocess_image <- function(image_name, target_height, target_width) {
+  
+  img_array <- image_load(
+    file.path(params$img_dir, image_name),
+    target_size = c(target_height, target_width)
+  ) %>%
+    image_to_array() %>%
+    xception_preprocess_input() 
+  dim(img_array) <- c(1, dim(img_array))
+  img_array
+}
 
+###
 
 loc_class_generator <-
   function(data,
@@ -241,4 +323,61 @@ format_data <- function(dataframe){
                       ST_sandy_indic = ifelse(soil_type=="sandy",1,0)
   )
   return(dataframe)
+}
+
+
+####
+# image plotter
+plot_image_with_boxes_single <- function(file_name,
+                                         object_class,
+                                         box,
+                                         scaled = FALSE,
+                                         class_pred = NULL,
+                                         box_pred = NULL) {
+  img <- image_read(file.path(params$img_dir, file_name))
+  if(scaled) img <- image_resize(img, geometry = "224x224!")
+  img <- image_draw(img)
+  x_left <- box[1]
+  y_bottom <- box[2]
+  x_right <- box[3]
+  y_top <- box[4]
+  rect(
+    x_left,
+    y_bottom,
+    x_right,
+    y_top,
+    border = "cyan",
+    lwd = 2.5
+  )
+  text(
+    x_left,
+    y_top,
+    object_class,
+    offset = 1,
+    pos = 2,
+    cex = 1.5,
+    col = "cyan"
+  )
+  if (!is.null(box_pred))
+    rect(box_pred[1],
+         box_pred[2],
+         box_pred[3],
+         box_pred[4],
+         border = "yellow",
+         lwd = 2.5)
+  if (!is.null(class_pred))
+    label_no <- which(class_pred == max(class_pred))
+  text(
+    box_pred[1],
+    box_pred[2],
+    params$label_names[label_no], #'text',#      which(class_pred == max(class_pred)      ),
+    offset = 1,
+    pos = 4,
+    cex = 1.5,
+    col = "yellow")
+  dev.off()
+  setwd(params$folder_to_save_images_in)
+  img %>% image_write(paste0("preds_", file_name))
+  setwd(params$folder_containing_scripts)
+  plot(img)
 }
