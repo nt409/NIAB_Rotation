@@ -32,21 +32,20 @@ if(run_xml_to_json==1){
 
 ##################################################################################
 # CNN
-# source('Image_classifier_functions_used.R',echo= TRUE)
-source('CNN_data_generator_and_model_functions.R',echo= TRUE)
+source('CNN_data_generator_and_model_functions.R',echo= TRUE) # generates data and contains functions called upon in CNN model, SVM model and the output analysis file.
 
 if(run_model_trainer==1){
-source('CNN_model_trainer.R',echo= TRUE) # sources 'Image_classifier_functions.R', 'parameters.R', feeds into
+source('CNN_model_trainer.R',echo= TRUE) # trains CNN model
 }
 
-source('CNN_output_analysis.R',echo= TRUE)
+source('CNN_output_analysis.R',echo= TRUE) # analyse resulting CNN (or a loaded CNN)
 ##################################################################################
 # SVM stuff from here
-source('Disease_fake_data.R',echo= TRUE) # feeds into
-source('SVM.R',echo= TRUE) # feeds into
+source('Disease_fake_data.R',echo= TRUE) # creates dataframes to train SVM model.
+source('SVM.R',echo= TRUE) # trains SVM
 
 if(run_analyse_SVM_output==1){
-  source('SVM_output_analysis.R',echo= TRUE)
+  source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function to test new data
   
 # now can predict for 'new data'
   categorical_test_sample<-list('location'="East_Anglia",
