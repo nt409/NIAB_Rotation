@@ -210,9 +210,8 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
     
     dat<-as.data.frame(t(c('disease'=name_to_use,'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
     datalist[[i]] <- dat # add to list of data frames
-    
   }
-  big_data = do.call(rbind, datalist)
+  big_data <- do.call(rbind, datalist)
   if(length(dataframe_to_use)>0){
   dataframe_to_use<-rbind(dataframe_to_use,big_data)
   return(dataframe_to_use)

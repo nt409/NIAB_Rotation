@@ -20,26 +20,21 @@ CNN_model <- load_model(params$load)
 # analyse CNN output. It is far too confident of it's predictions. Is there a way to scale or use these more sensibly?
 
 CNN_analysis <- function(testing_data){
-preds<-  CNN_model %>% predict(
-  load_and_preprocess_image(testing_data[1, "file_name"], 
-                            params$target_height, params$target_width),
-  batch_size = 1
-)
-###
-box_predictions<-as.data.frame(preds[[1]])
-class_preds <- as.data.frame(preds[[2]])
-for (i in 2:length(testing_data$name)) {
+
+box_predictions_individual<-list()
+class_preds_individual<-list()
+for (i in 1:length(testing_data$name)) {
   preds <-  CNN_model %>% predict(
       load_and_preprocess_image(testing_data[i, "file_name"], 
                                 params$target_height, params$target_width),
       batch_size = 1
     )
-  preds2<-as.data.frame(preds[[1]])
-  cl_preds2<-as.data.frame(preds[[2]])
-  box_predictions<- rbind(box_predictions,preds2)
-  class_preds <- rbind(class_preds,cl_preds2)
+  box_predictions_individual[[i]]<-as.data.frame(preds[[1]])
+  class_preds_individual[[i]] <- as.data.frame(preds[[2]])
 }
-
+box_predictions<- do.call(rbind, box_predictions_individual)
+class_preds    <- do.call(rbind, class_preds_individual)
+# now have model predictions for all of our data
 ###
 colnames(class_preds) <- params$label_names
 class_preds1<-class_preds

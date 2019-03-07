@@ -48,7 +48,7 @@ disease_im_scores<- as.data.frame(t(c('d1_score'=d_sc[[1]],
                                       'd2_score'=d_sc[[2]],
                                       'd3_score'=d_sc[[3]])))
 
-colnames(disease_im_scores)<-c(name_1,name_2,name_3) # name_1,name_2,name_3 from disease fake data
+colnames(disease_im_scores)<-c(name_disease[[1]],name_disease[[2]],name_disease[[3]]) # name_1,name_2,name_3 from disease fake data
 
 test_sample<- as.data.frame(t(c('d1_score'=d_sc[[1]],
                                 'd2_score'=d_sc[[2]],

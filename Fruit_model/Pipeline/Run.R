@@ -18,8 +18,9 @@ library(tensorflow)
 # with set.seed(12) we should get in CNN_data_generator_and_model_functions
 # train_indicies = [6 70 80 23 14  3 15 51  2  1 30 62 28 74 20 32 33 38 46  8 84 52  7 45 82]
 
-run_model_trainer<-0 # do we want to train model, or just load an existing one?
+run_model_trainer<-1 # do we want to train model, or just load an existing one?
 params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
+params$save <- 0
 
 run_xml_to_json<-0
 run_analyse_CNN_output<-1
