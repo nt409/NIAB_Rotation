@@ -98,12 +98,12 @@ validation_data <- imageinfo[-train_indices,]
 image_size <- params$target_width # same as height
 
 # is slow so only run if necessary
-# if(exists("feature_extractor")==FALSE){
+if(is.null(feature_extractor$input)){
 feature_extractor <- application_xception(
   include_top = FALSE,
   input_shape = c(224, 224, 3)
 )
-# }
+}
 
 input <- feature_extractor$input
 

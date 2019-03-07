@@ -18,7 +18,6 @@ library(tensorflow)
 
 run_model_trainer<-1 # do we want to train model, or just load an existing one?
 params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
-params$save <- 1
 
 run_xml_to_json<-0
 run_analyse_CNN_output<-1
