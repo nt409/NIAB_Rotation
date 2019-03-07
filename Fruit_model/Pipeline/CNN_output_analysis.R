@@ -69,7 +69,7 @@ for(i in 1:4){
                                testing_data[i, 3:6] %>% as.matrix(),
                                scaled = TRUE,
                                box_pred = box_predictions[i,],
-                               class_pred = class_preds$predicted_disease[i]
+                               class_pred = class_preds[i,1:3]
   )
 }
 return(list('class_predictions' = class_preds,'corners' = corners))

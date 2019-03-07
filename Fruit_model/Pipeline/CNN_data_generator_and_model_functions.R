@@ -88,7 +88,7 @@ imageinfo <- create_image_container(annotations)
 imageinfo <- scale_image_boundingbox(imageinfo, params$target_height, params$target_width)
 
 n_samples <- nrow(imageinfo)
-set.seed(12) # seed
+set.seed(params$seed) # seed
 train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 train_data <- imageinfo[train_indices,]
 validation_data <- imageinfo[-train_indices,]
@@ -97,11 +97,13 @@ validation_data <- imageinfo[-train_indices,]
 # Data generator
 image_size <- params$target_width # same as height
 
-
+# is slow so only run if necessary
+# if(exists("feature_extractor")==FALSE){
 feature_extractor <- application_xception(
   include_top = FALSE,
   input_shape = c(224, 224, 3)
 )
+# }
 
 input <- feature_extractor$input
 

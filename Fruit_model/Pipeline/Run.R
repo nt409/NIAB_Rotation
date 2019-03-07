@@ -15,8 +15,6 @@ library(xml2)
 library(jsonlite)
 library(tensorflow)
 
-# with set.seed(12) we should get in CNN_data_generator_and_model_functions
-# train_indicies = [6 70 80 23 14  3 15 51  2  1 30 62 28 74 20 32 33 38 46  8 84 52  7 45 82]
 
 run_model_trainer<-1 # do we want to train model, or just load an existing one?
 params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
@@ -33,6 +31,11 @@ if(run_xml_to_json==1){
 ##################################################################################
 # CNN
 source('CNN_data_generator_and_model_functions.R',echo= TRUE) # generates data and contains functions called upon in CNN model, SVM model and the output analysis file.
+# check that approx even number of each category present
+sum(train_data$category_id==1)
+sum(train_data$category_id==2)
+sum(train_data$category_id==3)
+
 
 if(run_model_trainer==1){
 source('CNN_model_trainer.R',echo= TRUE) # trains CNN model
