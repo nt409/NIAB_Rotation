@@ -46,7 +46,6 @@ data <- dis_data2 # comes in from Disease_fake_data.R
 category_id<-dis_data2$disease
 names(data)[names(data)=="disease"] <- "category_id"
 #########################################################
-raw_data <- subset(data, select = c(category_id,d1_score,d2_score,d3_score,location,rainfall,mean_temp,crop_variety,soil_type))
 data_use<- subset(data, select = c(-location,-crop_variety,-soil_type))
 class_labels <- category_id
 
@@ -56,12 +55,12 @@ svm_all<-svm_creator(data_use)
 
 ################################################
 # without disease images
-data_use_without_images<- subset(data, select = c(-location,-crop_variety,-soil_type,-d1_score,-d2_score,-d3_score))
+data_use_without_images<- subset(data, select = c(category_id,rainfall,mean_temp,Loc_EA_indic,Loc_Midlands_indic,WB_1_indic,WB_2_indic,ST_clay_indic,ST_sandy_indic))
 
 svm_no_images<-svm_creator(data_use_without_images)
 ################################################
 # only with images
-data_use_images_only<- subset(data, select = c(category_id,d1_score,d2_score,d3_score))
+data_use_images_only<- subset(data, select = c(-location,-crop_variety,-soil_type,-rainfall,-mean_temp,-Loc_EA_indic,-Loc_Midlands_indic,-WB_1_indic,-WB_2_indic,-ST_clay_indic,-ST_sandy_indic))
 
 svm_im_only<-svm_creator(data_use_images_only)
 ################################################
@@ -87,5 +86,3 @@ par(mfrow=c(1,1))
 plot(svm_all$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
 #,slice = list(category_id = 1,Loc_Midlands_indic = 0,Loc_EA_indic = 1,WB_1_indic=0,WB_2_indic=1,ST_clay_indic=0,ST_sandy_indic=1,d1_score>0.5),color.palette = terrain.colors)
 plot(svm_no_images$svm,data,mean_temp~rainfall,fill=TRUE,color.palette = terrain.colors)
-plot(svm_all$svm_tuned,data,d1_score~rainfall,fill=TRUE)
-plot(svm_all$svm_tuned,data,d1_score~d2_score,fill=FALSE)

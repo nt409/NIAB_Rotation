@@ -4,7 +4,7 @@ import json
 
 
 ### these need to match the path taken on whichever device we run the model on
-xml_path  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/New folder"
+xml_path  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/YR_MSD_BS"
 json_file  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
 ###
 

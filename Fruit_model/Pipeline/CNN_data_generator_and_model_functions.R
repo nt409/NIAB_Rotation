@@ -81,6 +81,11 @@ scale_image_boundingbox <- function(imageinfo, target_height, target_width){
 ######################################################################
 annotations <- jsonlite::fromJSON(txt = params$annot_file)
 
+# use annotations to correctly update parameters automatically.
+params$label_names <- annotations$categories$name
+params$cl_output <- length(params$label_names)
+params$class_background <- length(params$label_names)
+
 # create image object
 imageinfo <- create_image_container(annotations)
 
@@ -333,12 +338,16 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
 
 ######################################################################
 # SVM fake data formatter
-format_data <- function(dataframe){
+format_data <- function(dataframe,name_disease_to_use){
   # make sure values are correct format
   if("disease" %in% colnames(dataframe)){
     dataframe$disease   <- as.factor(dataframe$disease)
   }
-  for(jj in 2:(length(params$label_names)+1)){
+  position<-list()
+  for(j in length(params$label_names)){
+  position[[j]]<-which(colnames(dataframe) == paste(name_disease_to_use[[j]],"_score",sep=""))
+  }
+  for(jj in position){
   dataframe[,jj]  <- as.numeric(as.character(dataframe[,jj]))
   }
   dataframe$rainfall  <- as.numeric(as.character(dataframe$rainfall))

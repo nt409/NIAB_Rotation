@@ -44,21 +44,19 @@ for(i in 1:length(params$label_names)){
 d_sc[[i]]<-preds[[2]][i]
 }
 
-disease_im_scores<- as.data.frame(t(c('d1_score'=d_sc[[1]],
-                                      'd2_score'=d_sc[[2]],
-                                      'd3_score'=d_sc[[3]])))
+disease_im_scores<- as.data.frame(as.list(d_sc)) # changed
 
-colnames(disease_im_scores)<-c(name_disease[[1]],name_disease[[2]],name_disease[[3]]) # name_1,name_2,name_3 from disease fake data
+for(j in 1:length(params$label_names)){
+colnames(disease_im_scores)[j]<-paste(name_disease[[j]],"_score",sep="")
+}
 
-test_sample<- as.data.frame(t(c('d1_score'=d_sc[[1]],
-                                'd2_score'=d_sc[[2]],
-                                'd3_score'=d_sc[[3]],
-                                'location'=loc,
+test_sample<- as.data.frame(t(c('location'=loc,
                                 'rainfall'=rain,
                                 'mean_temp'=m_t,
                                 'crop_variety'=w_b,
                                 'soil_type'=s_t)))
-test_sample<-format_data(test_sample) # format data so can input
+test_sample<-cbind(disease_im_scores,test_sample)
+test_sample<-format_data(test_sample,name_disease) # format data so can input
 head(test_sample) # preview test_sample, which is now in correct format
 #########################################################
 predz<-predict(svm_input,test_sample,probability=TRUE) # use svm to predict

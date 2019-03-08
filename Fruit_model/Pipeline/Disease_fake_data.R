@@ -85,5 +85,5 @@ for(i in 1:length(params$label_names)){
   dis_data2<-fake_data_creator(dis_data2,name_disease,image_data_table[[i]],loc_bias[[i]],crop_bias[[i]],soil_bias[[i]],rain_av[[i]],temp_av[[i]],i) # add di data
 }
 
-dis_data2<-format_data(dis_data2) # gets it into the right form
+dis_data2<-format_data(dis_data2,name_disease) # gets it into the right form
 head(dis_data2)
