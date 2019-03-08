@@ -16,8 +16,8 @@ library(jsonlite)
 library(tensorflow)
 
 
-run_model_trainer<-1 # do we want to train model, or just load an existing one?
-params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
+run_model_trainer<-0 # do we want to train model, or just load an existing one?
+params$load <- 1     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
 
 run_xml_to_json<-0
 run_analyse_CNN_output<-1
@@ -31,10 +31,9 @@ if(run_xml_to_json==1){
 # CNN
 source('CNN_data_generator_and_model_functions.R',echo= TRUE) # generates data and contains functions called upon in CNN model, SVM model and the output analysis file.
 # check that approx even number of each category present
-sum(train_data$category_id==1)
-sum(train_data$category_id==2)
-sum(train_data$category_id==3)
-
+for(k in 1:length(params$label_names)){
+print(paste("Number of training images in category",params$label_names[k],"is",sum(train_data$category_id==k)))
+}
 
 if(run_model_trainer==1){
 source('CNN_model_trainer.R',echo= TRUE) # trains CNN model

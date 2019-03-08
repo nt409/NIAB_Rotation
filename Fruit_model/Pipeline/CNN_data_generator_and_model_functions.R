@@ -98,11 +98,18 @@ validation_data <- imageinfo[-train_indices,]
 image_size <- params$target_width # same as height
 
 # is slow so only run if necessary
-if(is.null(feature_extractor$input)){
-feature_extractor <- application_xception(
+# if feature_extractor not in environment, then define
+if(exists("feature_extractor")==FALSE){
+  feature_extractor <- application_xception(
+    include_top = FALSE,
+    input_shape = c(224, 224, 3)
+)
+}else{if(is.null(feature_extractor$input)){ # or if feature_extractor not in correct form
+  feature_extractor <- application_xception(
   include_top = FALSE,
   input_shape = c(224, 224, 3)
 )
+}
 }
 
 input <- feature_extractor$input
@@ -258,10 +265,32 @@ load_model <- function(load){
   return(conv_nn_model)
 }
 
+
+
+
+######################################################################
+generate_empty_data_frame <- function(name_disease_to_use){
+  dat_1 <- as.data.frame(t(c('disease'="about_to_be_empty")))
+  dat_2 <- data.frame(as.list(name_disease_to_use))
+  for(kk in 1:length(params$label_names)){
+    colnames(dat_2)[kk] <- paste(name_disease_to_use[[kk]],"_score",sep="")
+  }
+  dat_3<-as.data.frame(t(c('location'="about_to_be_empty",'rainfall'="about_to_be_empty",'mean_temp'="about_to_be_empty",'crop_variety'="about_to_be_empty",'soil_type'="about_to_be_empty")))
+  dat_4 <- cbind(dat_1,dat_2,dat_3)
+  dat_fm<-list()
+  for(kk in 1:(length(colnames(dat_4)))){
+    dat_fm[[kk]]<-numeric(0)
+  }
+  data_frame_output<-as.data.frame(dat_fm)
+  colnames(data_frame_output)<-colnames(dat_4)
+  return(data_frame_output)
+}
+
 ######################################################################
 # svm fake data creator
-fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av){
-  datalist = list()
+fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av,index){
+  datalist <- list()
+  d_score <- list()
   for(i in 1:length(image_data_to_use$label)){
     #initialise random variables
     rr<-rnorm(1,mean=0,sd=1)
@@ -275,16 +304,22 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
     WB <- 'WB1'
     rainfall <- Rain_av+rainfall_sd*rr
     mean_temp<- Temp_av+temp_sd*tt
-    d1_score<-image_data_to_use[i,1]
-    d2_score<-image_data_to_use[i,2]
-    d3_score<-image_data_to_use[i,3]
+    for(k in 1:length(params$label_names)){
+    d_score[[k]]<-image_data_to_use[i,k]
+    }
     # adjustments
     if(ll > L_bias){location='Midlands'}
     if(ss > S_bias){soil='sandy'}
     if(ww > WB_bias){WB='WB2'}
     
     # add into data frame
-    dat<-as.data.frame(t(c('disease'=name_to_use,'d1_score'=d1_score,'d2_score'=d2_score,'d3_score'=d3_score,'location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
+    dat_1 <- as.data.frame(t(c('disease'=name_to_use[[index]])))
+    dat_2 <- data.frame(as.list(d_score))
+    for(kk in 1:length(params$label_names)){
+    colnames(dat_2)[kk] <- paste(name_to_use[[kk]],"_score",sep="")
+    }
+    dat_3<-as.data.frame(t(c('location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
+    dat <- cbind(dat_1,dat_2,dat_3)
     datalist[[i]] <- dat # add to list of data frames
   }
   
@@ -303,9 +338,9 @@ format_data <- function(dataframe){
   if("disease" %in% colnames(dataframe)){
     dataframe$disease   <- as.factor(dataframe$disease)
   }
-  dataframe$d1_score  <- as.numeric(as.character(dataframe$d1_score))
-  dataframe$d2_score  <- as.numeric(as.character(dataframe$d2_score))
-  dataframe$d3_score  <- as.numeric(as.character(dataframe$d3_score))
+  for(jj in 2:(length(params$label_names)+1)){
+  dataframe[,jj]  <- as.numeric(as.character(dataframe[,jj]))
+  }
   dataframe$rainfall  <- as.numeric(as.character(dataframe$rainfall))
   dataframe$mean_temp <- as.numeric(as.character(dataframe$mean_temp))
   
@@ -363,7 +398,7 @@ plot_image_with_boxes_single <- function(file_name,
          border = "yellow",
          lwd = 2.5)
   if (!is.null(class_pred))
-    label_no <- which(class_pred == max(class_pred))
+  label_no <- which(class_pred == max(class_pred))
   text(
     box_pred[1],
     box_pred[2],

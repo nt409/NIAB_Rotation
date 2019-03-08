@@ -77,11 +77,12 @@ for(i in 1:length(params$label_names)){
   image_data_table[[i]]<-filter(tr_analysis$class_predictions,label==name_disease[[i]]) 
 }
 ###############################################################################################
-# initialise empty d frame
-dis_data2<-as.data.frame(t(c('disease'=numeric(0),'d1_score'=numeric(0),'d2_score'=numeric(0),'d3_score'=numeric(0),'location'=numeric(0),'rainfall'=numeric(0),'mean_temp'=numeric(0),'crop_variety'=numeric(0),'soil_type'=numeric(0))))
+# initialise empty d frame with correct column names
+dis_data2<-generate_empty_data_frame(name_disease)
+
 # add data
 for(i in 1:length(params$label_names)){
-  dis_data2<-fake_data_creator(dis_data2,name_disease[[i]],image_data_table[[i]],loc_bias[[i]],crop_bias[[i]],soil_bias[[i]],rain_av[[i]],temp_av[[i]]) # add di data
+  dis_data2<-fake_data_creator(dis_data2,name_disease,image_data_table[[i]],loc_bias[[i]],crop_bias[[i]],soil_bias[[i]],rain_av[[i]],temp_av[[i]],i) # add di data
 }
 
 dis_data2<-format_data(dis_data2) # gets it into the right form

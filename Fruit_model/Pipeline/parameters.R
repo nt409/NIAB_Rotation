@@ -20,7 +20,7 @@ params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_imag
                'label_names' = class_list,
                'layer_units' = 256,                     #256, # 30
                'patience' = 8,                          # was 8, but that's quite slow
-               'save' = 1,                              #save model?
+               'save' = 0,                              #save model?
                'load' = 1,                              #load a saved model?
-               'model_name' = "disease_image_classifier2.h5" # 'model_name' = "disease_image_classifier_prop_is_half.h5" did ok, 78% on test set but never predicted YR
+               'model_name' = "disease_image_classifier.h5" # 'model_name' = "disease_image_classifier_prop_is_half.h5" did ok, 78% on test set but never predicted YR
 )
