@@ -22,11 +22,10 @@ params$load <- 1     # if CNN_model is already in the environment, can change to
 run_xml_to_json<-0
 
 ####
-params$epochs<-7
-proportion_samples_vec_input<- c(1)#seq(0.1,0.7,0.3)
-epochs_vec_input<-c(2)#seq(10,40,15)
-batch_size_vec_input<- c(1)# seq(1,7,3)
-layers_vec_input<-c(32)
+proportion_samples_vec_input<- c(0.4)#seq(0.1,0.7,0.3)
+epochs_vec_input            <- c(4)#seq(10,40,15)
+batch_size_vec_input        <- c(2)# seq(1,7,3)
+layers_vec_input            <- c(32)
 
 
 ##################################################################################
@@ -48,6 +47,10 @@ if(run_model_trainer==1){
   grid_output<-grid(proportion_samples_vec_input,epochs_vec_input,batch_size_vec_input,layers_vec_input)
   grid_output$grid_results
   model<-grid_output$best_model # use model with best val_class_acc
+  params$proportion_of_samples <- grid_output$best_params$Proportion_Samples
+  params$epochs <- grid_output$best_params$Epochs
+  params$batch_size <- grid_output$best_params$Batch_Size
+  params$layer_units <- grid_output$best_params$Layers
 }
 
 
@@ -58,7 +61,6 @@ if(params$save == 1){
   model%>% save_model_hdf5(params$model_name)
   setwd(params$folder_containing_scripts)
 }
-
 
 ####
 source('CNN_output_analysis.R',echo= TRUE) # analyse resulting CNN (or a loaded CNN)
@@ -75,47 +77,10 @@ source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function 
 ##################################################################################
 # now can predict for 'new data'
 
-# test properly tomorrow
-##########################################
-SVM_on_new_data <- function(data_to_use,im_no){
-dis_name<- data_to_use$name[im_no]
-dis_number<-which(name_disease == dis_name)
-
-# assume categorical variables are for the average case of disease appearance
-categ_data_to_use<-list('location'=if(crop_bias[[dis_number]]<0){"Midlands"}else{"East_Anglia"},
-                              'rainfall'=rain_av[dis_number],
-                              'mean_temp'=temp_av[dis_number],
-                              'crop_variety'=if(crop_bias[[dis_number]]<0){"WB2"}else{"WB1"},
-                              'soil_type'=if(soil_bias[[dis_number]]<0){"sandy"}else{"clay"})
-
-
-res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-res_im_only<-SVM_predictor(svm_im_only$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-res_all<-SVM_predictor(svm_all$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-return(list('No_images' = res_no_im, 'Images_only' = res_im_only, 'All' = res_all, 'Disease' = dis_name))
-}
-
-SVM_No_im <- list()
-Dis_No_im <- list()
-SVM_Images_only <- list()
-Dis_Images_only <- list()
-SVM_All_data <- list()
-Dis_All_data <- list()
-Name <- list()
-
-for(i in 1:nrow(val_data)){
-output<-SVM_on_new_data(val_data,i)
-Name[[i]]<-output$Disease
-SVM_No_im[[i]] <- cbind(output$No_images$SVM_pred,'Disease'=as.character(Name[[i]]))
-SVM_Images_only[[i]] <- cbind(output$Images_only$SVM_pred,'Disease'=Name[[i]])
-SVM_All_data[[i]] <- cbind(output$All$SVM_pred,'Disease'=Name[[i]])
-Dis_No_im[[i]] <- cbind(output$No_images$Disease_image_scores,'Disease'=Name[[i]])
-Dis_Images_only[[i]] <- cbind(output$Images_only$Disease_image_scores,'Disease'=Name[[i]])
-Dis_All_data[[i]] <- cbind(output$All$Disease_image_scores,'Disease'=as.character(Name[[i]]))
-}
-S_N_bind<-arrange(as.data.frame(do.call(rbind, SVM_No_im)),Disease)
-S_I_bind<-arrange(as.data.frame(do.call(rbind, SVM_Images_only)),Disease)
-S_A_bind<-arrange(as.data.frame(do.call(rbind, SVM_All_data)),Disease)
-D_N_bind<-arrange(as.data.frame(do.call(rbind, Dis_No_im)),Disease)
-D_I_bind<-arrange(as.data.frame(do.call(rbind, Dis_Images_only)),Disease)
-D_A_bind<-arrange(as.data.frame(do.call(rbind, Dis_All_data)),Disease)
+new_predictions<-predictions_obtained(val_data)
+new_predictions$S_N
+new_predictions$S_I
+new_predictions$S_A
+new_predictions$D_N
+new_predictions$D_I
+new_predictions$D_A
