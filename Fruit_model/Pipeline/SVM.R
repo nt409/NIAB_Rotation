@@ -25,7 +25,7 @@ svm_creator<-function(data_to_use){
   pred_within_function <- predict(svm_model_within_function,predictor_data_to_use)
   
   svm_tune_within_function <- tune(svm, train.x=predictor_data_to_use, train.y=class_labels,
-                                   kernel="radial", ranges=list(cost=10^(-1:2), gamma=c(.5,1,2)))
+                                   kernel="radial", ranges=list(cost=1:5, epsilon = c(.5,1,2), gamma=c(.5,1,2)))
   
   print(svm_tune_within_function)
   

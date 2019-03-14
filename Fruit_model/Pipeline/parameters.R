@@ -1,6 +1,13 @@
 class_list <- c("names_of_diseases_will_go_in_here") # gets extracted from JSON in CNN_data_generator_and_model_functions.R
 # Need to check the 2 pathnames on the xmltojson.py file are correct for the device running the model and for the data we want to input.
 
+# for semi-automated JSON
+# fold_cont_annot <- "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold"
+# then inside params had these
+# 'folder_containing_annotations' = fold_cont_annot,
+# 'input_labels' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/YR_MSD_BS",
+# 'annot_file' = paste(fold_cont_annot,"online.json",sep="/"),
+
 # default parameters
 params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",

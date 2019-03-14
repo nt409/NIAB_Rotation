@@ -272,6 +272,61 @@ load_model <- function(load){
 
 
 
+######################################################################
+## train model with variety of parameters, keep model with best validation class accuracy
+grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
+  # initialise
+  count<-0
+  vals<-list()
+  parameters_used<-list()
+  model_hist_val_class_acc <- list()
+  model_hist_val_iou <- list()
+  model_hist_train_iou <- list()
+  model_hist_train_class_acc <- list()
+  val_class_acc <- list()
+  val_iou <- list()
+  train_iou <- list()
+  train_class_acc <- list()
+  for(i in 1:length(proportion_samples_vec)){
+    for(j in 1:length(epochs_vec)){
+      for(k in 1:length(batch_size_vec)){
+        for(l in 1:length(layers_vec)){
+          params$proportion_of_samples<- proportion_samples_vec[i]
+          params$epochs<- epochs_vec[j]
+          params$batch_size<- batch_size_vec[k]
+          params$layer_units<- layers_vec[l]
+          count<-count+1
+          vals[[count]]<-list(i,j,k,l)
+          parameters_used[[count]]<-list('Proportion_Samples' = proportion_samples_vec[i],'Epochs' = epochs_vec[j],'Batch_Size'= batch_size_vec[k],'Layers'= layers_vec[l])
+          source('CNN_model_trainer.R',echo= TRUE) # trains CNN model
+          # model_hist_train_class_acc[[count]]<-history$metrics$class_output_acc # every epoch value
+          # model_hist_train_iou[[count]]<-history$metrics$regression_output_iou # every epoch value
+          # model_hist_val_class_acc[[count]]<-history$metrics$val_class_output_acc # every epoch value
+          # model_hist_val_iou[[count]]<-history$metrics$val_regression_output_iou # every epoch value
+          train_class_acc[[count]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)] # final epoch value
+          train_iou[[count]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)] # final epoch value
+          val_class_acc[[count]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)] # final epoch value
+          val_iou[[count]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
+          if(count == which.max(unlist(val_class_acc))){
+            best_model<-model
+            best_count<-count
+            best_params<-parameters_used[[count]]
+          }
+        }
+      }
+    }
+  }
+  train_class_acc_vec<-as.data.frame(do.call(rbind,train_class_acc))
+  train_iou_vec<-as.data.frame(do.call(rbind,train_iou))
+  val_iou_vec<-as.data.frame(do.call(rbind,val_iou))
+  val_class_acc_vec<-as.data.frame(do.call(rbind,val_class_acc))
+  parameters_used_vec<-as.data.frame(do.call(rbind,parameters_used))
+  metric_table<-cbind('train_class_acc'=train_class_acc_vec,'train_iou' = train_iou_vec,'val_class_acc' = val_class_acc_vec,'val_iou' = val_iou_vec)
+  colnames(metric_table)<-c('train_class_acc','train_iou','val_class_acc','val_iou')
+  grid_results<-arrange(cbind(metric_table,parameters_used_vec),desc(val_class_acc))
+  return(list('best_model' = best_model,'best_count'=best_count,'best_params'=best_params,'parameters_used'=parameters_used,'train_class_acc'=train_class_acc,'train_iou'=train_iou,'val_class_acc'=val_class_acc,'val_iou'=val_iou,'grid_results'=grid_results))
+}
+
 
 ######################################################################
 generate_empty_data_frame <- function(name_disease_to_use){

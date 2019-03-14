@@ -2,11 +2,27 @@ import xml.etree.ElementTree as ET
 import os
 import json
 
-
-### these need to match the path taken on whichever device we run the model on
+#############################################
+### old way
 xml_path  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/YR_MSD_BS"
 json_file  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
-###
+#############################################
+### attempted automated way, but probably less efficient than old way
+# make sure that fold_cont_annot is correct!
+# fold_cont_annot = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold"
+######## rest is automatic
+# a = [ fold_cont_annot , "xml_pathnames.xml"]
+# name_mine =  '/'.join(a)
+
+### parse an xml file by name
+# tree_mine = ET.parse(name_mine)
+# root_mine = tree_mine.getroot()
+
+### these need to match the path taken on whichever device we run the model on - if params file + fold_cont_annot are correct this should be fine
+# xml_path = root_mine[0][0].text # use json file
+# json_file = root_mine[0][1].text # use json file
+#############################################
+
 
 coco = dict()
 coco['images'] = []
