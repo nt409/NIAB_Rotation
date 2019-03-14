@@ -271,6 +271,26 @@ load_model <- function(load){
 }
 
 
+######################################################################
+### model trainer
+model_trainer<-function(){
+  hist <- model %>% fit_generator(
+    train_gen,
+    epochs = params$epochs,
+    steps_per_epoch = nrow(train_data) / params$batch_size,
+    validation_data = valid_gen,
+    validation_steps = nrow(validation_data) / params$batch_size,
+    callbacks = list(
+      callback_model_checkpoint(
+        file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
+        save_best_only = TRUE,
+        verbose = 1
+      ),
+      callback_early_stopping(patience = params$patience)
+    )
+  )
+  return(hist)
+}
 
 ######################################################################
 ## train model with variety of parameters, keep model with best validation class accuracy
@@ -291,21 +311,21 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
     for(j in 1:length(epochs_vec)){
       for(k in 1:length(batch_size_vec)){
         for(l in 1:length(layers_vec)){
-          params$proportion_of_samples<- proportion_samples_vec[i]
+          params$proportion_of_samples <- proportion_samples_vec[i]
           params$epochs<- epochs_vec[j]
-          params$batch_size<- batch_size_vec[k]
-          params$layer_units<- layers_vec[l]
+          params$batch_size <- batch_size_vec[k]
+          params$layer_units <- layers_vec[l]
           count<-count+1
           vals[[count]]<-list(i,j,k,l)
           parameters_used[[count]]<-list('Proportion_Samples' = proportion_samples_vec[i],'Epochs' = epochs_vec[j],'Batch_Size'= batch_size_vec[k],'Layers'= layers_vec[l])
-          source('CNN_model_trainer.R',echo= TRUE) # trains CNN model
-          # model_hist_train_class_acc[[count]]<-history$metrics$class_output_acc # every epoch value
-          # model_hist_train_iou[[count]]<-history$metrics$regression_output_iou # every epoch value
+          history<-model_trainer()
+          # model_hist_train_class_acc[[count]]<-history$metrics$class_output_acc   # every epoch value
+          # model_hist_train_iou[[count]]<-history$metrics$regression_output_iou    # every epoch value
           # model_hist_val_class_acc[[count]]<-history$metrics$val_class_output_acc # every epoch value
-          # model_hist_val_iou[[count]]<-history$metrics$val_regression_output_iou # every epoch value
-          train_class_acc[[count]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)] # final epoch value
-          train_iou[[count]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)] # final epoch value
-          val_class_acc[[count]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)] # final epoch value
+          # model_hist_val_iou[[count]]<-history$metrics$val_regression_output_iou  # every epoch value
+          train_class_acc[[count]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)]           # final epoch value
+          train_iou[[count]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)]       # final epoch value
+          val_class_acc[[count]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)]     # final epoch value
           val_iou[[count]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
           if(count == which.max(unlist(val_class_acc))){
             best_model<-model

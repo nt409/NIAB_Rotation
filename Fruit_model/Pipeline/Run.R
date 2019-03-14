@@ -20,19 +20,13 @@ run_model_trainer<-1 # train model, or just load an existing one?
 params$save <- 0     # save model?
 params$load <- 1     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
 run_xml_to_json<-0
-use_grid<-1
 
 ####
-# changes from default, to speed up
-# params$batch_size<-4
-# params$epochs<-2
-# params$layer_units<-32
-
-####
+params$epochs<-7
 proportion_samples_vec_input<- c(1)#seq(0.1,0.7,0.3)
 epochs_vec_input<-c(2)#seq(10,40,15)
-batch_size_vec_input<- seq(1,7,3)
-layers_vec_input<-c(256)
+batch_size_vec_input<- c(1)# seq(1,7,3)
+layers_vec_input<-c(32)
 
 
 ##################################################################################
@@ -51,12 +45,9 @@ print(paste("Number of training images in category",params$label_names[k],"is",s
 }
 
 if(run_model_trainer==1){
-  if(use_grid==1){
   grid_output<-grid(proportion_samples_vec_input,epochs_vec_input,batch_size_vec_input,layers_vec_input)
   grid_output$grid_results
   model<-grid_output$best_model # use model with best val_class_acc
-}else{source('CNN_model_trainer.R',echo= TRUE) # trains CNN model
-}
 }
 
 
@@ -64,9 +55,7 @@ if(run_model_trainer==1){
 # save?
 if(params$save == 1){
   setwd(params$folder_to_save_images_in)
-  if(use_grid==1){
-    model%>% save_model_hdf5(params$model_name)
-  }else{model %>% save_model_hdf5(params$model_name)}
+  model%>% save_model_hdf5(params$model_name)
   setwd(params$folder_containing_scripts)
 }
 

@@ -18,18 +18,3 @@ library(xml2)
 library(jsonlite)
 library(tensorflow)
 
-history<- model %>% fit_generator(
-  train_gen,
-  epochs = params$epochs,
-  steps_per_epoch = nrow(train_data) / params$batch_size,
-  validation_data = valid_gen,
-  validation_steps = nrow(validation_data) / params$batch_size,
-  callbacks = list(
-    callback_model_checkpoint(
-      file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
-      save_best_only = TRUE,
-      verbose = 1
-    ),
-    callback_early_stopping(patience = params$patience)
-  )
-)
