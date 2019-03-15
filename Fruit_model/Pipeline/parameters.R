@@ -8,6 +8,7 @@ class_list <- c("names_of_diseases_will_go_in_here") # gets extracted from JSON 
 # 'input_labels' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/YR_MSD_BS",
 # 'annot_file' = paste(fold_cont_annot,"online.json",sep="/"),
 
+
 # default parameters
 params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",
@@ -19,15 +20,16 @@ params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_imag
                'target_width'  = 224,
                'class_background' = length(class_list), # gets updated when we run CNN_data_generator_and_model_functions.R
                'cl_output' = length(class_list),        # gets updated when we run CNN_data_generator_and_model_functions.R
-               'batch_size' = 5,                        #10 #1 # low is faster but less accurate?   ### 4
-               'proportion_of_samples' = 0.5,           # 0.2, but was classifying everything the same. ###0.3
+               'batch_size' = 5,                        # updated in Run.R # 10 #1 # low is faster but less accurate?   ### 4
+               'proportion_of_samples' = 0.5,           # updated in Run.R # 0.2, but was classifying everything the same. ###0.3
                'seed' = 4,
                'threshold' = 0.4,
-               'epochs' = 20,                           # 20
+               'epochs' = 20,                           # updated in Run.R
                'label_names' = class_list,
-               'layer_units' = 256,                     #256, # 30
+               'layer_units' = 256,                     # updated in Run.R
                'patience' = 8,                          # was 8, but that's quite slow
-               'save' = 1,                              #save model?
-               'load' = 1,                              #load a saved model?
-               'model_name' = "disease_image_classifier.h5" # 'model_name' = "disease_image_classifier_prop_is_half.h5" did ok, 78% on test set but never predicted YR
+               'save' = 1,                              #save model?  updated in Run.R
+               'load' = 1,                              #load a saved model?  updated in Run.R
+               'model_name_to_load' = "disease_image_classifier.h5", # updated in Run.R
+               'model_name_to_save' = "disease_image_classifier.h5"  # updated in Run.R
 )
