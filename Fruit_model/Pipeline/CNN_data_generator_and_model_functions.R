@@ -319,7 +319,7 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
           parameters_used[[counter]]<-list('Proportion_Samples' = proportion_samples_vec[i],'Epochs' = epochs_vec[j],'Batch_Size'= batch_size_vec[k],'Layers'= layers_vec[l])
           hist1<-model_trainer()
           history<-hist1$hist
-          model<-hist1$model_to_output
+          model_produced<-hist1$model_trained
           # model_hist_train_class_acc[[counter]]<-history$metrics$class_output_acc   # every epoch value
           # model_hist_train_iou[[counter]]<-history$metrics$regression_output_iou    # every epoch value
           # model_hist_val_class_acc[[counter]]<-history$metrics$val_class_output_acc # every epoch value
@@ -329,7 +329,7 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
           val_class_acc[[counter]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)]     # final epoch value
           val_iou[[counter]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
           if(counter == which.max(unlist(val_class_acc))){
-            best_model<-model
+            best_model<-model_produced
             best_count<-counter
             best_params<-parameters_used[[counter]]
           }
