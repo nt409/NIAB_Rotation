@@ -30,10 +30,10 @@ run_model_trainer <- 1 # train model, or just load an existing one?
 params$model_name_to_load <- list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T)[1] # 1, 2, or 3?
 
 # vector with one or more components to train over.
-proportion_samples_vec_input<- c(0.75) #seq(0.1,0.7,0.3)
-epochs_vec_input            <- c(30)  #seq(10,40,15)
-batch_size_vec_input        <- seq(1,7,3) # c(5) 
-layers_vec_input            <- c(512)
+proportion_samples_vec_input<- c(0.2) #seq(0.1,0.7,0.3)
+epochs_vec_input            <- c(2) #22  #seq(10,40,15)
+batch_size_vec_input        <- c(5) #seq(1,7,2) # c(5) 
+layers_vec_input            <- c(10,20) #28,192,256)
 
 ##################################################################################
 params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
@@ -57,8 +57,8 @@ print(paste("Number of training images in category",params$label_names[k],"is",s
 
 if(run_model_trainer==1){
   grid_output<-grid(proportion_samples_vec_input,epochs_vec_input,batch_size_vec_input,layers_vec_input)
-  grid_output$grid_results
   model<-grid_output$best_model # use model with best val_class_acc
+  print(grid_output$grid_results)
   params$proportion_of_samples <- grid_output$best_params$Proportion_Samples
   params$epochs <- grid_output$best_params$Epochs
   params$batch_size <- grid_output$best_params$Batch_Size

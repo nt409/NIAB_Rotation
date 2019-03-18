@@ -92,59 +92,7 @@ imageinfo <- create_image_container(annotations)
 # Scale bbox
 imageinfo <- scale_image_boundingbox(imageinfo, params$target_height, params$target_width)
 
-n_samples <- nrow(imageinfo)
-set.seed(params$seed) # seed
-train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
-train_data <- imageinfo[train_indices,]
-validation_data <- imageinfo[-train_indices,]
-
-
-# Data generator
-image_size <- params$target_width # same as height
-
-# is slow so only run if necessary
-# if feature_extractor not in environment, then define
-if(exists("feature_extractor")==FALSE){
-  feature_extractor <- application_xception(
-    include_top = FALSE,
-    input_shape = c(224, 224, 3)
-)
-}else{if(is.null(feature_extractor$input)){ # or if feature_extractor not in correct form
-  feature_extractor <- application_xception(
-  include_top = FALSE,
-  input_shape = c(224, 224, 3)
-)
-}
-}
-
-input <- feature_extractor$input
-
-common <- feature_extractor$output %>%
-  layer_flatten(name = "flatten") %>%
-  layer_activation_relu() %>%
-  layer_dropout(rate = 0.25) %>%
-  layer_dense(units = params$layer_units, activation = "relu") %>%
-  #layer_batch_normalization() %>% #turn off?? - probably yes otherwise output is centred around 0,0 i.e box is always small in top left corner
-  layer_dropout(rate = 0.5)
-
-# Bounding box
-regression_output <-
-  layer_dense(common, units = 4, name = "regression_output")
-
-# Class prediction
-class_output <- layer_dense(
-  common,
-  units = params$cl_output,
-  activation = "softmax",
-  name = "class_output"
-)
-
-model <- keras_model(
-  inputs = input,
-  outputs = list(regression_output, class_output)
-)
-
-# box metric
+# define box metric
 metric_iou <- function(y_true, y_pred) {
   # order is [x_left, y_top, x_right, y_bottom]
   intersection_xmin <- k_maximum(y_true[ ,1], y_pred[ ,1])
@@ -164,17 +112,93 @@ metric_iou <- function(y_true, y_pred) {
 }
 attr(metric_iou, "py_function_name") <- "metric_iou"
 
-model %>% freeze_weights(to = "flatten")
 
-model %>% compile(
-  optimizer = "adam",
-  loss = list("mae", "sparse_categorical_crossentropy"),
-  metrics = list(
-    regression_output = custom_metric("iou", metric_iou),
-    class_output = "accuracy"
+######################################################################
+n_samples <- nrow(imageinfo)
+set.seed(params$seed) # seed
+
+# Data generator
+image_size <- params$target_width # same as height
+
+# is slow so only run if necessary
+# if feature_extractor not in environment, then define
+if(exists("feature_extractor")==FALSE){
+  feature_extractor <<- application_xception(
+    include_top = FALSE,
+    input_shape = c(224, 224, 3)
   )
-)
+}else{if(is.null(feature_extractor$input)){ # or if feature_extractor not in correct form
+  feature_extractor <- application_xception(
+    include_top = FALSE,
+    input_shape = c(224, 224, 3)
+  )
+}
+}
 
+input <- feature_extractor$input
+
+
+
+
+# create model framework... this bit runs using different parameters
+formulate_model<-function(){
+  train_indices <<- sample(1:n_samples, params$proportion_of_samples * n_samples)
+  train_data <<- imageinfo[train_indices,]
+  validation_data <<- imageinfo[-train_indices,]
+
+  common <<- feature_extractor$output %>%
+    layer_flatten(name = "flatten") %>%
+    layer_activation_relu() %>%
+    layer_dropout(rate = 0.25) %>%
+    layer_dense(units = params$layer_units, activation = "relu") %>%
+    #layer_batch_normalization() %>% #turn off?? - probably yes otherwise output is centred around 0,0 i.e box is always small in top left corner
+    layer_dropout(rate = 0.5)
+  
+  # Bounding box
+  regression_output <<-
+    layer_dense(common, units = 4, name = "regression_output")
+  
+  # Class prediction
+  class_output <<- layer_dense(
+    common,
+    units = params$cl_output,
+    activation = "softmax",
+    name = "class_output"
+  )
+  
+  model <<- keras_model(
+    inputs = input,
+    outputs = list(regression_output, class_output)
+  )
+
+  model %>% freeze_weights(to = "flatten")
+  
+  model %>% compile(
+    optimizer = "adam",
+    loss = list("mae", "sparse_categorical_crossentropy"),
+    metrics = list(
+      regression_output = custom_metric("iou", metric_iou),
+      class_output = "accuracy"
+    )
+  )
+  
+  train_gen <<- loc_class_generator(
+    train_data,
+    target_height = params$target_height,
+    target_width = params$target_width,
+    shuffle = TRUE,
+    batch_size = params$batch_size
+  )
+  
+  valid_gen <<- loc_class_generator(
+    validation_data,
+    target_height = params$target_height,
+    target_width = params$target_width,
+    shuffle = FALSE,
+    batch_size = params$batch_size
+  )
+return(model)
+}
 
 ######################################################################
 ###
@@ -224,22 +248,7 @@ loc_class_generator <-  function(data,target_height,target_width,shuffle,batch_s
     }
   }
 
-train_gen <- loc_class_generator(
-  train_data,
-  target_height = params$target_height,
-  target_width = params$target_width,
-  shuffle = TRUE,
-  batch_size = params$batch_size
-)
-
-valid_gen <- loc_class_generator(
-  validation_data,
-  target_height = params$target_height,
-  target_width = params$target_width,
-  shuffle = FALSE,
-  batch_size = params$batch_size
-)
-
+formulate_model()
 ######################################################################
 # used later for testing
 tr_data <- train_data[, c("file_name", # or train_data if preferred
@@ -257,24 +266,12 @@ val_data <- validation_data[, c("file_name", # or train_data if preferred
                                 "y_bottom_scaled")]
 
 
-######################################################################
-# load model or use one in environment
-load_model <- function(load){
-  if(load == 1){ # if not running CNN_model_trainer, load model previously saved
-    setwd(params$folder_to_save_model_in)
-    conv_nn_model <- load_model_hdf5(params$model_name_to_load,custom_objects=c("iou" = metric_iou))
-    setwd(params$folder_containing_scripts)
-  }else{
-    conv_nn_model <- model # as model is already in the environment
-  }
-  return(conv_nn_model)
-}
-
 
 ######################################################################
 ### model trainer
 model_trainer<-function(){
-  hist <- model %>% fit_generator(
+  model<-formulate_model()
+  hist<- model %>% fit_generator(
     train_gen,
     epochs = params$epochs,
     steps_per_epoch = nrow(train_data) / params$batch_size,
@@ -289,7 +286,8 @@ model_trainer<-function(){
       callback_early_stopping(patience = params$patience)
     )
   )
-  return(hist)
+  model_to_output<-model
+  return(list('hist'=hist,'model_trained'=model_to_output))
 }
 
 
@@ -297,7 +295,7 @@ model_trainer<-function(){
 ## train model with variety of parameters, keep model with best validation class accuracy
 grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
   # initialise
-  count<-0
+  counter<-0
   vals<-list()
   parameters_used<-list()
   model_hist_val_class_acc <- list()
@@ -316,22 +314,24 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
           params$epochs <<- epochs_vec[j]
           params$batch_size <<- batch_size_vec[k]
           params$layer_units <<- layers_vec[l]
-          count<-count+1
-          vals[[count]]<-list(i,j,k,l)
-          parameters_used[[count]]<-list('Proportion_Samples' = proportion_samples_vec[i],'Epochs' = epochs_vec[j],'Batch_Size'= batch_size_vec[k],'Layers'= layers_vec[l])
-          history<-model_trainer()
-          # model_hist_train_class_acc[[count]]<-history$metrics$class_output_acc   # every epoch value
-          # model_hist_train_iou[[count]]<-history$metrics$regression_output_iou    # every epoch value
-          # model_hist_val_class_acc[[count]]<-history$metrics$val_class_output_acc # every epoch value
-          # model_hist_val_iou[[count]]<-history$metrics$val_regression_output_iou  # every epoch value
-          train_class_acc[[count]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)]           # final epoch value
-          train_iou[[count]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)]       # final epoch value
-          val_class_acc[[count]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)]     # final epoch value
-          val_iou[[count]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
-          if(count == which.max(unlist(val_class_acc))){
+          counter<-counter+1
+          vals[[counter]]<-list(i,j,k,l)
+          parameters_used[[counter]]<-list('Proportion_Samples' = proportion_samples_vec[i],'Epochs' = epochs_vec[j],'Batch_Size'= batch_size_vec[k],'Layers'= layers_vec[l])
+          hist1<-model_trainer()
+          history<-hist1$hist
+          model<-hist1$model_to_output
+          # model_hist_train_class_acc[[counter]]<-history$metrics$class_output_acc   # every epoch value
+          # model_hist_train_iou[[counter]]<-history$metrics$regression_output_iou    # every epoch value
+          # model_hist_val_class_acc[[counter]]<-history$metrics$val_class_output_acc # every epoch value
+          # model_hist_val_iou[[counter]]<-history$metrics$val_regression_output_iou  # every epoch value
+          train_class_acc[[counter]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)]           # final epoch value
+          train_iou[[counter]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)]       # final epoch value
+          val_class_acc[[counter]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)]     # final epoch value
+          val_iou[[counter]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
+          if(counter == which.max(unlist(val_class_acc))){
             best_model<-model
-            best_count<-count
-            best_params<-parameters_used[[count]]
+            best_count<-counter
+            best_params<-parameters_used[[counter]]
           }
         }
       }
@@ -346,6 +346,20 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
   colnames(metric_table)<-c('train_class_acc','train_iou','val_class_acc','val_iou')
   grid_results<-arrange(cbind(metric_table,parameters_used_vec),desc(val_class_acc))
   return(list('best_model' = best_model,'best_count'=best_count,'best_params'=best_params,'parameters_used'=parameters_used,'train_class_acc'=train_class_acc,'train_iou'=train_iou,'val_class_acc'=val_class_acc,'val_iou'=val_iou,'grid_results'=grid_results))
+}
+
+
+######################################################################
+# load model or use one in environment
+load_model <- function(load){
+  if(load == 1){ # if not running CNN_model_trainer, load model previously saved
+    setwd(params$folder_to_save_model_in)
+    conv_nn_model <- load_model_hdf5(params$model_name_to_load,custom_objects=c("iou" = metric_iou))
+    setwd(params$folder_containing_scripts)
+  }else{
+    conv_nn_model <- model # as model is already in the environment
+  }
+  return(conv_nn_model)
 }
 
 
