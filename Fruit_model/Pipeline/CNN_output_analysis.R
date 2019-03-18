@@ -77,12 +77,16 @@ return(list('class_predictions' = class_preds,'corners' = corners))
 
 tr_analysis <- CNN_analysis(tr_data)
 table_train<-table(tr_analysis$class_predictions$predicted_disease,tr_analysis$class_predictions$label)
+for(i in 1:length(colnames(table_train))){colnames(table_train)[i]<-paste0(colnames(table_train)[i],"_actual")}
+for(i in 1:length(rownames(table_train))){rownames(table_train)[i]<-paste0(rownames(table_train)[i],"_predicted")}
 
 tr_analysis$class_predictions <- arrange(tr_analysis$class_predictions,label)
 tr_analysis$class_predictions
 
 val_analysis <- CNN_analysis(val_data)
 table_val<-table(val_analysis$class_predictions$predicted_disease,val_analysis$class_predictions$label)
+for(i in 1:length(colnames(table_val))){colnames(table_val)[i]<-paste0(colnames(table_val)[i],"_actual")}
+for(i in 1:length(rownames(table_val))){rownames(table_val)[i]<-paste0(rownames(table_val)[i],"_predicted")}
 
 val_analysis$class_predictions <- arrange(val_analysis$class_predictions,label)
 val_analysis$class_predictions

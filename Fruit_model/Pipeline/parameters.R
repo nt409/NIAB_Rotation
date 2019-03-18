@@ -28,8 +28,8 @@ params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_imag
                'label_names' = class_list,
                'layer_units' = 256,                     # updated in Run.R
                'patience' = 8,                          # was 8, but that's quite slow
-               'save' = 1,                              #save model?  updated in Run.R
-               'load' = 1,                              #load a saved model?  updated in Run.R
+               'save' = 1,                              # save model?  updated in Run.R
+               'load' = 0,                              # load a saved model?  updated in Run.R
                'model_name_to_load' = "disease_image_classifier.h5", # updated in Run.R
                'model_name_to_save' = "disease_image_classifier.h5"  # updated in Run.R
 )

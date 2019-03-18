@@ -15,26 +15,31 @@ library(xml2)
 library(jsonlite)
 library(tensorflow)
 
+# list existing models, informs choice of one to load if we are loading
+Model_names<-as.data.frame(list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T))
+colnames(Model_names)<-'Model_Names'
+Model_names
+
 ##################################################################################
-run_xml_to_json<-0
+# changable things in this section
+run_xml_to_json <- 0    # use new data?
+run_model_trainer <- 1 # train model, or just load an existing one?
+# if train, then save. If not, then load.
 
-run_model_trainer<-0 # train model, or just load an existing one?
-params$save <- 0     # save model? most of the time this should agree with run_model_trainer
+## pick which model to load if loading # 1, 2, or 3?
+params$model_name_to_load <- list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T)[1] # 1, 2, or 3?
 
-params$load <- 0     # if CNN_model is already in the environment, can change to params$load <- 0 to save computational time
-## pick which model to load if loading
-x<-as.data.frame(list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T))
-colnames(x)<-'Model_Names'
-x
-params$model_name_to_load <- list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T)[1]
+# vector with one or more components to train over.
+proportion_samples_vec_input<- c(0.75) #seq(0.1,0.7,0.3)
+epochs_vec_input            <- c(30)  #seq(10,40,15)
+batch_size_vec_input        <- seq(1,7,3) # c(5) 
+layers_vec_input            <- c(512)
 
-####
-proportion_samples_vec_input<- c(0.8) #seq(0.1,0.7,0.3)
-epochs_vec_input            <- c(20)  #seq(10,40,15)
-batch_size_vec_input        <- c(4) #seq(1,7,2)
-layers_vec_input            <- c(256)
-
-
+##################################################################################
+params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
+# if CNN_model is already in the environment, can change to params$load <- 0 to save computational time. If we are training a new model, don't load. Otherwise load another.
+params$load <- 1 - run_model_trainer
+# don't change anything from here down. All settings should be accessible from above.
 ##################################################################################
 # adds our annotations to the relevant images
 if(run_xml_to_json==1){ 
@@ -61,8 +66,7 @@ if(run_model_trainer==1){
 }
 
 
-##########
-# save? problem with this??
+##################################################################################
 if(params$save == 1){
   x<- paste0("Disease_CNN_proportion-samples-",params$proportion_of_samples,"-epochs-",params$epochs,"-batch_size-",params$batch_size,"-layers-",params$layer_units)
   x1<-gsub("\\.","_",x)
@@ -72,7 +76,7 @@ if(params$save == 1){
   setwd(params$folder_containing_scripts)
 }
 
-####
+##################################################################################
 source('CNN_output_analysis.R',echo= TRUE) # analyse resulting CNN (or a loaded CNN)
 table_train  # confusion matrix
 table_val # confusion matrix
@@ -82,11 +86,9 @@ table_val # confusion matrix
 source('Disease_fake_data.R',echo= TRUE) # creates dataframes to train SVM model.
 source('SVM.R',echo= TRUE) # trains SVM
 
-#####
 source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function to test new data
 ##################################################################################
 # now can predict for 'new data'
-
 new_predictions<-predictions_obtained(val_data)
 summary(new_predictions$S_N)
 new_predictions$S_I
