@@ -33,7 +33,7 @@ params$model_name_to_load <- as.character(Model_names[1,]) # 1, 2, or 3?
 proportion_samples_vec_input<- c(0.6) #seq(0.1,0.7,0.3)
 epochs_vec_input            <- c(25) #22  #seq(10,40,15)
 batch_size_vec_input        <- c(5) #seq(1,7,2) # c(5) 
-layers_vec_input            <- seq(40,80,20) #c(40,80,128) #c(160,256,320,448,512) #28,192,256)
+layers_vec_input            <- seq(160,200,20) #c(40,80,128) #c(160,256,320,448,512) #28,192,256)
 
 ##################################################################################
 params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
@@ -100,8 +100,12 @@ new_predictions$S_I
 new_predictions$S_A
 new_predictions$Disease_image_scores
 
+Data_read<-list()
 setwd(params$folder_to_save_data_in)
-Data_file_names # now pick, 1, 2 or 3 for file_no
-file_no <- 1
-Data_read<-readRDS(as.character(Data_file_names[file_no,]))
+for(i in 1:nrow(Data_file_names)){
+  Data_read[[i]]<-readRDS(as.character(Data_file_names[i,]))
+  #Grid_table<-cbind(Data_saved,Grid_table)
+}
 setwd(params$folder_containing_scripts)
+
+arrange(as.data.frame(do.call(rbind, Data_read)),desc(val_class_acc))
