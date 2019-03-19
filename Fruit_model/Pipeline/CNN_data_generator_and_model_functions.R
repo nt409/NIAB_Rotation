@@ -281,6 +281,7 @@ model_trainer<-function(){
       callback_model_checkpoint(
         file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
         save_best_only = TRUE,
+        save_weights_only = TRUE, # otherwise we are generating a lot of big files
         verbose = 1
       ),
       callback_early_stopping(patience = params$patience)

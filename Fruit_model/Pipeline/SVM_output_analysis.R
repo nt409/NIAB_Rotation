@@ -77,12 +77,20 @@ SVM_on_new_data <- function(data_to_use,im_no){
                           'soil_type'=if(soil_bias[[dis_number]]<0){"sandy"}else{"clay"})
   
   
-  res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-  res_im_only<-SVM_predictor(svm_im_only$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-  res_all<-SVM_predictor(svm_all$svm_tuned,CNN_model,data_to_use,categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
+  res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
+  res_im_only<-SVM_predictor(svm_im_only$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
+  res_all<-SVM_predictor(svm_all$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
   return(list('No_images' = res_no_im, 'Images_only' = res_im_only, 'All' = res_all, 'Disease' = dis_name))
 }
 
+
+####################################################################################
+top_pred <- function(input){
+  data_output<-as.data.frame(input)
+  data_output$Top_Prediction <- 1
+  for(i in 1:nrow(data_output)){data_output$Top_Prediction[i] <- colnames(data_output)[which.max(data_output[i,1:length(params$label_names)])]}
+  return(data_output)
+}
 
 ####################################################################################
 predictions_obtained<-function(val_data_fn){
@@ -107,8 +115,11 @@ predictions_obtained<-function(val_data_fn){
   S_N_bind<-arrange(as.data.frame(do.call(rbind, SVM_No_im)),Disease)
   S_I_bind<-arrange(as.data.frame(do.call(rbind, SVM_Images_only)),Disease)
   S_A_bind<-arrange(as.data.frame(do.call(rbind, SVM_All_data)),Disease)
-  #D_N_bind<-arrange(as.data.frame(do.call(rbind, Dis_No_im)),Disease)
-  #D_I_bind<-arrange(as.data.frame(do.call(rbind, Dis_Images_only)),Disease)
   D_A_bind<-arrange(as.data.frame(do.call(rbind, Dis_All_data)),Disease)
+  
+  S_I_bind<-top_pred(S_I_bind)
+  S_A_bind<-top_pred(S_A_bind)
+  D_A_bind<-top_pred(D_A_bind)
+  
   return(list('S_N' = S_N_bind,'S_I' = S_I_bind,'S_A' = S_A_bind,'Disease_image_scores' = D_A_bind))
 }

@@ -30,10 +30,10 @@ run_model_trainer <- 1 # train model, or just load an existing one?
 params$model_name_to_load <- list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T)[1] # 1, 2, or 3?
 
 # vector with one or more components to train over.
-proportion_samples_vec_input<- c(0.2) #seq(0.1,0.7,0.3)
-epochs_vec_input            <- c(2) #22  #seq(10,40,15)
+proportion_samples_vec_input<- c(0.5) #seq(0.1,0.7,0.3)
+epochs_vec_input            <- c(22) #22  #seq(10,40,15)
 batch_size_vec_input        <- c(5) #seq(1,7,2) # c(5) 
-layers_vec_input            <- c(10,20) #28,192,256)
+layers_vec_input            <- c(40,80,128) #c(160,256,320,448,512) #28,192,256)
 
 ##################################################################################
 params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
@@ -91,7 +91,7 @@ source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function 
 # now can predict for 'new data'
 new_predictions<-predictions_obtained(val_data)
 summary(new_predictions$S_N)
+
 new_predictions$S_I
 new_predictions$S_A
 new_predictions$Disease_image_scores
-summary(new_predictions$S_A)
