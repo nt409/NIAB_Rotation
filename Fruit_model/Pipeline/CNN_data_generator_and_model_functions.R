@@ -155,8 +155,7 @@ formulate_model<-function(){
     layer_dropout(rate = 0.5)
   
   # Bounding box
-  regression_output <<-
-    layer_dense(common, units = 4, name = "regression_output")
+  regression_output <<- layer_dense(common, units = 4, name = "regression_output")
   
   # Class prediction
   class_output <<- layer_dense(

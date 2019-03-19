@@ -27,13 +27,13 @@ run_model_trainer <- 1 # train model, or just load an existing one?
 # if train, then save. If not, then load.
 
 ## pick which model to load if loading # 1, 2, or 3?
-params$model_name_to_load <- list.files(path = params$folder_to_save_model_in, pattern=".h5", all.files=T, full.names=F, no.. = T)[1] # 1, 2, or 3?
+params$model_name_to_load <- as.character(Model_names[1,]) # 1, 2, or 3?
 
 # vector with one or more components to train over.
-proportion_samples_vec_input<- c(0.5) #seq(0.1,0.7,0.3)
-epochs_vec_input            <- c(22) #22  #seq(10,40,15)
+proportion_samples_vec_input<- c(0.6) #seq(0.1,0.7,0.3)
+epochs_vec_input            <- c(25) #22  #seq(10,40,15)
 batch_size_vec_input        <- c(5) #seq(1,7,2) # c(5) 
-layers_vec_input            <- c(40,80,128) #c(160,256,320,448,512) #28,192,256)
+layers_vec_input            <- seq(40,80,20) #c(40,80,128) #c(160,256,320,448,512) #28,192,256)
 
 ##################################################################################
 params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
@@ -63,8 +63,12 @@ if(run_model_trainer==1){
   params$epochs <- grid_output$best_params$Epochs
   params$batch_size <- grid_output$best_params$Batch_Size
   params$layer_units <- grid_output$best_params$Layers
+  setwd(params$folder_to_save_data_in)
+  saveRDS(as.data.frame(grid_output$grid_results),file=paste("grid_output",paste(layers_vec_input,collapse="_"),sep="_"))
+  setwd(params$folder_containing_scripts)
 }
-
+Data_file_names<-as.data.frame(list.files(path = params$folder_to_save_data_in, pattern="grid_output", all.files=T, full.names=F, no.. = T))
+colnames(Data_file_names)<-'Data_file_names'
 
 ##################################################################################
 if(params$save == 1){
@@ -95,3 +99,9 @@ summary(new_predictions$S_N)
 new_predictions$S_I
 new_predictions$S_A
 new_predictions$Disease_image_scores
+
+setwd(params$folder_to_save_data_in)
+Data_file_names # now pick, 1, 2 or 3 for file_no
+file_no <- 1
+Data_read<-readRDS(as.character(Data_file_names[file_no,]))
+setwd(params$folder_containing_scripts)
