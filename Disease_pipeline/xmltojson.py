@@ -3,7 +3,7 @@ import os
 import json
 
 #############################################
-### old way
+### old way - these filepaths must match the device
 xml_path   = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/all_labels/YR_MSD_BS"
 json_file  = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/json_folder/online.json"
 #############################################

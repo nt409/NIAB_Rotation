@@ -1,5 +1,6 @@
 class_list <- c("names_of_diseases_will_go_in_here") # gets extracted from JSON in CNN_data_generator_and_model_functions.R
-# Need to check the 2 pathnames on the xmltojson.py file are correct for the device running the model and for the data we want to input.
+
+# Also need to check the 2 pathnames on the xmltojson.py file are correct for the device running the model and for the data we want to input.
 
 # for semi-automated JSON
 # fold_cont_annot <- "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold"
@@ -10,13 +11,13 @@ class_list <- c("names_of_diseases_will_go_in_here") # gets extracted from JSON 
 
 
 # default parameters
-params <- list('img_dir'                   = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/Image_directory",
-               'annot_file'                = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/json_folder/online.json",
-               'folder_containing_scripts' = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Disease_pipeline",
-               'folder_to_save_data_in'    = "C:/Users/Administrator/Documents/GitHub/Saved/Grid_output",
-               'folder_to_save_model_in'   = "C:/Users/Administrator/Documents/GitHub/Saved/Models",
-               'folder_to_save_images_in'  = "C:/Users/Administrator/Documents/GitHub/Saved/Pipeline_resulting_images",
-               'folder_to_save_weights_in' = "C:/Users/Administrator/Documents/GitHub/Saved/Weights",
+params <- list('img_dir'                   = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/Image_directory",         # file path unique to each device
+               'annot_file'                = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/json_folder/online.json", # file path unique to each device
+               'folder_containing_scripts' = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Disease_pipeline",            # file path unique to each device
+               'folder_to_save_data_in'    = "C:/Users/Administrator/Documents/GitHub/Saved/Grid_output",                         # file path unique to each device
+               'folder_to_save_model_in'   = "C:/Users/Administrator/Documents/GitHub/Saved/Models",                              # file path unique to each device
+               'folder_to_save_images_in'  = "C:/Users/Administrator/Documents/GitHub/Saved/Pipeline_resulting_images",           # file path unique to each device
+               'folder_to_save_weights_in' = "C:/Users/Administrator/Documents/GitHub/Saved/Weights",                             # file path unique to each device
                'target_height'         = 224,
                'target_width'          = 224,
                'class_background'      = length(class_list), # gets updated when we run CNN_data_generator_and_model_functions.R

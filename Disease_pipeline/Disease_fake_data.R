@@ -47,8 +47,8 @@ temp_av[[1]]<-16
 temp_av[[2]]<-18  # hottest
 temp_av[[3]]<-14  # coldest
 # weather standard dev
-rainfall_sd<-10
-temp_sd<-1
+rainfall_sd<-20
+temp_sd<-3
 # location bias
 loc_bias <- list()
 loc_bias[[1]]  <-  0.1 # usually EA

@@ -70,11 +70,11 @@ SVM_on_new_data <- function(data_to_use,im_no){
   dis_number<-which(name_disease == dis_name)
   
   # assume categorical variables are for the average case of disease appearance
-  categ_data_to_use<-list('location'=if(crop_bias[[dis_number]]<0){"Midlands"}else{"East_Anglia"},
-                          'rainfall'=rain_av[dis_number],
-                          'mean_temp'=temp_av[dis_number],
-                          'crop_variety'=if(crop_bias[[dis_number]]<0){"WB2"}else{"WB1"},
-                          'soil_type'=if(soil_bias[[dis_number]]<0){"sandy"}else{"clay"})
+  categ_data_to_use<-list('location' = if(rnorm(1,mean=0,sd=1)>loc_bias[[dis_number]]){"Midlands"}else{"East_Anglia"},
+                          'rainfall' = rain_av[dis_number] + rnorm(1,mean=0,sd=rainfall_sd),
+                          'mean_temp'= temp_av[dis_number] + rnorm(1,mean=0,sd=temp_sd),
+                          'crop_variety'= if(rnorm(1,mean=0,sd=1)>crop_bias[[dis_number]]){"WB2"}else{"WB1"},
+                          'soil_type'   = if(rnorm(1,mean=0,sd=1)>soil_bias[[dis_number]]){"sandy"}else{"clay"})
   
   
   res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
