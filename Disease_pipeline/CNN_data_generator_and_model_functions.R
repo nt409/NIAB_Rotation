@@ -277,7 +277,7 @@ model_trainer<-function(){
     validation_steps = nrow(validation_data) / params$batch_size_val,
     callbacks = list(
       callback_model_checkpoint(
-        file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
+        file.path(params$folder_to_save_weights_in, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
         save_best_only = TRUE,
         save_weights_only = TRUE, # otherwise we are generating a lot of big files
         verbose = 1

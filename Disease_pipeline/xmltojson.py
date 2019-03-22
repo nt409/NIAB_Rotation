@@ -4,8 +4,8 @@ import json
 
 #############################################
 ### old way
-xml_path  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all_label/YR_MSD_BS"
-json_file  = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json"
+xml_path   = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/all_labels/YR_MSD_BS"
+json_file  = "C:/Users/Administrator/Documents/GitHub/Images_and_labels/json_folder/online.json"
 #############################################
 ### attempted automated way, but probably less efficient than old way
 # make sure that fold_cont_annot is correct!

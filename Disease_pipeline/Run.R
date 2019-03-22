@@ -22,7 +22,7 @@ Model_names
 
 ##################################################################################
 # changable things in this section
-run_xml_to_json <- 0    # use new data?
+run_xml_to_json   <- 0    # use new data?
 run_model_trainer <- 1 # train model, or just load an existing one?
 # if train, then save. If not, then load.
 

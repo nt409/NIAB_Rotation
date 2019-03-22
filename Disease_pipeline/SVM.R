@@ -19,7 +19,7 @@ library(tensorflow)
 #fn to create svm model, and a tuned svm model. Could improve tuning aspect.
 svm_creator<-function(data_to_use){
   predictor_data_to_use <- subset(data_to_use, select = c(-category_id))
-  svm_model_within_function <- svm(category_id~., data=data_to_use,probability=TRUE)
+  svm_model_within_function <- svm(category_id~., data=data_to_use, probability=TRUE)
   summary(svm_model_within_function)
   
   pred_within_function <- predict(svm_model_within_function,predictor_data_to_use)
@@ -30,11 +30,12 @@ svm_creator<-function(data_to_use){
   print(svm_tune_within_function)
   
   ##
-  resulting_cost_within_function<-as.numeric(svm_tune_within_function$best.parameters[1]) # get from svm_tune
-  resulting_gamma_within_function<-as.numeric(svm_tune_within_function$best.parameters[2]) # get from svm_tune
+  resulting_cost_within_function<-as.numeric(svm_tune_within_function$best.parameters$cost) # get from svm_tune
+  resulting_epsilon_within_function<-as.numeric(svm_tune_within_function$best.parameters$epsilon) # get from svm_tune
+  resulting_gamma_within_function<-as.numeric(svm_tune_within_function$best.parameters$gamma) # get from svm_tune
   ##
   
-  svm_model_after_tune_within_function <- svm(category_id ~ ., data=data_to_use, kernel="radial", cost=resulting_cost_within_function, gamma=resulting_gamma_within_function,probability=TRUE)
+  svm_model_after_tune_within_function <- svm(category_id ~ ., data=data_to_use, kernel="radial", cost=resulting_cost_within_function, epsilon=resulting_epsilon_within_function, gamma=resulting_gamma_within_function, probability=TRUE)
   summary(svm_model_after_tune_within_function)
   
   pred_within_function_tuned <- predict(svm_model_after_tune_within_function,predictor_data_to_use)
