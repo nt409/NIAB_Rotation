@@ -88,21 +88,8 @@ source('CNN_output_analysis.R',echo= TRUE) # analyse resulting CNN (or a loaded 
 table_train  # confusion matrix
 table_val # confusion matrix
 
-##################################################################################
-# SVM stuff from here
-source('Disease_fake_data.R',echo= TRUE) # creates dataframes to train SVM model.
-source('SVM.R',echo= TRUE) # trains SVM
 
-source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function to test new data
-##################################################################################
-# now can predict for 'new data'
-new_predictions<-predictions_obtained(val_data)
-summary(new_predictions$S_N)
-
-new_predictions$S_I
-new_predictions$S_A
-new_predictions$Disease_image_scores
-
+# see how different parameter values have performed
 Data_read<-list()
 setwd(params$folder_to_save_data_in)
 for(i in 1:nrow(Data_file_names)){
@@ -113,3 +100,33 @@ setwd(params$folder_containing_scripts)
 
 grid_resulting_table<-arrange(as.data.frame(do.call(rbind, Data_read)),desc(val_class_acc))
 grid_resulting_table
+##################################################################################
+# SVM stuff from here
+source('Disease_fake_data.R',echo= TRUE) # creates dataframes to train SVM model.
+source('SVM.R',echo= TRUE) # trains SVM
+
+source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function to test new data
+##################################################################################
+# now can predict for 'new data'
+new_predictions<-predictions_obtained(val_data)
+
+
+for(i in 1:(ncol(new_predictions$S_N)-1)){new_predictions$S_N[,i]<-as.numeric(as.character(new_predictions$S_N[,i]))}
+for(i in 1:(ncol(new_predictions$S_I)-2)){new_predictions$S_I[,i]<-as.numeric(as.character(new_predictions$S_I[,i]))}
+for(i in 1:(ncol(new_predictions$S_A)-2)){new_predictions$S_A[,i]<-as.numeric(as.character(new_predictions$S_A[,i]))}
+for(i in 1:(ncol(new_predictions$Disease_image_scores)-2)){new_predictions$Disease_image_scores[,i]<-as.numeric(as.character(new_predictions$Disease_image_scores[,i]))}
+par(mfrow=c(2,2))
+boxplot(filter(new_predictions$Disease_image_scores,Disease=="BS")[,1:3],main="CNN, BS")
+boxplot(filter(new_predictions$S_I,Disease=="BS")[,1:3],main="Just images")
+boxplot(filter(new_predictions$S_N,Disease=="BS")[,1:3],main="Just descriptors")
+boxplot(filter(new_predictions$S_A,Disease=="BS")[,1:3],main="All")
+par(mfrow=c(2,2))
+boxplot(filter(new_predictions$Disease_image_scores,Disease=="MSD")[,1:3],main="CNN, MSD")
+boxplot(filter(new_predictions$S_I,Disease=="MSD")[,1:3],main="Just images")
+boxplot(filter(new_predictions$S_N,Disease=="MSD")[,1:3],main="Just descriptors")
+boxplot(filter(new_predictions$S_A,Disease=="MSD")[,1:3],main="All")
+par(mfrow=c(2,2))
+boxplot(filter(new_predictions$Disease_image_scores,Disease=="YR")[,1:3],main="CNN, YR")
+boxplot(filter(new_predictions$S_I,Disease=="YR")[,1:3],main="Just images")
+boxplot(filter(new_predictions$S_N,Disease=="YR")[,1:3],main="Just descriptors")
+boxplot(filter(new_predictions$S_A,Disease=="YR")[,1:3],main="All")
