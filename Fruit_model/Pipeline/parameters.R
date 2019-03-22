@@ -22,6 +22,7 @@ params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_imag
                'class_background' = length(class_list), # gets updated when we run CNN_data_generator_and_model_functions.R
                'cl_output' = length(class_list),        # gets updated when we run CNN_data_generator_and_model_functions.R
                'batch_size' = 5,                        # updated in Run.R # 10 #1 # low is faster but less accurate?   ### 4
+               'batch_size_val'=1,
                'proportion_of_samples' = 0.6,           # updated in Run.R # 0.2, but was classifying everything the same. ###0.3
                'seed' = 6,
                'threshold' = 0.4,

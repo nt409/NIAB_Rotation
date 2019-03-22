@@ -114,9 +114,6 @@ attr(metric_iou, "py_function_name") <- "metric_iou"
 
 
 ######################################################################
-n_samples <- nrow(imageinfo)
-set.seed(params$seed) # seed
-
 # Data generator
 image_size <- params$target_width # same as height
 
@@ -137,12 +134,12 @@ if(exists("feature_extractor")==FALSE){
 
 input <- feature_extractor$input
 
-
-
+n_samples <- nrow(imageinfo)
+set.seed(params$seed) # seed
+train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 
 # create model framework... this bit runs using different parameters
 formulate_model<-function(){
-  train_indices <<- sample(1:n_samples, params$proportion_of_samples * n_samples)
   train_data <<- imageinfo[train_indices,]
   validation_data <<- imageinfo[-train_indices,]
 
@@ -185,7 +182,7 @@ formulate_model<-function(){
     train_data,
     target_height = params$target_height,
     target_width = params$target_width,
-    shuffle = TRUE,
+    shuffle = TRUE, # was true, affects choice of model??
     batch_size = params$batch_size
   )
   
@@ -194,7 +191,7 @@ formulate_model<-function(){
     target_height = params$target_height,
     target_width = params$target_width,
     shuffle = FALSE,
-    batch_size = params$batch_size
+    batch_size = params$batch_size_val
   )
 return(model)
 }
@@ -221,10 +218,11 @@ loc_class_generator <-  function(data,target_height,target_width,shuffle,batch_s
     i <- 1
     function() {
       if (shuffle) {
+        ## seed here?
+        #set.seed(params$seed)
         indices <- sample(1:nrow(data), size = batch_size)
       } else {
-        if (i + batch_size >= nrow(data))
-          i <<- 1
+        if (i + batch_size >= nrow(data))  i <<- 1
         indices <- c(i:min(i + batch_size - 1, nrow(data)))
         i <<- i + length(indices)
       }
@@ -250,14 +248,14 @@ loc_class_generator <-  function(data,target_height,target_width,shuffle,batch_s
 formulate_model()
 ######################################################################
 # used later for testing
-tr_data <- train_data[, c("file_name", # or train_data if preferred
+tr_data <- train_data[, c("file_name",
                           "name",
                           "x_left_scaled",
                           "y_top_scaled",
                           "x_right_scaled",
                           "y_bottom_scaled")]
 
-val_data <- validation_data[, c("file_name", # or train_data if preferred
+val_data <- validation_data[, c("file_name",
                                 "name",
                                 "x_left_scaled",
                                 "y_top_scaled",
@@ -270,12 +268,13 @@ val_data <- validation_data[, c("file_name", # or train_data if preferred
 ### model trainer
 model_trainer<-function(){
   model<-formulate_model()
+  #params$batch_size_val<<-nrow(val_data)
   hist<- model %>% fit_generator(
     train_gen,
     epochs = params$epochs,
     steps_per_epoch = nrow(train_data) / params$batch_size,
     validation_data = valid_gen,
-    validation_steps = nrow(validation_data) / params$batch_size,
+    validation_steps = nrow(validation_data) / params$batch_size_val,
     callbacks = list(
       callback_model_checkpoint(
         file.path(params$weight_file_path, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
@@ -294,7 +293,7 @@ model_trainer<-function(){
 ######################################################################
 ## train model with variety of parameters, keep model with best validation class accuracy
 grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
-  # initialise
+  ### initialise
   counter<-0
   vals<-list()
   parameters_used<-list()
@@ -302,10 +301,13 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
   model_hist_val_iou <- list()
   model_hist_train_iou <- list()
   model_hist_train_class_acc <- list()
+  train_class_acc <- list()
+  train_iou <- list()
+  train_class_output_loss <- list()
   val_class_acc <- list()
   val_iou <- list()
-  train_iou <- list()
-  train_class_acc <- list()
+  val_class_output_loss <- list()
+  #####
   for(i in 1:length(proportion_samples_vec)){
     for(j in 1:length(epochs_vec)){
       for(k in 1:length(batch_size_vec)){
@@ -320,15 +322,20 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
           hist1<-model_trainer()
           history<-hist1$hist
           model_produced<-hist1$model_trained
+          
           # model_hist_train_class_acc[[counter]]<-history$metrics$class_output_acc   # every epoch value
           # model_hist_train_iou[[counter]]<-history$metrics$regression_output_iou    # every epoch value
           # model_hist_val_class_acc[[counter]]<-history$metrics$val_class_output_acc # every epoch value
           # model_hist_val_iou[[counter]]<-history$metrics$val_regression_output_iou  # every epoch value
-          train_class_acc[[counter]]<-history$metrics$class_output_acc[length(history$metrics$class_output_acc)]           # final epoch value
-          train_iou[[counter]]<-history$metrics$regression_output_iou[length(history$metrics$regression_output_iou)]       # final epoch value
-          val_class_acc[[counter]]<-history$metrics$val_class_output_acc[length(history$metrics$val_class_output_acc)]     # final epoch value
-          val_iou[[counter]]<-history$metrics$val_regression_output_iou[length(history$metrics$val_regression_output_iou)] # final epoch value
-          if(counter == which.max(unlist(val_class_acc))){
+          
+          no_model_saved <- which.min(unlist(history$metrics$val_loss)) # which model is saved? Thus which metrics are evaluated on the model we'll use
+          train_class_acc[[counter]]<-history$metrics$class_output_acc[no_model_saved]              # epoch value no_model_saved
+          train_iou[[counter]]<-history$metrics$regression_output_iou[no_model_saved]               # epoch value no_model_saved
+          train_class_output_loss[[counter]]<-history$metrics$class_output_loss[no_model_saved]     # epoch value no_model_saved
+          val_class_acc[[counter]]<-history$metrics$val_class_output_acc[no_model_saved]            # epoch value no_model_saved
+          val_iou[[counter]]<-history$metrics$val_regression_output_iou[no_model_saved]             # epoch value no_model_saved
+          val_class_output_loss[[counter]]<-history$metrics$val_class_output_loss[no_model_saved]   # epoch value no_model_saved
+          if(counter == which.max(unlist(val_class_acc))){ # We want to keep the model with best class acc? But is this the way saving works for us?
             best_model<-model_produced
             best_count<-counter
             best_params<-parameters_used[[counter]]
@@ -339,13 +346,15 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
   }
   train_class_acc_vec<-as.data.frame(do.call(rbind,train_class_acc))
   train_iou_vec<-as.data.frame(do.call(rbind,train_iou))
+  train_class_output_loss_vec<-as.data.frame(do.call(rbind,train_class_output_loss))
   val_iou_vec<-as.data.frame(do.call(rbind,val_iou))
   val_class_acc_vec<-as.data.frame(do.call(rbind,val_class_acc))
+  val_class_output_loss_vec<-as.data.frame(do.call(rbind,val_class_output_loss))
   parameters_used_vec<-as.data.frame(do.call(rbind,parameters_used))
-  metric_table<-cbind('train_class_acc'=train_class_acc_vec,'train_iou' = train_iou_vec,'val_class_acc' = val_class_acc_vec,'val_iou' = val_iou_vec)
-  colnames(metric_table)<-c('train_class_acc','train_iou','val_class_acc','val_iou')
-  grid_results<-arrange(cbind(metric_table,parameters_used_vec),desc(val_class_acc))
-  return(list('best_model' = best_model,'best_count'=best_count,'best_params'=best_params,'parameters_used'=parameters_used,'train_class_acc'=train_class_acc,'train_iou'=train_iou,'val_class_acc'=val_class_acc,'val_iou'=val_iou,'grid_results'=grid_results))
+  metric_table<-cbind('train_class_output_loss' = train_class_output_loss_vec,'train_class_acc'=train_class_acc_vec,'train_iou' = train_iou_vec,'val_class_output_loss' = val_class_output_loss_vec,'val_class_acc' = val_class_acc_vec,'val_iou' = val_iou_vec)
+  colnames(metric_table)<-c('train_class_output_loss','train_class_acc','train_iou','val_class_output_loss','val_class_acc','val_iou')
+  grid_results<-arrange(cbind(metric_table,parameters_used_vec),desc(val_class_output_loss))
+  return(list('best_model' = best_model,'best_count'=best_count,'best_params'=best_params,'parameters_used'=parameters_used,'train_class_acc'=train_class_acc,'train_iou'=train_iou,'train_class_output_loss'=train_class_output_loss,'val_class_acc'=val_class_acc,'val_iou'=val_iou,'val_class_output_loss'=val_class_output_loss,'grid_results'=grid_results))
 }
 
 
