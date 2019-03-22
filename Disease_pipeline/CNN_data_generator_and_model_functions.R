@@ -335,7 +335,7 @@ grid<-function(proportion_samples_vec,epochs_vec,batch_size_vec,layers_vec){
           val_class_acc[[counter]]<-history$metrics$val_class_output_acc[no_model_saved]            # epoch value no_model_saved
           val_iou[[counter]]<-history$metrics$val_regression_output_iou[no_model_saved]             # epoch value no_model_saved
           val_class_output_loss[[counter]]<-history$metrics$val_class_output_loss[no_model_saved]   # epoch value no_model_saved
-          if(counter == which.max(unlist(val_class_acc))){ # We want to keep the model with best class acc? But is this the way saving works for us?
+          if(counter == which.max(unlist(val_class_acc))){ # We want to keep the model with best class acc? But is this the way saving works for us, or is it saving models based on val_loss?
             best_model<-model_produced
             best_count<-counter
             best_params<-parameters_used[[counter]]

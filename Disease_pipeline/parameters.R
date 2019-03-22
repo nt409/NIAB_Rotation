@@ -12,7 +12,7 @@ class_list <- c("names_of_diseases_will_go_in_here") # gets extracted from JSON 
 # default parameters
 params <- list('img_dir'    = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/all2",
                'annot_file' = "C:/Users/Administrator/Documents/GitHub/test_images_to_use/jsonfold/online.json",
-               'folder_containing_scripts' = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline",
+               'folder_containing_scripts' = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Disease_pipeline",
                'folder_to_save_data_in'   = "C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Grid_output",
                'folder_to_save_model_in'   = "C:/Users/Administrator/Documents/GitHub",
                'folder_to_save_images_in'  = "C:/Users/Administrator/Documents/GitHub/Pipeline_resulting_images",

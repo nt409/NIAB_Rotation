@@ -1,4 +1,4 @@
-source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Fruit_model/Pipeline/parameters.R')
+source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Disease_pipeline/parameters.R')
 setwd(params$folder_containing_scripts)
 ### load libraries
 library(keras)
@@ -55,6 +55,9 @@ for(k in 1:length(params$label_names)){
 print(paste("Number of training images in category",params$label_names[k],"is",sum(train_data$category_id==k)))
 }
 
+
+#FIXME if I run just the model trainer bit below, for the same parameters, the model output is different every time. Further, the keras output quoting the model accuracy seems to disagree with the output when I test the model on the data set producing table_train and table_val.
+# this relates to the functions grid(), model_trainer(), formulate_model().
 if(run_model_trainer==1){
   grid_output<-grid(proportion_samples_vec_input,epochs_vec_input,batch_size_vec_input,layers_vec_input)
   model<-grid_output$best_model # use model with best val_class_acc
