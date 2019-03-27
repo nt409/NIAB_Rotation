@@ -1,5 +1,6 @@
 source('C:/Users/Administrator/Documents/GitHub/NIAB_Rotation/Disease_pipeline/parameters.R')
 setwd(params$folder_containing_scripts)
+
 ### load libraries
 library(keras)
 library(rjson)

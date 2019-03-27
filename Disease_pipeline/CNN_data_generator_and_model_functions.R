@@ -18,7 +18,8 @@ library(jsonlite)
 library(tensorflow)
 
 ######################################################################
-# added from image_classifier_functions
+use_session_with_seed(1) # Keras and Tensorflow seed
+set.seed(params$seed) # R seed
 
 create_image_container <- function(annotation){
   
@@ -135,7 +136,6 @@ if(exists("feature_extractor")==FALSE){
 input <- feature_extractor$input
 
 n_samples <- nrow(imageinfo)
-set.seed(params$seed) # seed
 train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 
 # create model framework... this bit runs using different parameters
@@ -218,8 +218,6 @@ loc_class_generator <-  function(data,target_height,target_width,shuffle,batch_s
     i <- 1
     function() {
       if (shuffle) {
-        ## seed here?
-        #set.seed(params$seed)
         indices <- sample(1:nrow(data), size = batch_size)
       } else {
         if (i + batch_size >= nrow(data))  i <<- 1
@@ -278,14 +276,14 @@ model_trainer<-function(){
     callbacks = list(
       callback_model_checkpoint(
         file.path(params$folder_to_save_weights_in, "weights.{epoch:02d}-{val_loss:.2f}.hdf5"),
-        save_best_only = TRUE,
+        save_best_only = FALSE, # was TRUE
         save_weights_only = TRUE, # otherwise we are generating a lot of big files
         verbose = 1
       ),
       callback_early_stopping(patience = params$patience)
     )
   )
-  model_to_output<-model
+  model_to_output<-model #? problem here?#hist$model??
   return(list('hist'=hist,'model_trained'=model_to_output))
 }
 
