@@ -56,12 +56,12 @@ svm_all<-svm_creator(data_use)
 
 ################################################
 # without disease images
-data_use_without_images<- subset(data, select = c(category_id,rainfall,mean_temp,Loc_EA_indic,Loc_Midlands_indic,WB_1_indic,WB_2_indic,ST_clay_indic,ST_sandy_indic))
+data_use_without_images<- subset(data, select = c(category_id,rainfall,mean_temp,Loc_EA_indic,Loc_Midlands_indic,WB_1_indic,WB_2_indic,ST_clay_indic,ST_sandy_indic,date))
 
 svm_no_images<-svm_creator(data_use_without_images)
 ################################################
 # only with images
-data_use_images_only<- subset(data, select = c(-location,-crop_variety,-soil_type,-rainfall,-mean_temp,-Loc_EA_indic,-Loc_Midlands_indic,-WB_1_indic,-WB_2_indic,-ST_clay_indic,-ST_sandy_indic))
+data_use_images_only<- subset(data, select = c(-location,-date,-crop_variety,-soil_type,-rainfall,-mean_temp,-Loc_EA_indic,-Loc_Midlands_indic,-WB_1_indic,-WB_2_indic,-ST_clay_indic,-ST_sandy_indic))
 
 svm_im_only<-svm_creator(data_use_images_only)
 ################################################

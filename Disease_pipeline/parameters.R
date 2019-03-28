@@ -26,6 +26,7 @@ params <- list('img_dir'                   = "C:/Users/Administrator/Documents/G
                'batch_size_val'        = 1,
                'proportion_of_samples' = 0.6,                # updated in Run.R # 0.2, but was classifying everything the same. ###0.3
                'seed'                  = 6,
+               'TF_seed'               = 1,
                'threshold'             = 0.4,
                'epochs'                = 20,                 # updated in Run.R
                'label_names'           = class_list,

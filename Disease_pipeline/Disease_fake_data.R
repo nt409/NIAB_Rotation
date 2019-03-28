@@ -41,14 +41,16 @@ rain_av<-list()
 rain_av[[1]]<-40
 rain_av[[2]]<-50
 rain_av[[3]]<-60  # wetter
+# date av
+date_av<-list()
+date_av[[1]]<-as.numeric(as.Date(as.character("13/04"), format="%d/%m"))
+date_av[[2]]<-as.numeric(as.Date(as.character("15/04"), format="%d/%m"))
+date_av[[3]]<-as.numeric(as.Date(as.character("18/04"), format="%d/%m"))
 # temp av
 temp_av<-list()
 temp_av[[1]]<-16
 temp_av[[2]]<-18  # hottest
 temp_av[[3]]<-14  # coldest
-# weather standard dev
-rainfall_sd<-10
-temp_sd<-3
 # location bias
 loc_bias <- list()
 loc_bias[[1]]  <-  0.1 # usually EA
@@ -64,6 +66,10 @@ soil_bias <- list()
 soil_bias[[1]] <- -100 # always sandy
 soil_bias[[2]] <- -0.1 # usually sandy
 soil_bias[[3]] <- -0.1 # usually sandy
+# standard deviations
+rainfall_sd<- 10 # 10
+temp_sd<- 3     # 3
+date_sd<- 3    # 3 
 ###############################################################################################
 # name of d1, d2, d3 ... di
 name_disease <- list()
@@ -82,7 +88,7 @@ dis_data2<-generate_empty_data_frame(name_disease)
 
 # add data
 for(i in 1:length(params$label_names)){
-  dis_data2<-fake_data_creator(dis_data2,name_disease,image_data_table[[i]],loc_bias[[i]],crop_bias[[i]],soil_bias[[i]],rain_av[[i]],temp_av[[i]],i) # add di data
+  dis_data2<-fake_data_creator(dis_data2,name_disease,image_data_table[[i]],loc_bias[[i]],crop_bias[[i]],soil_bias[[i]],rain_av[[i]],temp_av[[i]],date_av[[i]],i) # add di data
 }
 
 dis_data2<-format_data(dis_data2,name_disease) # gets it into the right form

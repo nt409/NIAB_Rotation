@@ -24,7 +24,7 @@ CNN_model <- load_model(params$load)
 #########################################################
 # mock prediction with new input data
 # include stage of disease??
-SVM_predictor <- function(svm_input,CNN_model_input,v_data,loc,rain,m_t,w_b,s_t){
+SVM_predictor <- function(svm_input,CNN_model_input,v_data,loc,rain,m_t,w_b,s_t,date){
 preds<-  CNN_model_input %>% predict(
   load_and_preprocess_image(v_data[1, "file_name"], 
                             params$target_height, params$target_width),
@@ -54,7 +54,8 @@ test_sample<- as.data.frame(t(c('location'=loc,
                                 'rainfall'=rain,
                                 'mean_temp'=m_t,
                                 'crop_variety'=w_b,
-                                'soil_type'=s_t)))
+                                'soil_type'=s_t,
+                                'date'=date)))
 test_sample<-cbind(disease_im_scores,test_sample)
 test_sample<-format_data(test_sample,name_disease) # format data so can input
 head(test_sample) # preview test_sample, which is now in correct format
@@ -74,12 +75,13 @@ SVM_on_new_data <- function(data_to_use,im_no){
                           'rainfall' = as.numeric(rain_av[dis_number]) + as.numeric(rnorm(1,mean=0,sd=rainfall_sd)),
                           'mean_temp'= as.numeric(temp_av[dis_number]) + as.numeric(rnorm(1,mean=0,sd=temp_sd)),
                           'crop_variety'= if(rnorm(1,mean=0,sd=1)>crop_bias[[dis_number]]){"WB2"}else{"WB1"},
-                          'soil_type'   = if(rnorm(1,mean=0,sd=1)>soil_bias[[dis_number]]){"sandy"}else{"clay"})
+                          'soil_type'   = if(rnorm(1,mean=0,sd=1)>soil_bias[[dis_number]]){"sandy"}else{"clay"},
+                          'date'        = as.numeric(date_av[dis_number]) + as.numeric(rnorm(1,mean=0,sd=date_sd)))
   
   
-  res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-  res_im_only<-SVM_predictor(svm_im_only$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
-  res_all<-SVM_predictor(svm_all$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type)
+  res_no_im<-SVM_predictor(svm_no_images$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type,categ_data_to_use$date)
+  res_im_only<-SVM_predictor(svm_im_only$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type,categ_data_to_use$date)
+  res_all<-SVM_predictor(svm_all$svm_tuned,CNN_model,data_to_use[im_no,],categ_data_to_use$location,categ_data_to_use$rainfall,categ_data_to_use$mean_temp,categ_data_to_use$crop_variety,categ_data_to_use$soil_type,categ_data_to_use$date)
   return(list('No_images' = res_no_im, 'Images_only' = res_im_only, 'All' = res_all, 'Disease' = dis_name))
 }
 

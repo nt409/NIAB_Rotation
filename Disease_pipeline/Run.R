@@ -105,12 +105,11 @@ grid_resulting_table
 # SVM stuff from here
 source('Disease_fake_data.R',echo= TRUE) # creates dataframes to train SVM model.
 source('SVM.R',echo= TRUE) # trains SVM
-
+head(data_use)
 source('SVM_output_analysis.R',echo= TRUE) # analyse output and create function to test new data
 ##################################################################################
 # now can predict for 'new data'
 new_predictions<-predictions_obtained(val_data)
-
 
 for(i in 1:(ncol(new_predictions$S_N)-1)){new_predictions$S_N[,i]<-as.numeric(as.character(new_predictions$S_N[,i]))}
 for(i in 1:(ncol(new_predictions$S_I)-2)){new_predictions$S_I[,i]<-as.numeric(as.character(new_predictions$S_I[,i]))}
@@ -121,12 +120,12 @@ boxplot(filter(new_predictions$Disease_image_scores,Disease=="BS")[,1:3],main="C
 boxplot(filter(new_predictions$S_I,Disease=="BS")[,1:3],main="Just images")
 boxplot(filter(new_predictions$S_N,Disease=="BS")[,1:3],main="Just descriptors")
 boxplot(filter(new_predictions$S_A,Disease=="BS")[,1:3],main="All")
-par(mfrow=c(2,2))
+# par(mfrow=c(2,2))
 boxplot(filter(new_predictions$Disease_image_scores,Disease=="MSD")[,1:3],main="CNN, MSD")
 boxplot(filter(new_predictions$S_I,Disease=="MSD")[,1:3],main="Just images")
 boxplot(filter(new_predictions$S_N,Disease=="MSD")[,1:3],main="Just descriptors")
 boxplot(filter(new_predictions$S_A,Disease=="MSD")[,1:3],main="All")
-par(mfrow=c(2,2))
+# par(mfrow=c(2,2))
 boxplot(filter(new_predictions$Disease_image_scores,Disease=="YR")[,1:3],main="CNN, YR")
 boxplot(filter(new_predictions$S_I,Disease=="YR")[,1:3],main="Just images")
 boxplot(filter(new_predictions$S_N,Disease=="YR")[,1:3],main="Just descriptors")

@@ -18,7 +18,7 @@ library(jsonlite)
 library(tensorflow)
 
 ######################################################################
-use_session_with_seed(1) # Keras and Tensorflow seed
+use_session_with_seed(params$TF_seed) # Keras and Tensorflow seed
 set.seed(params$seed) # R seed
 
 create_image_container <- function(annotation){
@@ -390,7 +390,7 @@ generate_empty_data_frame <- function(name_disease_to_use){
 
 ######################################################################
 # svm fake data creator
-fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av,index){
+fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bias,WB_bias,S_bias,Rain_av,Temp_av,Date_av,index){
   datalist <- list()
   d_score <- list()
   for(i in 1:length(image_data_to_use$label)){
@@ -400,12 +400,14 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
     ll<-rnorm(1,mean=0,sd=1)
     ss<-rnorm(1,mean=0,sd=1)
     ww<-rnorm(1,mean=0,sd=1)
+    dd<-rnorm(1,mean=0,sd=1)
     # data
     location<-'East_Anglia'
     soil<-"clay"
     WB <- 'WB1'
     rainfall <- Rain_av+rainfall_sd*rr
     mean_temp<- Temp_av+temp_sd*tt
+    date<-Date_av+date_sd*dd
     for(k in 1:length(params$label_names)){
     d_score[[k]]<-image_data_to_use[i,k]
     }
@@ -420,7 +422,7 @@ fake_data_creator<- function(dataframe_to_use,name_to_use,image_data_to_use,L_bi
     for(kk in 1:length(params$label_names)){
     colnames(dat_2)[kk] <- paste(name_to_use[[kk]],"_score",sep="")
     }
-    dat_3<-as.data.frame(t(c('location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil)))
+    dat_3<-as.data.frame(t(c('location'=location,'rainfall'=rainfall,'mean_temp'=mean_temp,'crop_variety'=WB,'soil_type'=soil,'date'=date)))
     dat <- cbind(dat_1,dat_2,dat_3)
     datalist[[i]] <- dat # add to list of data frames
   }
@@ -449,6 +451,7 @@ format_data <- function(dataframe,name_disease_to_use){
   }
   dataframe$rainfall  <- as.numeric(as.character(dataframe$rainfall))
   dataframe$mean_temp <- as.numeric(as.character(dataframe$mean_temp))
+  dataframe$date      <- as.numeric(as.character(dataframe$date))
   
   # make categorical data into numeric data taking values 0 or 1
   dataframe <- mutate(dataframe,
