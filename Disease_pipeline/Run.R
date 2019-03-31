@@ -76,7 +76,7 @@ colnames(Data_file_names)<-'Data_file_names'
 
 ##################################################################################
 if(params$save == 1){
-  x<- paste0("Disease_CNN_proportion-samples-",params$proportion_of_samples,"-epochs-",params$epochs,"-batch_size-",params$batch_size,"-layers-",params$layer_units)
+  x<- paste0("Disease_CNN_proportion-samples-",params$proportion_of_samples,"-epochs-",params$epochs,"-batch_size-",params$batch_size,"-layers-",params$layer_units,"-TF_seed-",params$TF_seed,"-R_seed-",params$seed,"-count-",grid_output$best_count) # best_count means that we know which iteration the model was trained on, since we set a seed at the start of the session and we want repeatability
   x1<-gsub("\\.","_",x)
   params$model_name_to_save<-paste0(x1,".h5") # name now more descriptive
   setwd(params$folder_to_save_model_in)

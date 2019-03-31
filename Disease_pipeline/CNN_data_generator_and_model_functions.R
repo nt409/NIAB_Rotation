@@ -18,7 +18,10 @@ library(jsonlite)
 library(tensorflow)
 
 ######################################################################
-use_session_with_seed(params$TF_seed) # Keras and Tensorflow seed
+if(exists("seed_on")==FALSE){ # only does if not already in environment
+  use_session_with_seed(params$TF_seed) # Keras and Tensorflow seed
+  seed_on<<-1
+}
 set.seed(params$seed) # R seed
 
 create_image_container <- function(annotation){
@@ -140,15 +143,16 @@ train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 
 # create model framework... this bit runs using different parameters
 formulate_model<-function(){
+  # tf$reset_default_graph() # turn off old seed? / reset tensorflow session?
+  # use_session_with_seed(params$TF_seed) # Keras and Tensorflow seed
   train_data <<- imageinfo[train_indices,]
   validation_data <<- imageinfo[-train_indices,]
-
+  
   common <<- feature_extractor$output %>%
     layer_flatten(name = "flatten") %>%
     layer_activation_relu() %>%
     layer_dropout(rate = 0.25) %>%
-    layer_dense(units = params$layer_units, activation = "relu") %>%
-    #layer_batch_normalization() %>% #turn off?? - probably yes otherwise output is centred around 0,0 i.e box is always small in top left corner
+    layer_dense(units = params$layer_units, activation = "relu") %>% #layer_batch_normalization() %>% #turn off?? - probably yes otherwise output is centred around 0,0 i.e box is always small in top left corner
     layer_dropout(rate = 0.5)
   
   # Bounding box
