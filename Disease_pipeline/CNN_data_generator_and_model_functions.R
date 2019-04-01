@@ -145,8 +145,10 @@ train_indices <- sample(1:n_samples, params$proportion_of_samples * n_samples)
 formulate_model<-function(){
   # tf$reset_default_graph() # turn off old seed? / reset tensorflow session?
   # use_session_with_seed(params$TF_seed) # Keras and Tensorflow seed
-  train_data <<- imageinfo[train_indices,]
-  validation_data <<- imageinfo[-train_indices,]
+  train_data <- imageinfo[train_indices,]
+  validation_data <- imageinfo[-train_indices,]
+  train_data <<- distinct(train_data,file_name,.keep_all = TRUE)
+  validation_data <<- distinct(validation_data,file_name,.keep_all = TRUE)
   
   common <<- feature_extractor$output %>%
     layer_flatten(name = "flatten") %>%
