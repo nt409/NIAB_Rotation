@@ -68,8 +68,8 @@ soil_bias[[2]] <- -0.1 # usually sandy
 soil_bias[[3]] <- -0.1 # usually sandy
 # standard deviations
 rainfall_sd<- 10 # 10
-temp_sd<- 3     # 3
-date_sd<- 3    # 3 
+temp_sd<- 4     # 3
+date_sd<- 5    # 3 
 ###############################################################################################
 # name of d1, d2, d3 ... di
 name_disease <- list()

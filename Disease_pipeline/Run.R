@@ -33,10 +33,10 @@ CNN_only          <- 1
 params$model_name_to_load <- as.character(Model_names[1,]) # 1, 2, or 3?
 
 # vector with one or more components to train over.
-proportion_samples_vec_input<- c(0.6) #seq(0.1,0.7,0.3)
-epochs_vec_input            <- c(2)#c(60) #25  #seq(10,40,15)
-batch_size_vec_input        <- c(7) #seq(1,7,2) # c(5) 
-layers_vec_input            <- c(256)#seq(260,280,20) #c(40,80,128) #c(160,256,320,448,512) #28,192,256)
+layers_vec_input            <- c(384)#seq(260,280,20) #c(40,80,128) #c(160,256,320,448,512) #28,192,256)
+proportion_samples_vec_input<- c(0.5) #seq(0.1,0.7,0.3)
+batch_size_vec_input        <- c(5) #seq(1,7,2) # c(5) 
+epochs_vec_input            <- c(80) #25  #seq(10,40,15)
 
 ##################################################################################
 params$save <- run_model_trainer     # save model? most of the time this should agree with run_model_trainer, but sometimes we might want to not save a model that we just trained
@@ -59,8 +59,7 @@ print(paste("Number of training images in category",params$label_names[k],"is",s
 }
 
 
-#FIXME if I run just the model trainer bit below, for the same parameters, the model output is different every time. Further, the keras output quoting the model accuracy seems to disagree with the output when I test the model on the data set producing table_train and table_val.
-# this relates to the functions grid(), model_trainer(), formulate_model().
+#FIXME the keras output quoting the model accuracy seems to disagree with the output when I test the model on the data set producing table_train and table_val.
 if(run_model_trainer==1){
   grid_output<-grid(proportion_samples_vec_input,epochs_vec_input,batch_size_vec_input,layers_vec_input)
   model<-grid_output$best_model # use model with best val_class_acc
@@ -78,7 +77,7 @@ colnames(Data_file_names)<-'Data_file_names'
 
 ##################################################################################
 if(params$save == 1){
-  x<- paste0("Disease_CNN-layers-",params$layer_units,"-proportion-samples-",params$proportion_of_samples,"-epochs-",params$epochs,"-TF_seed-",params$TF_seed,"-R_seed-",params$seed,"-count-",grid_output$best_count,"-seed_ind-",seed_ind) # best_count means that we know which iteration the model was trained on, since we set a seed at the start of the session and we want repeatability
+  x<- paste0("Disease_CNN-layers-",params$layer_units,"-proportion-samples-",params$proportion_of_samples,"-epochs-",params$epochs,"-batch_size-",params$batch_size,"-TF_seed-",params$TF_seed,"-R_seed-",params$seed,"-count-",grid_output$best_count,"-seed_ind-",seed_ind) # best_count means that we know which iteration the model was trained on, since we set a seed at the start of the session and we want repeatability
   x1<-gsub("\\.","_",x)
   params$model_name_to_save<-paste0(x1,".h5") # name now more descriptive
   setwd(params$folder_to_save_model_in)
